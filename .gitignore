@@ -1,0 +1,16 @@
+# Ignore uploads directory
+/uploads/
+/tools/uploads/
+
+# Ignore configuration files with sensitive data
+/config.php
+
+# Ignore log files
+*.log
+
+# Ignore environment-specific files
+.env
+
+# Ignore IDE-specific files
+.idea/
+.vscode/
