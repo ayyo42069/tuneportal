@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Email or username already exists. Please use different credentials.";
         } else {
             // Insert new user
-            $stmt = $conn->prepare("INSERT INTO users (username, email, password, ip, user_agent) VALUES (?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO users (username, email, password, ip, user_agent, role) VALUES (?, ?, ?, ?, ?, 'user')");
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $stmt->bind_param("sssss", $username, $email, $hashed_password, $ip, $user_agent);
 
@@ -39,6 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['username'] = $username;
                 $_SESSION['email'] = $email;
+                $_SESSION['role'] = 'user'; // Set the role to 'user' by default
+
+                // Log the registration as a successful login attempt
+                $stmt = $conn->prepare("
+                    INSERT INTO login_history (user_id, ip_address, user_agent, success, security_mismatch)
+                    VALUES (?, ?, ?, 1, 0)
+                ");
+                $stmt->bind_param("iss", $userId, $ip, $user_agent);
+                $stmt->execute();
 
                 // Redirect to dashboard
                 header("Location: dashboard.php");

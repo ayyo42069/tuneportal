@@ -20,31 +20,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Your account has been banned." . $ban_reason . " Please contact support.";
         } else {
             if (password_verify($password, $user['password'])) {
-                if ($user['ip'] === $_SERVER['REMOTE_ADDR'] && $user['user_agent'] === $_SERVER['HTTP_USER_AGENT']) {
-                    // Set session with role
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    $_SESSION['email'] = $user['email'];
-                    $_SESSION['role'] = $user['role']; // This line was missing
+                // Log the login attempt
+                $success = 1;
+                $ip = $_SERVER['REMOTE_ADDR'];
+                $user_agent = $_SERVER['HTTP_USER_AGENT'];
+                $user_id = $user['id'];
 
-                    // Log login attempt
-                    $success = isset($user) ? 1 : 0;
-                    $ip = $_SERVER['REMOTE_ADDR'];
-                    $user_agent = $_SERVER['HTTP_USER_AGENT'];
-                    $user_id = isset($user['id']) ? $user['id'] : NULL;
-
-                    $stmt = $conn->prepare("
-                        INSERT INTO login_history (user_id, ip_address, user_agent, success)
-                        VALUES (?, ?, ?, ?)
-                    ");
-                    $stmt->bind_param("issi", $user_id, $ip, $user_agent, $success);
-                    $stmt->execute();
-
-                    header("Location: dashboard.php");
-                    exit();
-                } else {
-                    $error = "Security mismatch detected. Please contact support.";
+                // Check for IP or User-Agent mismatch
+                $security_mismatch = 0;
+                if ($user['ip'] !== $ip || $user['user_agent'] !== $user_agent) {
+                    $security_mismatch = 1;
                 }
+
+                // Update user's IP and User-Agent in the database
+                $update_stmt = $conn->prepare("UPDATE users SET ip = ?, user_agent = ? WHERE id = ?");
+                $update_stmt->bind_param("ssi", $ip, $user_agent, $user_id);
+                $update_stmt->execute();
+
+                // Log login attempt with security mismatch flag
+                $stmt = $conn->prepare("
+                    INSERT INTO login_history (user_id, ip_address, user_agent, success, security_mismatch)
+                    VALUES (?, ?, ?, ?, ?)
+                ");
+                $stmt->bind_param("issii", $user_id, $ip, $user_agent, $success, $security_mismatch);
+                $stmt->execute();
+
+                // Set session with role
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['role'] = $user['role'];
+
+                header("Location: dashboard.php");
+                exit();
             } else {
                 $error = "Invalid credentials.";
             }
