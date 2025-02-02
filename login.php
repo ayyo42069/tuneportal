@@ -2,8 +2,10 @@
 include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Sanitize the login field.
     $login = sanitize($_POST['login']);
-    $password = sanitize($_POST['password']);
+    // Use raw password input (optionally trim whitespace).
+    $password = trim($_POST['password']);
 
     // Fetch user with role, banned status, and ban reason
     $stmt = $conn->prepare("SELECT id, username, email, password, ip, user_agent, role, banned, ban_reason FROM users WHERE email = ? OR username = ?");
@@ -19,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ban_reason = $user['ban_reason'] ? " Reason: " . $user['ban_reason'] : "";
             $error = "Your account has been banned." . $ban_reason . " Please contact support.";
         } else {
+            // Verify password without altering it
             if (password_verify($password, $user['password'])) {
                 // Log the login attempt
                 $success = 1;
@@ -46,10 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute();
 
                 // Set session with role
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['role'] = $user['role'];
+                $_SESSION['user_id']   = $user['id'];
+                $_SESSION['username']  = $user['username'];
+                $_SESSION['email']     = $user['email'];
+                $_SESSION['role']      = $user['role'];
 
                 header("Location: dashboard.php");
                 exit();
@@ -62,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <?php include 'header.php'; ?>
 <main class="container mx-auto px-4 py-6">
     <div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
