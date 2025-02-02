@@ -1,13 +1,14 @@
 <?php
+ob_start(); // Start output buffering
+
 include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize the login field.
     $login = sanitize($_POST['login']);
-    // Use the raw password input (optionally trim white space)
+    // Use raw password input (optionally trim whitespace)
     $password = trim($_POST['password']);
 
-    // Log the login attempt (for debugging purposes - remove in production)
     error_log("Login attempt for: $login");
 
     // Fetch user with role, banned status, and ban reason
@@ -32,30 +33,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
         
-        // Check if the user is banned
         if ($user['banned'] == 1) {
             $ban_reason = $user['ban_reason'] ? " Reason: " . $user['ban_reason'] : "";
             $error = "Your account has been banned." . $ban_reason . " Please contact support.";
             error_log("Banned user login attempt: " . $user['email'] . " $ban_reason");
         } else {
-            // Verify password without altering it
             if (password_verify($password, $user['password'])) {
-                // Log login success event
-                error_log("Successful login for: " . $user['email']);
+                error_log("Password verified. Redirecting user: " . $user['email']);
 
                 $success    = 1;
                 $ip         = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
                 $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
                 $user_id    = $user['id'];
 
-                // Check for IP or User-Agent mismatch
                 $security_mismatch = 0;
                 if ($user['ip'] !== $ip || $user['user_agent'] !== $user_agent) {
                     $security_mismatch = 1;
                     error_log("Security mismatch detected for user: " . $user['email']);
                 }
 
-                // Update user's IP and User-Agent in the database
                 $update_stmt = $conn->prepare("UPDATE users SET ip = ?, user_agent = ? WHERE id = ?");
                 if (!$update_stmt) {
                     error_log("Prepare update failed: " . $conn->error);
@@ -66,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                // Log login attempt with differences
                 $log_stmt = $conn->prepare("
                     INSERT INTO login_history (user_id, ip_address, user_agent, success, security_mismatch)
                     VALUES (?, ?, ?, ?, ?)
@@ -80,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                // Set session with user details
                 $_SESSION['user_id']  = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['email']    = $user['email'];
@@ -98,6 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("No matching user found for login: " . $login);
     }
 }
+
+// Flush the buffer (if any)
+ob_end_flush();
 ?>
 
 <?php include 'header.php'; ?>
