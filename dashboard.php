@@ -1,15 +1,34 @@
 <?php
 include 'config.php';
+
+// Debug: Log and output session data for testing purposes.
+error_log("Dashboard SESSION: " . print_r($_SESSION, true));
+echo '<pre>SESSION Data: ' . print_r($_SESSION, true) . '</pre>';
+
+// Call require_auth() to enforce authentication.
 require_auth();
 
 try {
-    // Get current credits using prepared statement
+    // Get current credits using a prepared statement.
     $stmt = $conn->prepare("SELECT credits FROM users WHERE id = ?");
+    if (!$stmt) {
+        throw new Exception("Prepare failed: " . $conn->error);
+    }
+    
     $stmt->bind_param("i", $_SESSION['user_id']);
-    $stmt->execute();
-    $user = $stmt->get_result()->fetch_assoc();
+    if (!$stmt->execute()) {
+        throw new Exception("Execute failed: " . $stmt->error);
+    }
+    
+    $result = $stmt->get_result();
+    if (!$result) {
+        throw new Exception("Get result failed: " . $stmt->error);
+    }
+    
+    $user = $result->fetch_assoc();
     $stmt->close();
     
+    // If the user record is found, assign credits (default to 0 if not).
     $_SESSION['credits'] = $user['credits'] ?? 0;
 } catch (Exception $e) {
     error_log("Dashboard error: " . $e->getMessage());
@@ -41,7 +60,9 @@ include 'header.php';
         </div>
 
         <div class="mb-8">
-            <h2 class="text-2xl font-bold text-red-600 mb-4">Welcome Back, <?= htmlspecialchars($_SESSION['username'], ENT_QUOTES) ?>!</h2>
+            <h2 class="text-2xl font-bold text-red-600 mb-4">
+                Welcome Back, <?= htmlspecialchars($_SESSION['username'], ENT_QUOTES) ?>!
+            </h2>
             
             <!-- Notifications -->
             <div class="bg-white rounded-lg shadow p-6 mb-8">
@@ -54,8 +75,15 @@ include 'header.php';
                         ORDER BY created_at DESC 
                         LIMIT 5
                     ");
+                    if (!$stmt) {
+                        throw new Exception("Prepare failed: " . $conn->error);
+                    }
+                    
                     $stmt->bind_param("i", $_SESSION['user_id']);
-                    $stmt->execute();
+                    if (!$stmt->execute()) {
+                        throw new Exception("Execute failed: " . $stmt->error);
+                    }
+                    
                     $notifications = $stmt->get_result();
                     
                     if ($notifications->num_rows > 0):
@@ -93,10 +121,8 @@ include 'header.php';
                 <h3 class="text-lg font-semibold mb-4">Upload New File</h3>
                 <form action="upload.php" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
-                    
                     <div class="grid grid-cols-2 gap-4">
-                        <!-- Form fields remain the same but add validation later -->
-                        <?php /* Existing form fields */ ?>
+                        <!-- Existing form fields -->
                     </div>
                     
                     <button type="submit" class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
@@ -112,18 +138,25 @@ include 'header.php';
                     <table class="w-full">
                         <thead>
                             <tr class="bg-red-50">
-                                <?php /* Table headers */ ?>
+                                <!-- Table headers -->
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             try {
                                 $stmt = $conn->prepare("SELECT * FROM files WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
+                                if (!$stmt) {
+                                    throw new Exception("Prepare failed: " . $conn->error);
+                                }
+                                
                                 $stmt->bind_param("i", $_SESSION['user_id']);
-                                $stmt->execute();
+                                if (!$stmt->execute()) {
+                                    throw new Exception("Execute failed: " . $stmt->error);
+                                }
+                                
                                 $files = $stmt->get_result();
                                 
-                                while ($file = $files->fetch_assoc()) :
+                                while ($file = $files->fetch_assoc()):
                             ?>
                                 <tr class="border-b">
                                     <td class="p-2"><?= htmlspecialchars($file['title'], ENT_QUOTES) ?></td>
