@@ -4,6 +4,12 @@ require_auth(true);
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify the CSRF token before proceeding
+    $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (!verify_csrf_token($token)) {
+        die("Error: Invalid CSRF token.");
+    }
+
     // Delete tool
     if (isset($_POST['delete'])) {
         $tool_id = (int)$_POST['tool_id'];

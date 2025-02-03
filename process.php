@@ -4,6 +4,12 @@ require_auth(true); // Admin only
 
 // Handle file processing
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify the CSRF token before proceeding
+    $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (!verify_csrf_token($token)) {
+        die("Error: Invalid CSRF token.");
+    }
+
     try {
         // Validate CSRF token
         if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {

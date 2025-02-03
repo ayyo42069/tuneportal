@@ -4,6 +4,12 @@ require_auth(true); // Admin only
 
 // Handle file processing and deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify the CSRF token before proceeding
+    $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (!verify_csrf_token($token)) {
+        die("Error: Invalid CSRF token.");
+    }
+
     // Handle deletion
     if (isset($_POST['action']) && $_POST['action'] === 'delete') {
         $file_id = (int)$_POST['file_id'];

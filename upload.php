@@ -3,6 +3,12 @@ include 'config.php';
 require_auth();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify the CSRF token before proceeding
+    $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (!verify_csrf_token($token)) {
+        die("Error: Invalid CSRF token.");
+    }
+
     // Start transaction for data consistency
     $conn->begin_transaction();
     

@@ -4,6 +4,12 @@ require_auth(true);
 
 // Handle ban/unban actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify the CSRF token before proceeding
+    $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (!verify_csrf_token($token)) {
+        die("Error: Invalid CSRF token.");
+    }
+
     $user_id = (int)$_POST['user_id'];
     $action = sanitize($_POST['action']);
     
