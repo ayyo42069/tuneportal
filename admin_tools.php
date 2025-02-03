@@ -157,6 +157,7 @@ include 'includes/sidebar.php';
         
         <!-- Add/Edit Form -->
         <form method="POST" enctype="multipart/form-data" class="mb-8 p-4 bg-gray-50 rounded-lg">
+        <?php echo csrf_input_field(); ?>
             <input type="hidden" name="tool_id" id="tool_id" value="">
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -215,6 +216,7 @@ include 'includes/sidebar.php';
                                 Edit
                             </button>
                             <form method="POST" class="inline">
+                            <?php echo csrf_input_field(); ?>
                                 <input type="hidden" name="tool_id" value="<?= $tool['id'] ?>">
                                 <button type="submit" name="delete" 
                                         class="text-red-600 hover:text-red-800"

@@ -110,6 +110,7 @@ include 'includes/sidebar.php';
         <div class="bg-white rounded-lg p-6 w-96">
             <h3 class="text-xl font-bold mb-4">Process Update Request</h3>
             <form method="POST" enctype="multipart/form-data">
+            <?php echo csrf_input_field(); ?>
                 <input type="hidden" name="request_id" id="modalRequestId">
                 <input type="hidden" name="complete_request" value="1">
                 

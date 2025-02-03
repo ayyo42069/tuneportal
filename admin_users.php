@@ -94,6 +94,7 @@ include 'includes/sidebar.php';
                             <div class="flex items-center gap-2">
                                 <?php if($user['banned']): ?>
                                     <form method="POST">
+                                    <?php echo csrf_input_field(); ?>
                                         <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
                                         <input type="hidden" name="action" value="unban">
                                         <button type="submit" class="text-green-600 hover:text-green-800">
@@ -129,6 +130,7 @@ include 'includes/sidebar.php';
                 <button onclick="closeBanModal()" class="text-gray-500 hover:text-gray-700">✕</button>
             </div>
             <form method="POST" id="banForm">
+            <?php echo csrf_input_field(); ?>
                 <input type="hidden" name="action" value="ban">
                 <input type="hidden" name="user_id" id="banUserId">
                 <div class="mb-4">

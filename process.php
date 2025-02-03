@@ -183,6 +183,7 @@ include 'includes/sidebar.php';
                                 <?php endif; ?>
                                 
                                 <form method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
+                                <?php echo csrf_input_field(); ?>
                                     <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
                                     <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
                                     <input type="hidden" name="user_id" value="<?= $file['user_id'] ?>">

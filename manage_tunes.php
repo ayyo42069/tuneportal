@@ -117,6 +117,7 @@ include 'includes/sidebar.php';
                                 </button>
                                 
                                 <form method="POST" 
+                                <?php echo csrf_input_field(); ?>
                                       class="inline"
                                       onsubmit="return confirm('Are you sure you want to delete this tuning option?');">
                                     <input type="hidden" name="action" value="delete">
@@ -141,6 +142,7 @@ include 'includes/sidebar.php';
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h3 class="text-xl font-bold mb-4">Add New Tuning Option</h3>
         <form method="POST">
+        <?php echo csrf_input_field(); ?>
             <input type="hidden" name="action" value="add">
             
             <div class="mb-4">
@@ -181,6 +183,7 @@ include 'includes/sidebar.php';
     <div class="bg-white rounded-lg p-6 w-full max-w-md">
         <h3 class="text-xl font-bold mb-4">Edit Tuning Option</h3>
         <form method="POST">
+        <?php echo csrf_input_field(); ?>
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="id" id="edit_id">
             

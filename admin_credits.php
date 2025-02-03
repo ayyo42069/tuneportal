@@ -107,6 +107,7 @@ include 'includes/sidebar.php'; // Create similar to user sidebar
         <div class="bg-white rounded-lg p-6 w-96">
             <h3 class="text-xl font-bold mb-4">Adjust Credits</h3>
             <form method="POST">
+            <?php echo csrf_input_field(); ?>
                 <input type="hidden" name="user_id" id="modalUserId">
                 <div class="mb-4">
                     <label class="block mb-2">Username</label>
