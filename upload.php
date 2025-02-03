@@ -49,13 +49,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      VALUES ($fileId, 1, '$filename')");
 
         // Deduct credits and log transaction
-        $conn->query("UPDATE users SET credits = -credits - $totalCredits WHERE id = {$_SESSION['user_id']}");
+        $conn->query("UPDATE users SET credits = credits - $totalCredits WHERE id = {$_SESSION['user_id']}");
         
-        // Log credit transaction
+        // Log credit transaction with negative amount
         $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description) 
                               VALUES (?, ?, 'file_upload', ?)");
         $description = "Credits used for file upload: " . htmlspecialchars($_POST['title']);
-        $stmt->bind_param("iis", $_SESSION['user_id'], $totalCredits, $description);
+        $negativeAmount = -$totalCredits; // Convert to negative for deduction
+        $stmt->bind_param("iis", $_SESSION['user_id'], $negativeAmount, $description);
         $stmt->execute();
 
         // Commit transaction
