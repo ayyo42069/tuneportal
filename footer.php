@@ -3,7 +3,7 @@
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
-<footer class="bg-gray-800 text-white py-12 mt-auto z-50">
+<footer class="bg-gray-800 text-white <?= $current_page === 'index.php' ? 'py-12' : 'py-4' ?> mt-auto z-50">
     <div class="container mx-auto px-4">
         <?php if ($current_page === 'index.php'): ?>
             <!-- Full footer content for index page -->
@@ -37,10 +37,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </div>
                 </div>
             </div>
+            <div class="border-t border-gray-700 pt-8 mt-8 text-center">
+        <?php else: ?>
+            <!-- Minimal footer with reduced spacing -->
+            <div class="text-center">
         <?php endif; ?>
-        
-        <!-- Simple copyright notice for all pages -->
-        <div class="border-t border-gray-700 pt-8 mt-8 text-center">
             <p class="text-gray-400">
                 &copy; <?= date('Y') ?> TunePortal. All rights reserved.
             </p>
