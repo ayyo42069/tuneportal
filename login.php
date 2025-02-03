@@ -2,8 +2,8 @@
 include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $login = sanitize($_POST['login']);
-    $password = sanitize($_POST['password']);
+    $login = $_POST['login'];
+    $password = $_POST['password'];
 
     // Fetch user with role, banned status, and ban reason
     $stmt = $conn->prepare("SELECT id, username, email, password, ip, user_agent, role, banned, ban_reason FROM users WHERE email = ? OR username = ?");
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Check if the user is banned
         if ($user['banned'] == 1) {
-            $ban_reason = $user['ban_reason'] ? " Reason: " . $user['ban_reason'] : "";
+            $ban_reason = $user['ban_reason'] ? " Reason: " . htmlspecialchars($user['ban_reason']) : "";
             $error = "Your account has been banned." . $ban_reason . " Please contact support.";
         } else {
             if (password_verify($password, $user['password'])) {
@@ -27,15 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user_id = $user['id'];
 
                 // Check for IP or User-Agent mismatch
-                $security_mismatch = 0;
-                if ($user['ip'] !== $ip || $user['user_agent'] !== $user_agent) {
-                    $security_mismatch = 1;
-                }
+                $security_mismatch = ($user['ip'] !== $ip || $user['user_agent'] !== $user_agent) ? 1 : 0;
 
                 // Update user's IP and User-Agent in the database
                 $update_stmt = $conn->prepare("UPDATE users SET ip = ?, user_agent = ? WHERE id = ?");
                 $update_stmt->bind_param("ssi", $ip, $user_agent, $user_id);
                 $update_stmt->execute();
+                $update_stmt->close();
 
                 // Log login attempt with security mismatch flag
                 $stmt = $conn->prepare("
@@ -44,6 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ");
                 $stmt->bind_param("issii", $user_id, $ip, $user_agent, $success, $security_mismatch);
                 $stmt->execute();
+                $stmt->close();
+
+                // Regenerate session ID to prevent session fixation
+                session_regenerate_id(true);
 
                 // Set session with role
                 $_SESSION['user_id'] = $user['id'];
@@ -60,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $error = "Invalid credentials.";
     }
+
+    $stmt->close();
 }
 ?>
 
@@ -69,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2 class="text-2xl font-bold mb-4 text-red-600">Login</h2>
         <?php if (isset($error)): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <?= $error ?>
+                <?= htmlspecialchars($error) ?>
             </div>
         <?php endif; ?>
         <form method="POST">

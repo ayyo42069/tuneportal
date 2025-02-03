@@ -7,7 +7,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Delete tool
     if (isset($_POST['delete'])) {
         $tool_id = (int)$_POST['tool_id'];
-        $tool = $conn->query("SELECT file_path FROM tools WHERE id = $tool_id")->fetch_assoc();
+        
+        // Fetch the tool to get the file path
+        $stmt = $conn->prepare("SELECT file_path FROM tools WHERE id = ?");
+        $stmt->bind_param("i", $tool_id);
+        $stmt->execute();
+        $tool = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
         
         // Delete file if exists
         if ($tool['file_path'] && file_exists($tool['file_path'])) {
@@ -15,25 +21,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Delete from database
-        $conn->query("DELETE FROM tools WHERE id = $tool_id");
+        $stmt = $conn->prepare("DELETE FROM tools WHERE id = ?");
+        $stmt->bind_param("i", $tool_id);
+        $stmt->execute();
+        $stmt->close();
+        
         $_SESSION['success'] = "Tool deleted successfully";
     }
     // Add/Edit tool
     else {
         $tool_id = isset($_POST['tool_id']) ? (int)$_POST['tool_id'] : null;
-        $name = sanitize($_POST['name']);
+        $name = htmlspecialchars(trim($_POST['name']));
         $category_id = (int)$_POST['category_id'];
-        $description = sanitize($_POST['description']);
-        $download_url = filter_var($_POST['download_url'], FILTER_SANITIZE_URL);
+        $description = htmlspecialchars(trim($_POST['description']));
+        $download_url = filter_var(trim($_POST['download_url']), FILTER_SANITIZE_URL);
 
         // File upload handling
         $file_path = null;
         if (!empty($_FILES['tool_file']['name'])) {
             $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/tools/uploads/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            
             
             // Create upload directory if it doesn't exist
             if (!is_dir($uploadDir)) {
@@ -73,7 +79,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Delete old file if updating
                 if ($tool_id) {
-                    $old_tool = $conn->query("SELECT file_path FROM tools WHERE id = $tool_id")->fetch_assoc();
+                    $stmt = $conn->prepare("SELECT file_path FROM tools WHERE id = ?");
+                    $stmt->bind_param("i", $tool_id);
+                    $stmt->execute();
+                    $old_tool = $stmt->get_result()->fetch_assoc();
+                    $stmt->close();
+                    
                     if ($old_tool['file_path'] && file_exists($old_tool['file_path'])) {
                         unlink($old_tool['file_path']);
                     }
@@ -89,25 +100,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($tool_id) {
                 // Update existing tool
-                $conn->query("UPDATE tools SET 
-                    category_id = $category_id,
-                    name = '$name',
-                    description = '$description',
-                    download_url = '$download_url',
-                    file_path = " . ($file_path ? "'$file_path'" : "file_path") . "
-                    WHERE id = $tool_id
-                ");
+                $stmt = $conn->prepare("UPDATE tools SET 
+                    category_id = ?, 
+                    name = ?, 
+                    description = ?, 
+                    download_url = ?, 
+                    file_path = ? 
+                    WHERE id = ?");
+                $stmt->bind_param("issssi", $category_id, $name, $description, $download_url, $file_path, $tool_id);
+                $stmt->execute();
+                $stmt->close();
                 $_SESSION['success'] = "Tool updated successfully";
             } else {
                 // Insert new tool
-                $conn->query("INSERT INTO tools 
-                    (category_id, name, description, download_url, file_path)
-                    VALUES ($category_id, '$name', '$description', '$download_url', '$file_path')
-                ");
+                $stmt = $conn->prepare("INSERT INTO tools 
+                    (category_id, name, description, download_url, file_path) 
+                    VALUES (?, ?, ?, ?, ?)");
+                $stmt->bind_param("issss", $category_id, $name, $description, $download_url, $file_path);
+                $stmt->execute();
+                $stmt->close();
                 $_SESSION['success'] = "Tool added successfully";
             }
         } catch (Exception $e) {
-            $_SESSION['error'] = "Database error: " . $e->getMessage();
+            $_SESSION['error'] = "Database error: " . htmlspecialchars($e->getMessage());
         }
     }
     header("Location: admin_tools.php");
@@ -116,12 +131,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get data for display
 $categories = $conn->query("SELECT * FROM tool_categories ORDER BY name");
-$tools = $conn->query("
+$stmt = $conn->prepare("
     SELECT t.*, tc.name AS category_name 
     FROM tools t
     JOIN tool_categories tc ON t.category_id = tc.id
     ORDER BY tc.name, t.name
 ");
+$stmt->execute();
+$tools = $stmt->get_result();
+$stmt->close();
 
 include 'header.php';
 include 'includes/sidebar.php';

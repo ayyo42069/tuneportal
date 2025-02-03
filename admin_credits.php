@@ -5,13 +5,15 @@ require_auth(true); // Admin-only
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = (int)$_POST['user_id'];
     $amount = (int)$_POST['amount'];
-    $description = sanitize($_POST['description']);
+    $description = htmlspecialchars(trim($_POST['description']));
 
     try {
         $conn->autocommit(FALSE);
         
-        // Update user balance
-        $conn->query("UPDATE users SET credits = credits + $amount WHERE id = $user_id");
+        // Update user balance using a prepared statement
+        $stmt = $conn->prepare("UPDATE users SET credits = credits + ? WHERE id = ?");
+        $stmt->bind_param("ii", $amount, $user_id);
+        $stmt->execute();
         
         // Record transaction
         $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description) VALUES (?, ?, 'admin_adjust', ?)");
@@ -22,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['success'] = "Credits updated successfully";
     } catch (Exception $e) {
         $conn->rollback();
-        $_SESSION['error'] = "Error updating credits: " . $e->getMessage();
+        $_SESSION['error'] = "Error updating credits: " . htmlspecialchars($e->getMessage());
     }
 }
 
@@ -38,7 +40,7 @@ include 'includes/sidebar.php'; // Create similar to user sidebar
         <div class="mb-6">
             <form method="GET" class="flex gap-4">
                 <input type="text" name="search" placeholder="Search by email or user ID" 
-                       class="flex-1 p-2 border rounded" value="<?= $_GET['search'] ?? '' ?>">
+                       class="flex-1 p-2 border rounded" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
                 <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
                     Search
                 </button>
@@ -50,9 +52,15 @@ include 'includes/sidebar.php'; // Create similar to user sidebar
         $search = $_GET['search'] ?? '';
         $query = "SELECT id, username, email, credits FROM users";
         if (!empty($search)) {
-            $query .= " WHERE email LIKE '%$search%' OR username LIKE '%$search%' OR id = " . (int)$search;
+            $query .= " WHERE email LIKE ? OR username LIKE ? OR id = ?";
+            $stmt = $conn->prepare($query);
+            $searchParam = "%$search%";
+            $stmt->bind_param("ssi", $searchParam, $searchParam, (int)$search);
+        } else {
+            $stmt = $conn->prepare($query);
         }
-        $users = $conn->query($query . " LIMIT 50");
+        $stmt->execute();
+        $users = $stmt->get_result();
         ?>
         
         <div class="overflow-x-auto">
@@ -69,12 +77,12 @@ include 'includes/sidebar.php'; // Create similar to user sidebar
                 <tbody>
                     <?php while ($user = $users->fetch_assoc()): ?>
                     <tr class="border-b">
-                        <td class="p-3"><?= $user['id'] ?></td>
-                        <td class="p-3"><?= $user['username'] ?></td>
-                        <td class="p-3"><?= $user['email'] ?></td>
+                        <td class="p-3"><?= htmlspecialchars($user['id']) ?></td>
+                        <td class="p-3"><?= htmlspecialchars($user['username']) ?></td>
+                        <td class="p-3"><?= htmlspecialchars($user['email']) ?></td>
                         <td class="p-3"><?= number_format($user['credits']) ?></td>
                         <td class="p-3">
-                            <button onclick="showCreditModal(<?= $user['id'] ?>, '<?= $user['username'] ?>')" 
+                            <button onclick="showCreditModal(<?= $user['id'] ?>, '<?= htmlspecialchars($user['username']) ?>')" 
                                     class="text-red-600 hover:text-red-800">
                                 Adjust Credits
                             </button>

@@ -5,36 +5,61 @@ require_auth(true);
 // Handle request completion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) {
     $request_id = (int)$_POST['request_id'];
-    $notes = sanitize($_POST['admin_notes']);
-    
+    $notes = htmlspecialchars(trim($_POST['admin_notes']));
+
     // Handle file upload
     if (!empty($_FILES['updated_file']['name'])) {
         $file = $_FILES['updated_file'];
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         
         if ($ext === 'bin') {
-            // Get request details
-            $request = $conn->query("SELECT * FROM update_requests WHERE id = $request_id")->fetch_assoc();
+            // Get request details using a prepared statement
+            $stmt = $conn->prepare("SELECT * FROM update_requests WHERE id = ?");
+            $stmt->bind_param("i", $request_id);
+            $stmt->execute();
+            $request = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
             
             // Update file version
-            $new_version = $conn->query("SELECT current_version FROM files WHERE id = {$request['file_id']}")->fetch_assoc()['current_version'] + 1;
+            $stmt = $conn->prepare("SELECT current_version FROM files WHERE id = ?");
+            $stmt->bind_param("i", $request['file_id']);
+            $stmt->execute();
+            $new_version = $stmt->get_result()->fetch_assoc()['current_version'] + 1;
+            $stmt->close();
+
             $filename = "processed_{$request['file_id']}_v{$new_version}.bin";
-            move_uploaded_file($file['tmp_name'], __DIR__ . "/uploads/$filename");
-            
-            // Update database
-            $conn->query("UPDATE files SET current_version = $new_version WHERE id = {$request['file_id']}");
-            $conn->query("INSERT INTO file_versions (file_id, version, file_path, notes) 
-                         VALUES ({$request['file_id']}, $new_version, '$filename', '$notes')");
-            
-            // Update request status
-            $conn->query("UPDATE update_requests SET status = 'completed', admin_notes = '$notes' WHERE id = $request_id");
-            
-            // Notify user
-            $user_msg = "Your update request #$request_id has been completed";
-            $conn->query("INSERT INTO notifications (user_id, message, link) 
-                         VALUES ({$request['user_id']}, '$user_msg', 'file_details.php?id={$request['file_id']}')");
-            
-            $_SESSION['success'] = "Request completed successfully";
+            $uploadPath = __DIR__ . "/uploads/$filename";
+
+            // Move uploaded file
+            if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+                // Update database
+                $stmt = $conn->prepare("UPDATE files SET current_version = ? WHERE id = ?");
+                $stmt->bind_param("ii", $new_version, $request['file_id']);
+                $stmt->execute();
+                $stmt->close();
+
+                $stmt = $conn->prepare("INSERT INTO file_versions (file_id, version, file_path, notes) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("iiss", $request['file_id'], $new_version, $filename, $notes);
+                $stmt->execute();
+                $stmt->close();
+
+                // Update request status
+                $stmt = $conn->prepare("UPDATE update_requests SET status = 'completed', admin_notes = ? WHERE id = ?");
+                $stmt->bind_param("si", $notes, $request_id);
+                $stmt->execute();
+                $stmt->close();
+
+                // Notify user
+                $user_msg = "Your update request #$request_id has been completed";
+                $stmt = $conn->prepare("INSERT INTO notifications (user_id, message, link) VALUES (?, ?, ?)");
+                $stmt->bind_param("iss", $request['user_id'], $user_msg, "file_details.php?id={$request['file_id']}");
+                $stmt->execute();
+                $stmt->close();
+
+                $_SESSION['success'] = "Request completed successfully";
+            } else {
+                $_SESSION['error'] = "Failed to upload file. Please check permissions.";
+            }
         } else {
             $_SESSION['error'] = "Only .bin files accepted";
         }
@@ -62,25 +87,27 @@ include 'includes/sidebar.php';
                 </thead>
                 <tbody>
                     <?php
-                    $requests = $conn->query("
+                    $stmt = $conn->prepare("
                         SELECT ur.*, f.title, u.username 
                         FROM update_requests ur
                         JOIN files f ON ur.file_id = f.id
                         JOIN users u ON ur.user_id = u.id
                         ORDER BY ur.created_at DESC
                     ");
+                    $stmt->execute();
+                    $requests = $stmt->get_result();
                     
                     while ($request = $requests->fetch_assoc()):
                     ?>
                     <tr class="border-b">
-                        <td class="p-3">#<?= $request['id'] ?></td>
-                        <td class="p-3"><?= $request['title'] ?></td>
-                        <td class="p-3"><?= $request['username'] ?></td>
+                        <td class="p-3">#<?= htmlspecialchars($request['id']) ?></td>
+                        <td class="p-3"><?= htmlspecialchars($request['title']) ?></td>
+                        <td class="p-3"><?= htmlspecialchars($request['username']) ?></td>
                         <td class="p-3">
                             <span class="px-2 py-1 rounded 
                                 <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                    ($request['status'] === 'processing' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800') ?>">
-                                <?= ucfirst($request['status']) ?>
+                                <?= ucfirst(htmlspecialchars($request['status'])) ?>
                             </span>
                         </td>
                         <td class="p-3">

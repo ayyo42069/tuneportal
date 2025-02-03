@@ -13,25 +13,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         try {
             // Get all file versions to delete physical files
-            $versions = $conn->query("SELECT file_path FROM file_versions WHERE file_id = $file_id");
+            $stmt = $conn->prepare("SELECT file_path FROM file_versions WHERE file_id = ?");
+            $stmt->bind_param("i", $file_id);
+            $stmt->execute();
+            $versions = $stmt->get_result();
             while ($version = $versions->fetch_assoc()) {
                 $filepath = __DIR__ . '/uploads/' . $version['file_path'];
                 if (file_exists($filepath)) {
                     unlink($filepath);
                 }
             }
+            $stmt->close();
             
             // Delete all associated records
-            $conn->query("DELETE FROM file_versions WHERE file_id = $file_id");
-            $conn->query("DELETE FROM update_requests WHERE file_id = $file_id");
-            $conn->query("DELETE FROM files WHERE id = $file_id");
+            $stmt = $conn->prepare("DELETE FROM file_versions WHERE file_id = ?");
+            $stmt->bind_param("i", $file_id);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM update_requests WHERE file_id = ?");
+            $stmt->bind_param("i", $file_id);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $conn->prepare("DELETE FROM files WHERE id = ?");
+            $stmt->bind_param("i", $file_id);
+            $stmt->execute();
+            $stmt->close();
             
             $conn->commit();
             $_SESSION['success'] = "File and all associated data deleted successfully";
             
         } catch (Exception $e) {
             $conn->rollback();
-            $_SESSION['error'] = "Error deleting file";
+            $_SESSION['error'] = "Error deleting file: " . htmlspecialchars($e->getMessage());
         }
         
         header("Location: " . $_SERVER['PHP_SELF']);
@@ -46,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Upload processed file
         if (!empty($_FILES['processed_file']['name'])) {
             $file = $_FILES['processed_file'];
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             
             if ($ext === 'bin') {
                 // Start transaction
@@ -54,8 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 try {
                     // Get current version
-                    $current = $conn->query("SELECT current_version FROM files WHERE id = $file_id")->fetch_assoc();
+                    $stmt = $conn->prepare("SELECT current_version FROM files WHERE id = ?");
+                    $stmt->bind_param("i", $file_id);
+                    $stmt->execute();
+                    $current = $stmt->get_result()->fetch_assoc();
                     $new_version = $current['current_version'] + 1;
+                    $stmt->close();
                     
                     // Store file
                     $uploadDir = __DIR__ . '/uploads/';
@@ -66,20 +85,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     
                     // Update database
-                    $conn->query("UPDATE files SET status = 'processed', current_version = $new_version WHERE id = $file_id");
-                    $conn->query("INSERT INTO file_versions (file_id, version, file_path) VALUES ($file_id, $new_version, '$filename')");
+                    $stmt = $conn->prepare("UPDATE files SET status = 'processed', current_version = ? WHERE id = ?");
+                    $stmt->bind_param("ii", $new_version, $file_id);
+                    $stmt->execute();
+                    $stmt->close();
+
+                    $stmt = $conn->prepare("INSERT INTO file_versions (file_id, version, file_path) VALUES (?, ?, ?)");
+                    $stmt->bind_param("iis", $file_id, $new_version, $filename);
+                    $stmt->execute();
+                    $stmt->close();
                     
                     // Create notification
                     $message = "Your file #$file_id has been processed!";
                     $link = "file_details.php?id=$file_id";
-                    $conn->query("INSERT INTO notifications (user_id, message, link) VALUES ($user_id, '$message', '$link')");
+                    $stmt = $conn->prepare("INSERT INTO notifications (user_id, message, link) VALUES (?, ?, ?)");
+                    $stmt->bind_param("iss", $user_id, $message, $link);
+                    $stmt->execute();
+                    $stmt->close();
                     
                     $conn->commit();
                     $_SESSION['success'] = "File processed successfully";
                     
                 } catch (Exception $e) {
                     $conn->rollback();
-                    $_SESSION['error'] = "Error processing file: " . $e->getMessage();
+                    $_SESSION['error'] = "Error processing file: " . htmlspecialchars($e->getMessage());
                     
                     // Clean up uploaded file if it exists
                     if (file_exists($uploadDir . $filename)) {
@@ -103,14 +132,14 @@ include 'includes/sidebar.php';
         
         <?php if (isset($_SESSION['success'])): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <?= $_SESSION['success'] ?>
+                <?= htmlspecialchars($_SESSION['success']) ?>
                 <?php unset($_SESSION['success']); ?>
             </div>
         <?php endif; ?>
         
         <?php if (isset($_SESSION['error'])): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <?= $_SESSION['error'] ?>
+                <?= htmlspecialchars($_SESSION['error']) ?>
                 <?php unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
@@ -129,26 +158,28 @@ include 'includes/sidebar.php';
                 </thead>
                 <tbody>
                     <?php
-                    $files = $conn->query("
+                    $stmt = $conn->prepare("
                         SELECT f.*, u.username, fv.file_path 
                         FROM files f
                         JOIN users u ON f.user_id = u.id
                         JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
                         ORDER BY f.created_at DESC
                     ");
+                    $stmt->execute();
+                    $files = $stmt->get_result();
                     
                     while ($file = $files->fetch_assoc()):
                     ?>
                     <tr class="border-b">
-                        <td class="p-3">#<?= $file['id'] ?></td>
+                        <td class="p-3">#<?= htmlspecialchars($file['id']) ?></td>
                         <td class="p-3"><?= htmlspecialchars($file['username']) ?></td>
                         <td class="p-3"><?= htmlspecialchars($file['title']) ?></td>
                         <td class="p-3">
                             <span class="px-2 py-1 rounded <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' ?>">
-                                <?= ucfirst($file['status']) ?>
+                                <?= ucfirst(htmlspecialchars($file['status'])) ?>
                             </span>
                         </td>
-                        <td class="p-3">v<?= $file['current_version'] ?></td>
+                        <td class="p-3">v<?= htmlspecialchars($file['current_version']) ?></td>
                         <td class="p-3">
                             <div class="flex items-center gap-2">
                                 <?php if(!empty($file['file_path'])): ?>

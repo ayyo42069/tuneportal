@@ -3,18 +3,32 @@ include 'config.php';
 include 'header.php';
 include 'includes/sidebar.php';
 
-// Get all tools
-$tools = $conn->query("
+// Get all tools with their categories using a prepared statement
+$stmt = $conn->prepare("
     SELECT t.*, tc.name AS category_name
     FROM tools t
     JOIN tool_categories tc ON t.category_id = tc.id
     ORDER BY tc.name, t.name
 ");
+$stmt->execute();
+$tools = $stmt->get_result();
 
 $grouped_tools = [];
-while($tool = $tools->fetch_assoc()) {
+while ($tool = $tools->fetch_assoc()) {
     $grouped_tools[$tool['category_name']][] = $tool;
 }
+$stmt->close();
+
+// Get all categories for the filter
+$categoryStmt = $conn->prepare("
+    SELECT DISTINCT tc.id, tc.name 
+    FROM tool_categories tc
+    JOIN tools t ON tc.id = t.category_id
+    ORDER BY tc.name
+");
+$categoryStmt->execute();
+$categories = $categoryStmt->get_result();
+$categoryStmt->close();
 ?>
 
 <div class="flex-1 mt-16 ml-64 p-8">
@@ -26,14 +40,7 @@ while($tool = $tools->fetch_assoc()) {
             <select id="categoryFilter" 
                     class="w-full px-4 py-2 rounded-lg border border-red-300 focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent bg-white appearance-none">
                 <option value="all">All Brands</option>
-                <?php 
-                $categories = $conn->query("
-                    SELECT DISTINCT tc.id, tc.name 
-                    FROM tool_categories tc
-                    JOIN tools t ON tc.id = t.category_id
-                    ORDER BY tc.name
-                ");
-                while($cat = $categories->fetch_assoc()): ?>
+                <?php while ($cat = $categories->fetch_assoc()): ?>
                 <option value="<?= htmlspecialchars($cat['name']) ?>">
                     <?= htmlspecialchars($cat['name']) ?>
                 </option>
@@ -49,13 +56,13 @@ while($tool = $tools->fetch_assoc()) {
 
     <!-- Tools Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <?php foreach($grouped_tools as $category => $tools): ?>
+        <?php foreach ($grouped_tools as $category => $tools): ?>
         <div class="category-group" data-category="<?= htmlspecialchars($category) ?>">
             <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b-2 border-red-200 pb-2">
                 <?= htmlspecialchars($category) ?>
             </h2>
             <div class="space-y-4">
-                <?php foreach($tools as $tool): ?>
+                <?php foreach ($tools as $tool): ?>
                 <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 p-6">
                     <div class="flex items-start justify-between mb-3">
                         <h3 class="text-lg font-semibold text-gray-800">
@@ -67,7 +74,7 @@ while($tool = $tools->fetch_assoc()) {
                     </div>
                     <p class="text-gray-600 mb-4"><?= htmlspecialchars($tool['description']) ?></p>
                     <div class="mt-4">
-                        <?php if($tool['file_path']): ?>
+                        <?php if ($tool['file_path']): ?>
                             <a href="tools/download.php?id=<?= $tool['id'] ?>" 
                                class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -75,7 +82,7 @@ while($tool = $tools->fetch_assoc()) {
                                 </svg>
                                 Download
                             </a>
-                        <?php elseif($tool['download_url']): ?>
+                        <?php elseif ($tool['download_url']): ?>
                             <a href="<?= htmlspecialchars($tool['download_url']) ?>" target="_blank" 
                                class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

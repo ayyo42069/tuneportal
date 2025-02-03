@@ -6,14 +6,19 @@ include 'header.php';
 include 'includes/sidebar.php';
 
 $userId = $_SESSION['user_id'];
-$files = $conn->query("
+
+// Use a prepared statement to fetch user files
+$stmt = $conn->prepare("
     SELECT f.*, fv.uploaded_at, fv.file_path 
     FROM files f
     LEFT JOIN file_versions fv 
         ON f.id = fv.file_id AND f.current_version = fv.version
-    WHERE f.user_id = $userId
+    WHERE f.user_id = ?
     ORDER BY f.created_at DESC
 ");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$files = $stmt->get_result();
 ?>
 
 <div class="flex-1 mt-16 ml-64 p-8">
@@ -45,19 +50,19 @@ $files = $conn->query("
                                 <td class="p-3"><?= htmlspecialchars($file['car_model']) ?></td>
                                 <td class="p-3">
                                     <span class="px-2 py-1 rounded <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' ?>">
-                                        <?= ucfirst($file['status']) ?>
+                                        <?= ucfirst(htmlspecialchars($file['status'])) ?>
                                     </span>
                                 </td>
-                                <td class="p-3">v<?= $file['current_version'] ?></td>
+                                <td class="p-3">v<?= htmlspecialchars($file['current_version']) ?></td>
                                 <td class="p-3"><?= $file['uploaded_at'] ? date('M j, Y H:i', strtotime($file['uploaded_at'])) : 'N/A' ?></td>
                                 <td class="p-3">
                                     <div class="flex items-center gap-2">
-                                        <a href="file_details.php?id=<?= $file['id'] ?>" 
+                                        <a href="file_details.php?id=<?= htmlspecialchars($file['id']) ?>" 
                                            class="text-blue-600 hover:text-blue-800">
                                             View
                                         </a>
-                                        <?php if($file['status'] === 'processed' && !empty($file['file_path'])): ?>
-                                            <a href="uploads/<?= $file['file_path'] ?>" 
+                                        <?php if ($file['status'] === 'processed' && !empty($file['file_path'])): ?>
+                                            <a href="uploads/<?= htmlspecialchars($file['file_path']) ?>" 
                                                class="text-green-600 hover:text-green-800"
                                                download>
                                                 Download
