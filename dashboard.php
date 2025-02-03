@@ -15,7 +15,7 @@ include 'header.php';
     <?php include 'includes/sidebar.php'; ?>
     
     <!-- Main Content -->
-    <div class="flex-1 mt-16 ml-64 p-8"> <!-- mt-16 for header, ml-64 for sidebar -->
+    <div class="flex-1 mt-16 p-8"> <!-- mt-16 for header -->
         <!-- Credit Balance Card -->
     <div class="bg-white rounded-lg shadow p-6 mb-8">
         <div class="flex justify-between items-center">
