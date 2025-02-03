@@ -1,3 +1,4 @@
+<?php
 include 'config.php';
 require_auth();
 
