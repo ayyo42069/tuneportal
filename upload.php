@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      VALUES ($fileId, 1, '$filename')");
 
         // Deduct credits and log transaction
-        $conn->query("UPDATE users SET credits = credits - $totalCredits WHERE id = {$_SESSION['user_id']}");
+        $conn->query("UPDATE users SET credits = -credits - $totalCredits WHERE id = {$_SESSION['user_id']}");
         
         // Log credit transaction
         $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description) 
