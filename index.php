@@ -1,40 +1,4 @@
-<?php 
-include 'header.php';
-include 'config.php';
-
-// Get dynamic data
-try {
-    // Total tuned vehicles
-    $stmt = $pdo->query("SELECT COUNT(*) FROM files");
-    $totalTuned = $stmt->fetchColumn();
-
-    // Total certified tuners (admins)
-    $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'admin'");
-    $totalTuners = $stmt->fetchColumn();
-
-    // Recent expert tunes
-    $stmt = $pdo->query("SELECT f.*, u.username 
-                        FROM files f
-                        JOIN users u ON f.user_id = u.id
-                        WHERE u.role = 'admin'
-                        ORDER BY f.created_at DESC 
-                        LIMIT 3");
-    $recentTunes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Testimonials
-    $stmt = $pdo->query("SELECT u.username, f.car_model, f.description 
-                       FROM files f
-                       JOIN users u ON f.user_id = u.id
-                       WHERE f.description IS NOT NULL
-                       AND u.role = 'admin'
-                       ORDER BY f.created_at DESC 
-                       LIMIT 2");
-    $testimonials = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch(PDOException $e) {
-    die("Database error: " . $e->getMessage());
-}
-?>
+<?php include 'header.php'; ?>
 
 <main class="flex-grow mt-16">
     <!-- Hero Section with Live Stats -->
@@ -50,11 +14,11 @@ try {
                 <div class="live-stats absolute top-4 right-4 bg-black/30 p-4 rounded-lg backdrop-blur-sm">
                     <div class="flex space-x-6">
                         <div class="text-center">
-                            <div class="text-2xl font-bold count-up" data-count="<?= $totalTuned ?>">0</div>
+                            <div class="text-2xl font-bold count-up" data-count="2543">0</div>
                             <div class="text-sm">Tuned Vehicles</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-2xl font-bold count-up" data-count="<?= $totalTuners ?>">0</div>
+                            <div class="text-2xl font-bold count-up" data-count="178">0</div>
                             <div class="text-sm">Expert Tuners</div>
                         </div>
                     </div>
@@ -179,77 +143,7 @@ try {
             </div>
         </div>
     </section>
-
-    <!-- Testimonials Carousel -->
-    <section class="py-16 bg-gray-100">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12 text-red-600">Success Stories</h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <?php foreach($testimonials as $testimonial): ?>
-                <div class="bg-white p-6 rounded-xl shadow-sm">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white">
-                            <?= strtoupper(substr($testimonial['username'], 0, 1)) ?>
-                        </div>
-                        <div class="ml-4">
-                            <div class="font-semibold"><?= htmlspecialchars($testimonial['username']) ?></div>
-                            <div class="text-sm text-gray-500"><?= htmlspecialchars($testimonial['car_model']) ?></div>
-                        </div>
-                    </div>
-                    <p class="text-gray-600">"<?= htmlspecialchars($testimonial['description']) ?>"</p>
-                    <div class="mt-4 flex items-center">
-                        <div class="text-sm bg-red-100 text-red-600 px-3 py-1 rounded-full">Dyno Verified</div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
-
-    <!-- Latest Tunes Feed -->
-    <section class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12 text-red-600">Recently Tuned</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <?php foreach($recentTunes as $tune): ?>
-                <div class="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <div class="font-semibold"><?= htmlspecialchars($tune['car_model']) ?></div>
-                                <div class="text-sm text-gray-500"><?= htmlspecialchars($tune['title']) ?></div>
-                            </div>
-                        </div>
-                        <div class="text-red-600 font-bold">v<?= $tune['current_version'] ?></div>
-                    </div>
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-sm">
-                            <span>Tuner:</span>
-                            <span class="font-semibold"><?= htmlspecialchars($tune['username']) ?></span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span>Date:</span>
-                            <span class="font-semibold">
-                                <?= date('M j, Y', strtotime($tune['created_at'])) ?>
-                            </span>
-                        </div>
-                        <div class="pt-2">
-                            <div class="h-1 bg-gray-200 rounded-full">
-                                <div class="h-1 bg-red-600 rounded-full w-3/4"></div>
-                            </div>
-                            <div class="text-right text-sm text-gray-500 mt-1">75% Complete</div>
-                        </div>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
+    
 
     <!-- CTA Section -->
     <section class="bg-gray-900 text-white py-16">
@@ -273,24 +167,3 @@ try {
 </main>
 
 <?php include 'footer.php'; ?>
-
-<script>
-// Animated counter
-document.addEventListener('DOMContentLoaded', () => {
-    const animateValue = (obj, start, end, duration) => {
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            obj.textContent = Math.floor(progress * (end - start) + start);
-            if (progress < 1) window.requestAnimationFrame(step);
-        };
-        window.requestAnimationFrame(step);
-    };
-
-    document.querySelectorAll('.count-up').forEach(element => {
-        const target = parseInt(element.getAttribute('data-count'));
-        animateValue(element, 0, target, 2000);
-    });
-});
-</script>
