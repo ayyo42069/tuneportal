@@ -1,9 +1,16 @@
-<aside class="fixed top-16 left-0 h-screen w-64 bg-red-600 text-white z-40">
+<aside class="fixed md:relative md:translate-x-0 transform -translate-x-full transition-transform duration-300 ease-in-out top-16 left-0 h-screen w-64 bg-red-600 text-white z-40" id="sidebar">
+    <!-- Mobile Close Button -->
+    <button class="md:hidden absolute top-2 right-2 p-2 text-white hover:text-red-200" id="close-sidebar">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+    
     <nav class="p-4">
         <ul class="space-y-2">
             <!-- Common User Links -->
             <li>
-                <a href="dashboard.php" class="flex items-center p-2 hover:bg-red-700 rounded">
+                <a href="dashboard.php" class="flex items-center p-2 hover:bg-red-700 rounded transition-colors">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
@@ -94,3 +101,39 @@
         </ul>
     </nav>
 </aside>
+<!-- Mobile Menu Button -->
+<button class="md:hidden fixed bottom-4 right-4 p-4 bg-red-600 text-white rounded-full shadow-lg z-50 hover:bg-red-700 transition-colors" id="mobile-menu-button">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+</button>
+
+<script>
+// Toggle Sidebar
+document.getElementById('mobile-menu-button').addEventListener('click', () => {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('-translate-x-full');
+});
+
+// Close Sidebar
+document.getElementById('close-sidebar').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.add('-translate-x-full');
+});
+
+// Close sidebar when clicking outside
+document.addEventListener('click', (event) => {
+    const sidebar = document.getElementById('sidebar');
+    const mobileButton = document.getElementById('mobile-menu-button');
+    
+    if (!sidebar.contains(event.target) && !mobileButton.contains(event.target)) {
+        sidebar.classList.add('-translate-x-full');
+    }
+});
+
+// Close on ESC key
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+    }
+});
+</script>
