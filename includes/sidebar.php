@@ -1,4 +1,4 @@
-<aside class="w-64 h-screen fixed top-0 left-0 bg-gray-900 text-white p-5 shadow-lg">
+<aside class="w-64 h-screen fixed top-0 left-0 bg-gray-900 z-40 text-white p-5 shadow-lg">
     <nav class="p-4">
         <ul class="space-y-2">
             <!-- Common User Links -->
