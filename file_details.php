@@ -89,6 +89,7 @@ include 'includes/sidebar.php';
                 <div class="bg-white rounded-lg p-6 w-96">
                     <h3 class="text-xl font-bold mb-4">Request File Update</h3>
                     <form action="request_update.php" method="POST">
+                    <?php echo csrf_input_field(); ?>
                         <input type="hidden" name="file_id" value="<?= $fileId ?>">
                         <div class="mb-4">
                             <label class="block mb-2">Update Instructions</label>

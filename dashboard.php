@@ -73,6 +73,7 @@ include 'header.php';
             <div class="bg-white rounded-lg shadow p-6 mb-8">
                 <h3 class="text-lg font-semibold mb-4">Upload New File</h3>
                 <form action="upload.php" method="POST" enctype="multipart/form-data">
+                <?php echo csrf_input_field(); ?>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block mb-2">File Title</label>
