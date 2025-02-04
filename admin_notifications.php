@@ -41,8 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch existing notifications
 $result = $conn->query("SELECT * FROM notifications ORDER BY created_at DESC");
 $notifications = $result->fetch_all(MYSQLI_ASSOC);
-   header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
+
 ?>
 
 <div class="p-6 bg-gray-100 min-h-screen">
