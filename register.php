@@ -8,11 +8,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Error: Invalid CSRF token.");
     }
 
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $ip = $_SERVER['REMOTE_ADDR'];
-    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    $username = sanitize($_POST['username']);
+    $email = sanitize($_POST['email']);
+    $password = sanitize($_POST['password']);
+    $ip = sanitize($_SERVER['REMOTE_ADDR']);
+    $user_agent = sanitize($_SERVER['HTTP_USER_AGENT']);
 
     // IP-based rate limiting
     $stmt = $conn->prepare("SELECT COUNT(*) FROM login_attempts WHERE ip = ? AND attempt_time > NOW() - INTERVAL 1 HOUR");

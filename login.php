@@ -8,8 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Error: Invalid CSRF token.");
     }
 
-    $login = $_POST['login'];
-    $password = $_POST['password'];
+    $login = sanitize($_POST['login']);
+    $password = sanitize($_POST['password']);
 
     // Fetch user with role, banned status, and ban reason
     $stmt = $conn->prepare("SELECT id, username, email, password, ip, user_agent, role, banned, ban_reason FROM users WHERE email = ? OR username = ?");
