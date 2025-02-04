@@ -43,37 +43,48 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 ?>
 
 <div class="p-6 bg-gray-100 min-h-screen">
-    <h2 class="text-2xl font-semibold mb-4">Manage Notifications</h2>
-    <form method="POST" class="bg-white p-4 rounded-lg shadow-md">
-        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-        <textarea name="message" required placeholder="Notification message" class="w-full p-2 border rounded-md"></textarea>
-        <select name="recipient_id" class="w-full p-2 border rounded-md mt-2">
-            <option value="all">All Users</option>
-            <?php
-            $users = $conn->query("SELECT id, username FROM users");
-            while ($user = $users->fetch_assoc()) {
-                echo "<option value='{$user['id']}'>{$user['username']}</option>";
-            }
-            ?>
-        </select>
-        <button type="submit" name="action" value="add" class="mt-3 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Send Notification</button>
-    </form>
+    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Manage Notifications</h2>
+        <form method="POST" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            <textarea name="message" required placeholder="Notification message" class="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300"></textarea>
+            <select name="recipient_id" class="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300">
+                <option value="all">All Users</option>
+                <?php
+                $users = $conn->query("SELECT id, username FROM users");
+                while ($user = $users->fetch_assoc()) {
+                    echo "<option value='{$user['id']}'>{$user['username']}</option>";
+                }
+                ?>
+            </select>
+            <button type="submit" name="action" value="add" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">Send Notification</button>
+        </form>
 
-    <h3 class="text-xl font-semibold mt-6">Existing Notifications</h3>
-    <ul class="mt-4">
-        <?php foreach ($notifications as $note): ?>
-            <li class="bg-white p-4 rounded-lg shadow-md mb-2 flex justify-between items-center">
-                <span><?php echo htmlspecialchars($note['message']); ?></span>
-                <form method="POST" class="flex items-center space-x-2">
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                    <input type="hidden" name="id" value="<?php echo $note['id']; ?>">
-                    <textarea name="message" class="p-2 border rounded-md"><?php echo htmlspecialchars($note['message']); ?></textarea>
-                    <button type="submit" name="action" value="edit" class="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600">Edit</button>
-                    <button type="submit" name="action" value="delete" class="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600">Delete</button>
-                </form>
-            </li>
-        <?php endforeach; ?>
-    </ul>
+        <h3 class="text-xl font-semibold text-gray-800 mt-8">Existing Notifications</h3>
+        <div class="mt-4 space-y-4">
+            <?php foreach ($notifications as $note): ?>
+                <div class="p-4 border rounded-lg bg-gray-50 shadow-md">
+                    <p class="text-gray-700 mb-2"><?php echo htmlspecialchars($note['message']); ?></p>
+                    <div class="flex justify-between items-center text-gray-500 text-sm">
+                        <span><?php echo date('M j, Y H:i', strtotime($note['created_at'])); ?></span>
+                        <div class="space-x-2">
+                            <form method="POST" class="inline">
+                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                <input type="hidden" name="id" value="<?php echo $note['id']; ?>">
+                                <textarea name="message" class="hidden"><?php echo htmlspecialchars($note['message']); ?></textarea>
+                                <button type="submit" name="action" value="edit" class="text-blue-600 hover:text-blue-800">Edit</button>
+                            </form>
+                            <form method="POST" class="inline">
+                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                                <input type="hidden" name="id" value="<?php echo $note['id']; ?>">
+                                <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-800">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
 </div>
 
 <?php include 'footer.php'; ?>
