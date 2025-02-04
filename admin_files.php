@@ -210,7 +210,7 @@ include 'includes/sidebar.php';
                                     <input type="hidden" name="user_id" value="<?= $file['user_id'] ?>">
                                     <input type="file" name="processed_file" 
                                            class="text-sm" accept=".bin">
-                                           <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                           <?php echo csrf_input_field(); ?>
                                     <button type="submit" 
                                             class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
                                         Process
@@ -222,7 +222,7 @@ include 'includes/sidebar.php';
                                       onsubmit="return confirm('Are you sure you want to permanently delete this file and all its versions? This action cannot be undone.');">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
-                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                    <?php echo csrf_input_field(); ?>
                                     <button type="submit" 
                                             class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">
 
