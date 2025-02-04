@@ -2,12 +2,18 @@
 include 'config.php';
 require_auth(true); // Admin only
 
+// Generate CSRF token
+session_start();
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Handle file processing and deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verify the CSRF token before proceeding
     $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-    if (!verify_csrf_token($token)) {
-        die("Error: Invalid CSRF token.");
+    if (!hash_equals($_SESSION['csrf_token'], $token)) {
+        die(json_encode(['error' => 'Invalid CSRF token.']));
     }
 
     // Handle deletion
@@ -199,7 +205,6 @@ include 'includes/sidebar.php';
                                 <?php endif; ?>
                                 
                                 <form method="POST" enctype="multipart/form-data" 
-                                
                                       class="flex items-center gap-2">
                                     <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
                                     <input type="hidden" name="user_id" value="<?= $file['user_id'] ?>">
@@ -212,7 +217,6 @@ include 'includes/sidebar.php';
                                 </form>
                                 
                                 <form method="POST" 
-                              
                                       class="ml-2"
                                       onsubmit="return confirm('Are you sure you want to permanently delete this file and all its versions? This action cannot be undone.');">
                                     <input type="hidden" name="action" value="delete">
