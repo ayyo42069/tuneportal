@@ -12,7 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $action = $_POST['action'] ?? '';
     $message = sanitize($_POST['message'] ?? '');
-    $recipient_id = $_POST['recipient_id'] ?? 'all';
+    $recipient_id = ($_POST['recipient_id'] === 'all') ? null : $_POST['recipient_id'];
+
     
     if ($action === 'add' && !empty($message)) {
         $stmt = $conn->prepare("INSERT INTO notifications (user_id, message, created_at) VALUES (?, ?, NOW())");
