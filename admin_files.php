@@ -199,7 +199,7 @@ include 'includes/sidebar.php';
                                 <?php endif; ?>
                                 
                                 <form method="POST" enctype="multipart/form-data" 
-                                <?php echo csrf_input_field(); ?>
+                                
                                       class="flex items-center gap-2">
                                     <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
                                     <input type="hidden" name="user_id" value="<?= $file['user_id'] ?>">
@@ -212,7 +212,7 @@ include 'includes/sidebar.php';
                                 </form>
                                 
                                 <form method="POST" 
-                                <?php echo csrf_input_field(); ?>
+                              
                                       class="ml-2"
                                       onsubmit="return confirm('Are you sure you want to permanently delete this file and all its versions? This action cannot be undone.');">
                                     <input type="hidden" name="action" value="delete">
