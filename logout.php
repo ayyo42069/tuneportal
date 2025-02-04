@@ -15,6 +15,6 @@ if (session_id() !== '' || isset($_COOKIE[session_name()])) {
 }
 
 // Redirect to the index page
-header("Location: index.php?logout=success");
+header("Location: index.php");
 exit();
 ?>

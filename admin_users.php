@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
         }
     }
-    header("Location: admin_users.php");
+    header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
 
