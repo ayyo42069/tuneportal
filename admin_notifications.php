@@ -40,14 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $result = $conn->query("SELECT * FROM notifications ORDER BY created_at DESC");
 $notifications = $result->fetch_all(MYSQLI_ASSOC);
 
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 ?>
 
 <div class="p-6 bg-gray-100 min-h-screen">
     <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <h2 class="text-2xl font-semibold text-gray-800 mb-6">Manage Notifications</h2>
         <form method="POST" class="space-y-4">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+        <?php echo csrf_input_field(); ?>
             <textarea name="message" required placeholder="Notification message" class="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300"></textarea>
             <select name="recipient_id" class="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300">
                 <option value="all">All Users</option>
@@ -70,14 +69,14 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                         <span><?php echo date('M j, Y H:i', strtotime($note['created_at'])); ?></span>
                         <div class="space-x-2">
                             <form method="POST" class="inline">
-                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                <input type="hidden" name="id" value="<?php echo $note['id']; ?>">
+                            <?php echo csrf_input_field(); ?>
+                               <input type="hidden" name="id" value="<?php echo $note['id']; ?>">
                                 <textarea name="message" class="hidden"><?php echo htmlspecialchars($note['message']); ?></textarea>
                                 <button type="submit" name="action" value="edit" class="text-blue-600 hover:text-blue-800">Edit</button>
                             </form>
                             <form method="POST" class="inline">
-                                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                                <input type="hidden" name="id" value="<?php echo $note['id']; ?>">
+                            <?php echo csrf_input_field(); ?>
+                              <input type="hidden" name="id" value="<?php echo $note['id']; ?>">
                                 <button type="submit" name="action" value="delete" class="text-red-600 hover:text-red-800">Delete</button>
                             </form>
                         </div>
