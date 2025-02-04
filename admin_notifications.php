@@ -6,8 +6,10 @@ include 'sidebar.php';
 
 // Handle notification actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("Invalid CSRF token.");
+    // Verify the CSRF token before proceeding
+    $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (!hash_equals($_SESSION['csrf_token'], $token)) {
+        die(json_encode(['error' => 'Invalid CSRF token.']));
     }
 
     $action = $_POST['action'] ?? '';
@@ -39,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch existing notifications
 $result = $conn->query("SELECT * FROM notifications ORDER BY created_at DESC");
 $notifications = $result->fetch_all(MYSQLI_ASSOC);
-
+   header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
 ?>
 
 <div class="p-6 bg-gray-100 min-h-screen">
