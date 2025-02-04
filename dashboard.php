@@ -51,7 +51,8 @@ include 'header.php';
                             <span class="bg-red-100 text-red-600 text-sm py-1 px-3 rounded-full">New</span>
                         </div>
                         <?php
-                        $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
+$stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? OR user_id IS NULL ORDER BY created_at DESC LIMIT 5");
+
                         $stmt->bind_param("i", $_SESSION['user_id']);
                         $stmt->execute();
                         $notifications = $stmt->get_result();
