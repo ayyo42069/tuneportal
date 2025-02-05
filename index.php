@@ -36,15 +36,7 @@
             </div>
         </div>
         
-        <!-- Animated Car Silhouette -->
-        <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-4xl">
-            <svg class="w-full" viewBox="0 0 1200 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 250h1200" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-                <path class="car-body" d="M100 200c0-66.27 53.73-120 120-120h760c66.27 0 120 53.73 120 120v50H100v-50z" fill="rgba(255,255,255,0.1)"/>
-                <circle class="wheel" cx="300" cy="250" r="50" fill="rgba(255,255,255,0.2)"/>
-                <circle class="wheel" cx="900" cy="250" r="50" fill="rgba(255,255,255,0.2)"/>
-            </svg>
-        </div>
+        
     </section>
 
     <!-- Features Grid with Hover Effects -->
@@ -139,36 +131,6 @@
         retina_detect: true
     });
 
-    // Animated car silhouette
-    const car = document.querySelector('.car-body');
-    const wheels = document.querySelectorAll('.wheel');
-    
-    function animateCar() {
-        car.animate([
-            { transform: 'translateY(0px)' },
-            { transform: 'translateY(-10px)' },
-            { transform: 'translateY(0px)' }
-        ], {
-            duration: 2000,
-            iterations: Infinity,
-            easing: 'ease-in-out'
-        });
-
-        wheels.forEach(wheel => {
-            wheel.animate([
-                { transform: 'rotate(0deg)' },
-                { transform: 'rotate(360deg)' }
-            ], {
-                duration: 1000,
-                iterations: Infinity,
-                easing: 'linear'
-            });
-        });
-    }
-
-    // Start the animation when the page is loaded
-    window.addEventListener('load', animateCar);
-
     // Animate count-up
     const countUpElements = document.querySelectorAll('.count-up');
     countUpElements.forEach(element => {
@@ -193,3 +155,4 @@
 
 </body>
 </html>
+
