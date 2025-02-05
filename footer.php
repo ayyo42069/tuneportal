@@ -5,16 +5,16 @@
             <!-- Full footer for index page -->
             <div class="grid md:grid-cols-3 gap-8 py-12">
                 <div class="space-y-4">
-                    <h3 class="text-xl font-bold text-red-500">TunePortal</h3>
+                    <h3 class="text-xl font-bold text-primary">TunePortal</h3>
                     <p class="text-gray-400 leading-relaxed">Unlock your vehicle's full potential with professional-grade tuning solutions.</p>
                     <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
                             <i class="fab fa-facebook text-xl"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
                             <i class="fab fa-twitter text-xl"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
                             <i class="fab fa-instagram text-xl"></i>
                         </a>
                     </div>
@@ -23,9 +23,9 @@
                 <div class="space-y-4">
                     <h4 class="font-semibold text-lg">Quick Links</h4>
                     <ul class="space-y-2">
-                        <li><a href="#features" class="text-gray-400 hover:text-red-500 transition-colors block">Features</a></li>
-                        <li><a href="#testimonials" class="text-gray-400 hover:text-red-500 transition-colors block">Testimonials</a></li>
-                        <li><a href="#contact" class="text-gray-400 hover:text-red-500 transition-colors block">Contact</a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-primary transition-colors block">Features</a></li>
+                        <li><a href="#testimonials" class="text-gray-400 hover:text-primary transition-colors block">Testimonials</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-primary transition-colors block">Contact</a></li>
                     </ul>
                 </div>
                 
@@ -66,6 +66,7 @@
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         const header = document.querySelector('header');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
 
         // Mobile menu toggle
         if (mobileMenuButton && mobileMenu) {
@@ -101,8 +102,42 @@
                 }
             }
         });
+
+        // Dark mode toggle
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+            });
+
+            // Check for saved dark mode preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
+        }
+
+        // Animate count-up
+        const countUpElements = document.querySelectorAll('.count-up');
+        countUpElements.forEach(element => {
+            const target = parseInt(element.getAttribute('data-count'), 10);
+            let count = 0;
+            const duration = 2000; // 2 seconds
+            const increment = target / (duration / 16); // 60 FPS
+
+            const updateCount = () => {
+                count += increment;
+                if (count < target) {
+                    element.textContent = Math.round(count);
+                    requestAnimationFrame(updateCount);
+                } else {
+                    element.textContent = target;
+                }
+            };
+
+            updateCount();
+        });
     });
 </script>
-</footer>
 </body>
 </html>
+
