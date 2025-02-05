@@ -1,6 +1,10 @@
+<?php
+$isLoggedIn = isset($_SESSION['user_id']);
+$footerClass = $isLoggedIn ? 'lg:ml-64' : '';
+?>
 <!-- footer.php -->
-<footer class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white mt-auto z-30 transition-colors duration-300">
-  <div class="container mx-auto px-4">
+<footer class="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white mt-auto z-30 transition-colors duration-300 <?php echo $footerClass; ?>">
+  <div class="container mx-auto px-4 <?php echo $isLoggedIn ? 'lg:max-w-[calc(100%-16rem)]' : ''; ?>">
       <?php if (basename($_SERVER['PHP_SELF']) === 'index.php'): ?>
           <!-- Full footer for index page -->
           <div class="grid md:grid-cols-3 gap-8 py-12">
@@ -58,100 +62,58 @@
 
 <!-- Add this before closing body tag -->
 <script>
-  // Improved mobile menu and sidebar toggle functionality
-  document.addEventListener('DOMContentLoaded', function() {
-      const mobileMenuButton = document.getElementById('mobile-menu-button');
-      const mobileMenu = document.getElementById('mobile-menu');
-      const sidebarToggle = document.getElementById('sidebar-toggle');
-      const sidebar = document.getElementById('sidebar');
-      const header = document.querySelector('header');
-      const darkModeToggle = document.getElementById('dark-mode-toggle');
-      const footer = document.querySelector('footer');
+document.addEventListener('DOMContentLoaded', function() {
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const footer = document.querySelector('footer');
+    const sidebar = document.getElementById('sidebar');
 
-      // Mobile menu toggle
-      if (mobileMenuButton && mobileMenu) {
-          mobileMenuButton.addEventListener('click', () => {
-              mobileMenu.classList.toggle('hidden');
-          });
-      }
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+            
+            // Update footer classes for dark mode
+            if (footer) {
+                footer.classList.toggle('bg-gray-100');
+                footer.classList.toggle('dark:bg-gray-800');
+                footer.classList.toggle('text-gray-800');
+                footer.classList.toggle('dark:text-white');
+            }
+        });
 
-      // Sidebar toggle for mobile
-      if (sidebarToggle && sidebar) {
-          sidebarToggle.addEventListener('click', () => {
-              sidebar.classList.toggle('-translate-x-full');
-          });
-      }
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+            
+            // Update footer classes for dark mode
+            if (footer) {
+                footer.classList.remove('bg-gray-100');
+                footer.classList.add('dark:bg-gray-800');
+                footer.classList.remove('text-gray-800');
+                footer.classList.add('dark:text-white');
+            }
+        }
+    }
 
-      // Scroll effect for header
-      window.addEventListener('scroll', () => {
-          if (window.scrollY > 20) {
-              header.classList.add('shadow-lg');
-          } else {
-              header.classList.remove('shadow-lg');
-          }
-      });
+    // Adjust footer position when sidebar toggles
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    if (sidebarToggle && sidebar && footer) {
+        sidebarToggle.addEventListener('click', () => {
+            footer.classList.toggle('lg:ml-64');
+        });
+    }
 
-      // Close sidebar on window resize if screen becomes larger
-      window.addEventListener('resize', () => {
-          if (window.innerWidth >= 1024) { // lg breakpoint
-              if (sidebar) {
-                  sidebar.classList.remove('-translate-x-full');
-              }
-              if (mobileMenu) {
-                  mobileMenu.classList.add('hidden');
-              }
-          }
-      });
+    // Ensure footer is in the correct position on page load for larger screens
+    function adjustFooterPosition() {
+        if (window.innerWidth >= 1024 && sidebar && !sidebar.classList.contains('-translate-x-full')) {
+            footer.classList.add('lg:ml-64');
+        } else {
+            footer.classList.remove('lg:ml-64');
+        }
+    }
 
-      // Dark mode toggle
-      if (darkModeToggle) {
-          darkModeToggle.addEventListener('click', () => {
-              document.documentElement.classList.toggle('dark');
-              localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-              
-              // Update footer classes for dark mode
-              if (footer) {
-                  footer.classList.toggle('bg-gray-100');
-                  footer.classList.toggle('dark:bg-gray-800');
-                  footer.classList.toggle('text-gray-800');
-                  footer.classList.toggle('dark:text-white');
-              }
-          });
-
-          // Check for saved dark mode preference
-          if (localStorage.getItem('darkMode') === 'true') {
-              document.documentElement.classList.add('dark');
-              
-              // Update footer classes for dark mode
-              if (footer) {
-                  footer.classList.remove('bg-gray-100');
-                  footer.classList.add('dark:bg-gray-800');
-                  footer.classList.remove('text-gray-800');
-                  footer.classList.add('dark:text-white');
-              }
-          }
-      }
-
-      // Animate count-up
-      const countUpElements = document.querySelectorAll('.count-up');
-      countUpElements.forEach(element => {
-          const target = parseInt(element.getAttribute('data-count'), 10);
-          let count = 0;
-          const duration = 2000; // 2 seconds
-          const increment = target / (duration / 16); // 60 FPS
-
-          const updateCount = () => {
-              count += increment;
-              if (count < target) {
-                  element.textContent = Math.round(count);
-                  requestAnimationFrame(updateCount);
-              } else {
-                  element.textContent = target;
-              }
-          };
-
-          updateCount();
-      });
-  });
+    window.addEventListener('resize', adjustFooterPosition);
+    adjustFooterPosition(); // Call on initial load
+});
 </script>
 
