@@ -1,6 +1,6 @@
-<aside id="sidebar" class="w-64 h-screen fixed top-0 left-0 lg:translate-x-0 -translate-x-full transition-transform duration-300 bg-white dark:bg-gray-800 text-gray-800 dark:text-white z-40 mt-16 flex flex-col shadow-lg">
-    <div class="flex-grow overflow-y-auto overflow-x-hidden hover:overflow-y-scroll">
-        <div class="absolute right-2 top-20 w-1 h-8 bg-gray-300 dark:bg-gray-600 rounded opacity-0 transition-opacity duration-300" id="scroll-indicator"></div>
+<aside id="sidebar" class="w-64 h-screen fixed top-0 left-0 lg:translate-x-0 -translate-x-full transition-transform duration-300 bg-white dark:bg-gray-800 text-gray-800 dark:text-white z-40 mt-16 flex flex-col shadow-lg overflow-y-auto">
+    <div class="flex-grow">
+        <div class="sticky top-0 right-2 w-1 h-8 bg-gray-300 dark:bg-gray-600 rounded opacity-0 transition-opacity duration-300" id="scroll-indicator"></div>
         <nav class="p-4">
             <div class="space-y-4">
                 <!-- Common User Links -->
@@ -148,8 +148,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Show/hide scroll indicator
-    scrollContainer.addEventListener('scroll', () => {
-        if (scrollContainer.scrollTop > 20) {
+    sidebar.addEventListener('scroll', () => {
+        if (sidebar.scrollTop > 20) {
             scrollIndicator.classList.add('opacity-50');
         } else {
             scrollIndicator.classList.remove('opacity-50');
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Hide scroll indicator when not hovering
-    scrollContainer.addEventListener('mouseleave', () => {
+    sidebar.addEventListener('mouseleave', () => {
         scrollIndicator.classList.remove('opacity-50');
     });
 });
