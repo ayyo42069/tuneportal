@@ -89,49 +89,6 @@
         </div>
     </section>
 
-    <!-- Interactive Performance Graph -->
-    <section class="py-20 bg-white dark:bg-gray-800">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">Visualize Your Performance Gains</h2>
-            <div class="max-w-4xl mx-auto bg-gray-100 dark:bg-gray-700 p-6 rounded-xl shadow-lg">
-                <canvas id="performanceGraph" width="400" height="200"></canvas>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Carousel -->
-    <section class="py-20 bg-gray-50 dark:bg-gray-900">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">What Our Customers Say</h2>
-            <div class="max-w-4xl mx-auto">
-                <div class="testimonial-carousel">
-                    <!-- Testimonial 1 -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
-                        <p class="text-gray-600 dark:text-gray-300 mb-4">"TunePortal transformed my car's performance. The power gains are incredible, and the fuel efficiency improvement is a welcome bonus!"</p>
-                        <div class="flex items-center">
-                            <img src="https://i.pravatar.cc/60?img=1" alt="Customer" class="w-12 h-12 rounded-full mr-4">
-                            <div>
-                                <h4 class="font-semibold text-gray-800 dark:text-white">John Doe</h4>
-                                <p class="text-gray-500 dark:text-gray-400">BMW M3 Owner</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Testimonial 2 -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
-                        <p class="text-gray-600 dark:text-gray-300 mb-4">"The real-time diagnostics feature is a game-changer. I can fine-tune my car's performance on the fly!"</p>
-                        <div class="flex items-center">
-                            <img src="https://i.pravatar.cc/60?img=2" alt="Customer" class="w-12 h-12 rounded-full mr-4">
-                            <div>
-                                <h4 class="font-semibold text-gray-800 dark:text-white">Jane Smith</h4>
-                                <p class="text-gray-500 dark:text-gray-400">Audi RS6 Enthusiast</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- CTA Section with Animated Background -->
     <section class="relative py-20 bg-primary text-white overflow-hidden">
         <div class="absolute inset-0 z-0">
@@ -162,7 +119,6 @@
 
 <?php include 'footer.php'; ?>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Particle.js configuration
     particlesJS("particles-js", {
@@ -193,8 +149,9 @@
             { transform: 'translateY(-10px)' },
             { transform: 'translateY(0px)' }
         ], {
-            duration: 1000,
-            iterations: Infinity
+            duration: 2000,
+            iterations: Infinity,
+            easing: 'ease-in-out'
         });
 
         wheels.forEach(wheel => {
@@ -203,42 +160,36 @@
                 { transform: 'rotate(360deg)' }
             ], {
                 duration: 1000,
-                iterations: Infinity
+                iterations: Infinity,
+                easing: 'linear'
             });
         });
     }
 
-    animateCar();
+    // Start the animation when the page is loaded
+    window.addEventListener('load', animateCar);
 
-    // Performance Graph
-    const ctx = document.getElementById('performanceGraph').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Stock', 'Stage 1', 'Stage 2', 'Stage 3'],
-            datasets: [{
-                label: 'Horsepower',
-                data: [200, 250, 300, 350],
-                borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1
-            }, {
-                label: 'Torque',
-                data: [180, 220, 260, 300],
-                borderColor: 'rgb(54, 162, 235)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+    // Animate count-up
+    const countUpElements = document.querySelectorAll('.count-up');
+    countUpElements.forEach(element => {
+        const target = parseInt(element.getAttribute('data-count'), 10);
+        let count = 0;
+        const duration = 2000; // 2 seconds
+        const increment = target / (duration / 16); // 60 FPS
+
+        const updateCount = () => {
+            count += increment;
+            if (count < target) {
+                element.textContent = Math.round(count);
+                requestAnimationFrame(updateCount);
+            } else {
+                element.textContent = target;
             }
-        }
+        };
+
+        updateCount();
     });
 </script>
 
 </body>
 </html>
-
