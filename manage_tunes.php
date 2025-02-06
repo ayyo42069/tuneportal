@@ -117,9 +117,10 @@ include 'includes/sidebar.php';
                                 </button>
                                 
                                 <form method="POST" 
-                                <?php echo csrf_input_field(); ?>
+                             
                                       class="inline"
                                       onsubmit="return confirm('Are you sure you want to delete this tuning option?');">
+                                      <?php echo csrf_input_field(); ?>
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= $option['id'] ?>">
                                     <button type="submit" 
