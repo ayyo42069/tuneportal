@@ -18,11 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         switch ($action) {
             case 'ban':
-                $ban_reason = sanitize($_POST['ban_reason']); // Get the ban reason
+                $ban_reason = sanitize($_POST['ban_reason']);
                 if (empty($ban_reason)) {
                     $_SESSION['error'] = "Ban reason is required.";
                 } else {
-                    // Update the user's banned status and ban reason
                     $stmt = $conn->prepare("UPDATE users SET banned = TRUE, ban_reason = ? WHERE id = ?");
                     $stmt->bind_param("si", $ban_reason, $user_id);
                     $stmt->execute();
@@ -30,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
             case 'unban':
-                // Unban the user and clear the ban reason
                 $stmt = $conn->prepare("UPDATE users SET banned = FALSE, ban_reason = NULL WHERE id = ?");
                 $stmt->bind_param("i", $user_id);
                 $stmt->execute();
@@ -43,80 +41,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 include 'header.php';
-include 'includes/sidebar.php';
 ?>
 
-<div class="flex-1 mt-16 ml-64 p-8">
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-2xl font-bold text-red-600 mb-6">Manage Users</h2>
-        
-        <div class="mb-4">
-            <input type="text" id="searchInput" placeholder="Search users..." 
-                   class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-600">
-        </div>
+<div class="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+    <?php include 'includes/sidebar.php'; ?>
+    
+    <div class="flex-1 transition-all duration-300 lg:ml-64">
+        <div class="container mx-auto px-4 py-8 mt-16">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-6">Manage Users</h2>
+                
+                <div class="mb-4">
+                    <input type="text" id="searchInput" placeholder="Search users..." 
+                           class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full" id="usersTable">
-                <thead>
-                    <tr class="bg-red-50">
-                        <th class="p-3 text-left">ID</th>
-                        <th class="p-3 text-left">Username</th>
-                        <th class="p-3 text-left">Email</th>
-                        <th class="p-3 text-left">Registered</th>
-                        <th class="p-3 text-left">Last Login</th>
-                        <th class="p-3 text-left">Status</th>
-                        <th class="p-3 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $users = $conn->query("
-                        SELECT u.*, 
-                        (SELECT MAX(attempted_at) FROM login_history WHERE user_id = u.id AND success = 1) AS last_login
-                        FROM users u
-                        ORDER BY u.created_at DESC
-                    ");
-                    
-                    while ($user = $users->fetch_assoc()):
-                    ?>
-                    <tr class="border-b" data-id="<?= $user['id'] ?>">
-                        <td class="p-3"><?= $user['id'] ?></td>
-                        <td class="p-3"><?= $user['username'] ?></td>
-                        <td class="p-3"><?= $user['email'] ?></td>
-                        <td class="p-3"><?= date('M j, Y', strtotime($user['created_at'])) ?></td>
-                        <td class="p-3"><?= $user['last_login'] ? date('M j, Y H:i', strtotime($user['last_login'])) : 'Never' ?></td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded <?= $user['banned'] ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' ?>">
-                                <?= $user['banned'] ? 'Banned' : 'Active' ?>
-                            </span>
-                        </td>
-                        <td class="p-3">
-                            <div class="flex items-center gap-2">
-                                <?php if($user['banned']): ?>
-                                    <form method="POST">
-                                    <?php echo csrf_input_field(); ?>
-                                        <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                                        <input type="hidden" name="action" value="unban">
-                                        <button type="submit" class="text-green-600 hover:text-green-800">
-                                            Unban
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="usersTable">
+                        <thead>
+                            <tr class="bg-red-50 dark:bg-red-900">
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">ID</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Username</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Email</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Registered</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Last Login</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Status</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $users = $conn->query("
+                                SELECT u.*, 
+                                (SELECT MAX(attempted_at) FROM login_history WHERE user_id = u.id AND success = 1) AS last_login
+                                FROM users u
+                                ORDER BY u.created_at DESC
+                            ");
+                            
+                            while ($user = $users->fetch_assoc()):
+                            ?>
+                            <tr class="border-b dark:border-gray-700" data-id="<?= $user['id'] ?>">
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= $user['id'] ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= $user['username'] ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= $user['email'] ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= date('M j, Y', strtotime($user['created_at'])) ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= $user['last_login'] ? date('M j, Y H:i', strtotime($user['last_login'])) : 'Never' ?></td>
+                                <td class="p-3">
+                                    <span class="px-2 py-1 rounded <?= $user['banned'] ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' ?>">
+                                        <?= $user['banned'] ? 'Banned' : 'Active' ?>
+                                    </span>
+                                </td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        <?php if($user['banned']): ?>
+                                            <form method="POST">
+                                            <?php echo csrf_input_field(); ?>
+                                                <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                                                <input type="hidden" name="action" value="unban">
+                                                <button type="submit" class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
+                                                    Unban
+                                                </button>
+                                            </form>
+                                        <?php else: ?>
+                                            <button onclick="openBanModal(<?= $user['id'] ?>)" 
+                                                    class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                                Ban
+                                            </button>
+                                        <?php endif; ?>
+                                        <button onclick="showUserDetails(<?= $user['id'] ?>)" 
+                                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                            Details
                                         </button>
-                                    </form>
-                                <?php else: ?>
-                                    <button onclick="openBanModal(<?= $user['id'] ?>)" 
-                                            class="text-red-600 hover:text-red-800">
-                                        Ban
-                                    </button>
-                                <?php endif; ?>
-                                <button onclick="showUserDetails(<?= $user['id'] ?>)" 
-                                        class="text-blue-600 hover:text-blue-800">
-                                    Details
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -124,27 +127,27 @@ include 'includes/sidebar.php';
 <!-- Ban Modal -->
 <div id="banModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
     <div class="flex items-center justify-center min-h-screen">
-        <div class="bg-white rounded-lg p-6 w-11/12 max-w-md">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12 max-w-md">
             <div class="flex justify-between items-start mb-4">
-                <h3 class="text-xl font-bold">Ban User</h3>
-                <button onclick="closeBanModal()" class="text-gray-500 hover:text-gray-700">✕</button>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">Ban User</h3>
+                <button onclick="closeBanModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">✕</button>
             </div>
             <form method="POST" id="banForm">
             <?php echo csrf_input_field(); ?>
                 <input type="hidden" name="action" value="ban">
                 <input type="hidden" name="user_id" id="banUserId">
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Ban Reason:</label>
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2">Ban Reason:</label>
                     <textarea name="ban_reason" id="banReason" 
-                              class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-600" 
+                              class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
                               required></textarea>
                 </div>
                 <div class="flex justify-end">
                     <button type="button" onclick="closeBanModal()" 
-                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2">
+                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 mr-2">
                         Cancel
                     </button>
-                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                         Ban User
                     </button>
                 </div>
@@ -156,76 +159,75 @@ include 'includes/sidebar.php';
 <!-- User Details Modal -->
 <div id="userModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
     <div class="flex items-center justify-center min-h-screen">
-        <div class="bg-white rounded-lg p-6 w-11/12 max-w-4xl">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12 max-w-4xl">
             <div class="flex justify-between items-start mb-4">
-                <h3 class="text-xl font-bold">User Details - #<span id="userId"></span></h3>
-                <button onclick="toggleUserModal()" class="text-gray-500 hover:text-gray-700">✕</button>
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">User Details - #<span id="userId"></span></h3>
+                <button onclick="toggleUserModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">✕</button>
             </div>
             
             <div class="grid grid-cols-2 gap-6">
                 <!-- Column 1: User Info -->
                 <div class="space-y-4">
                     <div>
-                        <label class="font-semibold">Username:</label>
-                        <p id="detailUsername" class="text-gray-600"></p>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Username:</label>
+                        <p id="detailUsername" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                     <div>
-                        <label class="font-semibold">Email:</label>
-                        <p id="detailEmail" class="text-gray-600"></p>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Email:</label>
+                        <p id="detailEmail" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                     <div>
-                        <label class="font-semibold">Registered:</label>
-                        <p id="detailRegistered" class="text-gray-600"></p>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Registered:</label>
+                        <p id="detailRegistered" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                     <div>
-                        <label class="font-semibold">IP Address:</label>
-                        <p id="detailIP" class="text-gray-600"></p>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">IP Address:</label>
+                        <p id="detailIP" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                     <div>
-                        <label class="font-semibold">Ban Reason:</label>
-                        <p id="detailBanReason" class="text-gray-600"></p>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Ban Reason:</label>
+                        <p id="detailBanReason" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                 </div>
 
                 <!-- Column 2: Statistics -->
                 <div class="space-y-4">
                     <div>
-                        <label class="font-semibold">Total Files:</label>
-                        <p id="detailFiles" class="text-gray-600"></p>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Total Files:</label>
+                        <p id="detailFiles" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                     <div>
-                        <label class="font-semibold">Credits Balance:</label>
-                        <p id="detailCredits" class="text-gray-600"></p>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Credits Balance:</label>
+                        <p id="detailCredits" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                     <div>
-                        <label class="font-semibold">Last Activity:</label>
-                        <p id="detailLastActivity" class="text-gray-600"></p>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Last Activity:</label>
+                        <p id="detailLastActivity" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                 </div>
             </div>
 
             <!-- Tabs -->
-           <!-- Tabs -->
-<div class="mt-6 border-b">
-    <button onclick="showTab('loginHistory', event)" class="tab-link px-4 py-2 font-semibold text-red-600 border-b-2 border-red-600">
-        Login History
-    </button>
-    <button onclick="showTab('files', event)" class="tab-link px-4 py-2 font-semibold text-gray-500">
-        Files
-    </button>
-    <button onclick="showTab('transactions', event)" class="tab-link px-4 py-2 font-semibold text-gray-500">
-        Transactions
-    </button>
-</div>
+            <div class="mt-6 border-b dark:border-gray-700">
+                <button onclick="showTab('loginHistory', event)" class="tab-link px-4 py-2 font-semibold text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400">
+                    Login History
+                </button>
+                <button onclick="showTab('files', event)" class="tab-link px-4 py-2 font-semibold text-gray-500 dark:text-gray-400">
+                    Files
+                </button>
+                <button onclick="showTab('transactions', event)" class="tab-link px-4 py-2 font-semibold text-gray-500 dark:text-gray-400">
+                    Transactions
+                </button>
+            </div>
 
             <!-- Tab Content -->
             <div id="loginHistory" class="tab-content py-4">
                 <table class="w-full">
                     <thead>
-                        <tr class="bg-gray-50">
-                            <th class="p-2 text-left">Date</th>
-                            <th class="p-2 text-left">IP Address</th>
-                            <th class="p-2 text-left">Status</th>
+                        <tr class="bg-gray-50 dark:bg-gray-700">
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">Date</th>
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">IP Address</th>
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">Status</th>
                         </tr>
                     </thead>
                     <tbody id="loginHistoryBody"></tbody>
@@ -235,10 +237,10 @@ include 'includes/sidebar.php';
             <div id="files" class="tab-content py-4 hidden">
                 <table class="w-full">
                     <thead>
-                        <tr class="bg-gray-50">
-                            <th class="p-2 text-left">File</th>
-                            <th class="p-2 text-left">Status</th>
-                            <th class="p-2 text-left">Last Modified</th>
+                        <tr class="bg-gray-50 dark:bg-gray-700">
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">File</th>
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">Status</th>
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">Last Modified</th>
                         </tr>
                     </thead>
                     <tbody id="userFilesBody"></tbody>
@@ -248,10 +250,10 @@ include 'includes/sidebar.php';
             <div id="transactions" class="tab-content py-4 hidden">
                 <table class="w-full">
                     <thead>
-                        <tr class="bg-gray-50">
-                            <th class="p-2 text-left">Date</th>
-                            <th class="p-2 text-left">Amount</th>
-                            <th class="p-2 text-left">Description</th>
+                        <tr class="bg-gray-50 dark:bg-gray-700">
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">Date</th>
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">Amount</th>
+                            <th class="p-2 text-left text-gray-700 dark:text-gray-300">Description</th>
                         </tr>
                     </thead>
                     <tbody id="transactionsBody"></tbody>
@@ -260,7 +262,7 @@ include 'includes/sidebar.php';
 
             <div class="mt-6 flex justify-end">
                 <button onclick="toggleUserModal()" 
-                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
+                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
                     Close
                 </button>
             </div>
@@ -314,11 +316,11 @@ async function showUserDetails(userId) {
         // Populate login history
         const loginBody = document.getElementById('loginHistoryBody');
         loginBody.innerHTML = data.login_history.map(login => `
-            <tr class="border-b">
-                <td class="p-2">${new Date(login.attempted_at).toLocaleString()}</td>
-                <td class="p-2">${login.ip_address}</td>
+            <tr class="border-b dark:border-gray-700">
+                <td class="p-2 text-gray-700 dark:text-gray-300">${new Date(login.attempted_at).toLocaleString()}</td>
+                <td class="p-2 text-gray-700 dark:text-gray-300">${login.ip_address}</td>
                 <td class="p-2">
-                    <span class="px-2 py-1 rounded ${login.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    <span class="px-2 py-1 rounded ${login.success ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
                         ${login.success ? 'Success' : 'Failed'}
                     </span>
                 </td>
@@ -328,26 +330,26 @@ async function showUserDetails(userId) {
         // Populate files
         const filesBody = document.getElementById('userFilesBody');
         filesBody.innerHTML = data.files.map(file => `
-            <tr class="border-b">
-                <td class="p-2">${file.title}</td>
+            <tr class="border-b dark:border-gray-700">
+                <td class="p-2 text-gray-700 dark:text-gray-300">${file.title}</td>
                 <td class="p-2">
-                    <span class="px-2 py-1 rounded ${file.status === 'processed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                    <span class="px-2 py-1 rounded ${file.status === 'processed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}">
                         ${file.status}
                     </span>
                 </td>
-                <td class="p-2">${new Date(file.created_at).toLocaleDateString()}</td>
+                <td class="p-2 text-gray-700 dark:text-gray-300">${new Date(file.created_at).toLocaleDateString()}</td>
             </tr>
         `).join('');
 
         // Populate transactions
         const transactionsBody = document.getElementById('transactionsBody');
         transactionsBody.innerHTML = data.transactions.map(tx => `
-            <tr class="border-b">
-                <td class="p-2">${new Date(tx.created_at).toLocaleString()}</td>
-                <td class="p-2 ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}">
+            <tr class="border-b dark:border-gray-700">
+                <td class="p-2 text-gray-700 dark:text-gray-300">${new Date(tx.created_at).toLocaleString()}</td>
+                <td class="p-2 ${tx.amount > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
                     ${tx.amount > 0 ? '+' : ''}${tx.amount}
                 </td>
-                <td class="p-2">${tx.description}</td>
+                <td class="p-2 text-gray-700 dark:text-gray-300">${tx.description}</td>
             </tr>
         `).join('');
 
@@ -370,8 +372,8 @@ function showTab(tabName, event = null) {
 
     // Remove active styles from all tab links
     document.querySelectorAll('.tab-link').forEach(link => {
-        link.classList.remove('text-red-600', 'border-red-600');
-        link.classList.add('text-gray-500');
+        link.classList.remove('text-red-600', 'dark:text-red-400', 'border-red-600', 'dark:border-red-400');
+        link.classList.add('text-gray-500', 'dark:text-gray-400');
     });
 
     // Show the selected tab content
@@ -379,8 +381,8 @@ function showTab(tabName, event = null) {
 
     // Add active styles to the clicked tab link (if event is provided)
     if (event) {
-        event.target.classList.add('text-red-600', 'border-red-600');
-        event.target.classList.remove('text-gray-500');
+        event.target.classList.add('text-red-600', 'dark:text-red-400', 'border-red-600', 'dark:border-red-400');
+        event.target.classList.remove('text-gray-500', 'dark:text-gray-400');
     }
 }
 </script>

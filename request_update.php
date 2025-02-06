@@ -38,3 +38,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: file_details.php?id=$file_id");
     exit();
 }
+

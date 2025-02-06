@@ -148,89 +148,94 @@ $tools = $stmt->get_result();
 $stmt->close();
 
 include 'header.php';
-include 'includes/sidebar.php';
 ?>
 
-<div class="flex-1 mt-16 ml-64 p-8">
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-2xl font-bold text-red-600 mb-6">Manage Tools</h2>
-        
-        <!-- Add/Edit Form -->
-        <form method="POST" enctype="multipart/form-data" class="mb-8 p-4 bg-gray-50 rounded-lg">
-        <?php echo csrf_input_field(); ?>
-            <input type="hidden" name="tool_id" id="tool_id" value="">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block mb-2">Category</label>
-                    <select name="category_id" required class="w-full p-2 border rounded">
-                        <?php while($cat = $categories->fetch_assoc()): ?>
-                        <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-                <div>
-                    <label class="block mb-2">Tool Name</label>
-                    <input type="text" name="name" required class="w-full p-2 border rounded">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block mb-2">Description</label>
-                    <textarea name="description" class="w-full p-2 border rounded" rows="3"></textarea>
-                </div>
-                <div>
-                    <label class="block mb-2">Upload File (ZIP, EXE, RAR, 7Z, BIN)</label>
-                    <input type="file" name="tool_file" class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label class="block mb-2">OR Download URL</label>
-                    <input type="url" name="download_url" class="w-full p-2 border rounded">
-                </div>
-            </div>
-            <button type="submit" class="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                Save Tool
-            </button>
-        </form>
+<div class="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+    <?php include 'includes/sidebar.php'; ?>
+    
+    <div class="flex-1 transition-all duration-300 lg:ml-64">
+        <div class="container mx-auto px-4 py-8 mt-16">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-6">Manage Tools</h2>
+                
+                <!-- Add/Edit Form -->
+                <form method="POST" enctype="multipart/form-data" class="mb-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <?php echo csrf_input_field(); ?>
+                    <input type="hidden" name="tool_id" id="tool_id" value="">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-2 text-gray-700 dark:text-gray-300">Category</label>
+                            <select name="category_id" required class="w-full p-2 border rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                                <?php while($cat = $categories->fetch_assoc()): ?>
+                                <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-gray-700 dark:text-gray-300">Tool Name</label>
+                            <input type="text" name="name" required class="w-full p-2 border rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block mb-2 text-gray-700 dark:text-gray-300">Description</label>
+                            <textarea name="description" class="w-full p-2 border rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white" rows="3"></textarea>
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-gray-700 dark:text-gray-300">Upload File (ZIP, EXE, RAR, 7Z, BIN)</label>
+                            <input type="file" name="tool_file" class="w-full p-2 border rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block mb-2 text-gray-700 dark:text-gray-300">OR Download URL</label>
+                            <input type="url" name="download_url" class="w-full p-2 border rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white">
+                        </div>
+                    </div>
+                    <button type="submit" class="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                        Save Tool
+                    </button>
+                </form>
 
-        <!-- Tools List -->
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-red-50">
-                        <th class="p-3 text-left">Name</th>
-                        <th class="p-3 text-left">Category</th>
-                        <th class="p-3 text-left">Type</th>
-                        <th class="p-3 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while($tool = $tools->fetch_assoc()): ?>
-                    <tr class="border-b">
-                        <td class="p-3"><?= htmlspecialchars($tool['name']) ?></td>
-                        <td class="p-3"><?= htmlspecialchars($tool['category_name']) ?></td>
-                        <td class="p-3">
-                            <?= $tool['file_path'] ? 'File' : 'URL' ?>
-                        </td>
-                        <td class="p-3">
-                            <button onclick="editTool(<?= $tool['id'] ?>)" 
-                                    class="text-blue-600 hover:text-blue-800 mr-2">
-                                Edit
-                            </button>
-                            <form method="POST" class="inline">
-                            <?php echo csrf_input_field(); ?>
-                                <input type="hidden" name="tool_id" value="<?= $tool['id'] ?>">
-                                <button type="submit" name="delete" 
-                                        class="text-red-600 hover:text-red-800"
-                                        onclick="return confirm('Are you sure you want to delete this tool?')">
-                                    Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                <!-- Tools List -->
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-red-50 dark:bg-red-900">
+                                <th class="p-3 text-left text-gray-700 dark:text-gray-300">Name</th>
+                                <th class="p-3 text-left text-gray-700 dark:text-gray-300">Category</th>
+                                <th class="p-3 text-left text-gray-700 dark:text-gray-300">Type</th>
+                                <th class="p-3 text-left text-gray-700 dark:text-gray-300">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($tool = $tools->fetch_assoc()): ?>
+                            <tr class="border-b dark:border-gray-700">
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($tool['name']) ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($tool['category_name']) ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300">
+                                    <?= $tool['file_path'] ? 'File' : 'URL' ?>
+                                </td>
+                                <td class="p-3">
+                                    <button onclick="editTool(<?= $tool['id'] ?>)" 
+                                            class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mr-2">
+                                        Edit
+                                    </button>
+                                    <form method="POST" class="inline">
+                                    <?php echo csrf_input_field(); ?>
+                                        <input type="hidden" name="tool_id" value="<?= $tool['id'] ?>">
+                                        <button type="submit" name="delete" 
+                                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                                onclick="return confirm('Are you sure you want to delete this tool?')">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
         </div>
-        
     </div>
 </div>
 

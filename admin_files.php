@@ -135,106 +135,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 include 'header.php';
-include 'includes/sidebar.php';
 ?>
 
-<div class="flex-1 mt-16 ml-64 p-8">
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-2xl font-bold text-red-600 mb-6">Manage User Files</h2>
-        
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <?= htmlspecialchars($_SESSION['success']) ?>
-                <?php unset($_SESSION['success']); ?>
+<div class="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+    <?php include 'includes/sidebar.php'; ?>
+    
+    <div class="flex-1 transition-all duration-300 lg:ml-64">
+        <div class="container mx-auto px-4 py-8 mt-16">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-6">Manage User Files</h2>
+                
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                        <?= htmlspecialchars($_SESSION['success']) ?>
+                        <?php unset($_SESSION['success']); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <?= htmlspecialchars($_SESSION['error']) ?>
+                        <?php unset($_SESSION['error']); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-red-50 dark:bg-red-900">
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">File ID</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">User</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Title</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Status</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Version</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $stmt = $conn->prepare("
+                                SELECT f.*, u.username, fv.file_path 
+                                FROM files f
+                                JOIN users u ON f.user_id = u.id
+                                JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
+                                ORDER BY f.created_at DESC
+                            ");
+                            $stmt->execute();
+                            $files = $stmt->get_result();
+                            
+                            while ($file = $files->fetch_assoc()):
+                            ?>
+                            <tr class="border-b dark:border-gray-700">
+                                <td class="p-3 text-gray-700 dark:text-gray-300">#<?= htmlspecialchars($file['id']) ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['username']) ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['title']) ?></td>
+                                <td class="p-3">
+                                    <span class="px-2 py-1 rounded <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' ?>">
+                                        <?= ucfirst(htmlspecialchars($file['status'])) ?>
+                                    </span>
+                                </td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300">v<?= htmlspecialchars($file['current_version']) ?></td>
+                                <td class="p-3">
+                                    <div class="flex items-center gap-2">
+                                        <?php if(!empty($file['file_path'])): ?>
+                                            <a href="uploads/<?= htmlspecialchars($file['file_path']) ?>" 
+                                               class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                               download>
+                                                Download
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-gray-400">No file</span>
+                                        <?php endif; ?>
+                                        
+                                        <form method="POST" enctype="multipart/form-data" 
+                                              class="flex items-center gap-2">
+                                            <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
+                                            <input type="hidden" name="user_id" value="<?= $file['user_id'] ?>">
+                                            <input type="file" name="processed_file" 
+                                                   class="text-sm" accept=".bin">
+                                                   <?php echo csrf_input_field(); ?>
+                                            <button type="submit" 
+                                                    class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                                                Process
+                                            </button>
+                                        </form>
+                                        
+                                        <form method="POST" 
+                                              class="ml-2"
+                                              onsubmit="return confirm('Are you sure you want to permanently delete this file and all its versions? This action cannot be undone.');">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
+                                            <?php echo csrf_input_field(); ?>
+                                            <button type="submit" 
+                                                    class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        <?php endif; ?>
-        
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <?= htmlspecialchars($_SESSION['error']) ?>
-                <?php unset($_SESSION['error']); ?>
-            </div>
-        <?php endif; ?>
-        
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-red-50">
-                        <th class="p-3 text-left">File ID</th>
-                        <th class="p-3 text-left">User</th>
-                        <th class="p-3 text-left">Title</th>
-                        <th class="p-3 text-left">Status</th>
-                        <th class="p-3 text-left">Version</th>
-                        <th class="p-3 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $stmt = $conn->prepare("
-                        SELECT f.*, u.username, fv.file_path 
-                        FROM files f
-                        JOIN users u ON f.user_id = u.id
-                        JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
-                        ORDER BY f.created_at DESC
-                    ");
-                    $stmt->execute();
-                    $files = $stmt->get_result();
-                    
-                    while ($file = $files->fetch_assoc()):
-                    ?>
-                    <tr class="border-b">
-                        <td class="p-3">#<?= htmlspecialchars($file['id']) ?></td>
-                        <td class="p-3"><?= htmlspecialchars($file['username']) ?></td>
-                        <td class="p-3"><?= htmlspecialchars($file['title']) ?></td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' ?>">
-                                <?= ucfirst(htmlspecialchars($file['status'])) ?>
-                            </span>
-                        </td>
-                        <td class="p-3">v<?= htmlspecialchars($file['current_version']) ?></td>
-                        <td class="p-3">
-                            <div class="flex items-center gap-2">
-                                <?php if(!empty($file['file_path'])): ?>
-                                    <a href="uploads/<?= htmlspecialchars($file['file_path']) ?>" 
-                                       class="text-blue-600 hover:text-blue-800"
-                                       download>
-                                        Download
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-gray-400">No file</span>
-                                <?php endif; ?>
-                                
-                                <form method="POST" enctype="multipart/form-data" 
-                                      class="flex items-center gap-2">
-                                    <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
-                                    <input type="hidden" name="user_id" value="<?= $file['user_id'] ?>">
-                                    <input type="file" name="processed_file" 
-                                           class="text-sm" accept=".bin">
-                                           <?php echo csrf_input_field(); ?>
-                                    <button type="submit" 
-                                            class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
-                                        Process
-                                    </button>
-                                </form>
-                                
-                                <form method="POST" 
-                                      class="ml-2"
-                                      onsubmit="return confirm('Are you sure you want to permanently delete this file and all its versions? This action cannot be undone.');">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
-                                    <?php echo csrf_input_field(); ?>
-                                    <button type="submit" 
-                                            class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700">
-
-                                        Delete
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
         </div>
     </div>
 </div>

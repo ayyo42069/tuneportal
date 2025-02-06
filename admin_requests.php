@@ -4,6 +4,12 @@ require_auth(true);
 
 // Handle request completion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) {
+    // Verify the CSRF token before proceeding
+    $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (!verify_csrf_token($token)) {
+        die("Error: Invalid CSRF token.");
+    }
+
     $request_id = (int)$_POST['request_id'];
     $notes = sanitize($_POST['admin_notes']);
     
@@ -42,64 +48,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) 
 }
 
 include 'header.php';
-include 'includes/sidebar.php';
 ?>
 
-<div class="flex-1 mt-16 ml-64 p-8">
-    <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-2xl font-bold text-red-600 mb-6">Update Requests</h2>
-        
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead>
-                    <tr class="bg-red-50">
-                        <th class="p-3 text-left">Request ID</th>
-                        <th class="p-3 text-left">File</th>
-                        <th class="p-3 text-left">User</th>
-                        <th class="p-3 text-left">Status</th>
-                        <th class="p-3 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $requests = $conn->query("
-                        SELECT ur.*, f.title, u.username 
-                        FROM update_requests ur
-                        JOIN files f ON ur.file_id = f.id
-                        JOIN users u ON ur.user_id = u.id
-                        ORDER BY ur.created_at DESC
-                    ");
-                    
-                    while ($request = $requests->fetch_assoc()):
-                    ?>
-                    <tr class="border-b">
-                        <td class="p-3">#<?= $request['id'] ?></td>
-                        <td class="p-3"><?= $request['title'] ?></td>
-                        <td class="p-3"><?= $request['username'] ?></td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded 
-                                <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                   ($request['status'] === 'processing' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800') ?>">
-                                <?= ucfirst($request['status']) ?>
-                            </span>
-                        </td>
-                        <td class="p-3">
-                            <?php if($request['status'] !== 'completed'): ?>
-                            <button onclick="toggleProcessingModal(<?= $request['id'] ?>)" 
-                                    class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
-                                Process
-                            </button>
-                            <?php endif; ?>
-                            <a href="javascript:void(0)" 
-                               onclick="showRequestDetails(<?= $request['id'] ?>)" 
-                               class="text-blue-600 hover:text-blue-800 ml-2">
-                                Details
-                            </a>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+<div class="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+    <?php include 'includes/sidebar.php'; ?>
+    
+    <div class="flex-1 transition-all duration-300 lg:ml-64">
+        <div class="container mx-auto px-4 py-8 mt-16">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-6">Update Requests</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-red-50 dark:bg-red-900">
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Request ID</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">File</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">User</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Status</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $requests = $conn->query("
+                                SELECT ur.*, f.title, u.username 
+                                FROM update_requests ur
+                                JOIN files f ON ur.file_id = f.id
+                                JOIN users u ON ur.user_id = u.id
+                                ORDER BY ur.created_at DESC
+                            ");
+                            
+                            while ($request = $requests->fetch_assoc()):
+                            ?>
+                            <tr class="border-b dark:border-gray-700">
+                                <td class="p-3 text-gray-700 dark:text-gray-300">#<?= $request['id'] ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= $request['title'] ?></td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300"><?= $request['username'] ?></td>
+                                <td class="p-3">
+                                    <span class="px-2 py-1 rounded 
+                                        <?= $request['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                           ($request['status'] === 'processing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200') ?>">
+                                        <?= ucfirst($request['status']) ?>
+                                    </span>
+                                </td>
+                                <td class="p-3">
+                                    <?php if($request['status'] !== 'completed'): ?>
+                                    <button onclick="toggleProcessingModal(<?= $request['id'] ?>)" 
+                                            class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                                        Process
+                                    </button>
+                                    <?php endif; ?>
+                                    <a href="javascript:void(0)" 
+                                       onclick="showRequestDetails(<?= $request['id'] ?>)" 
+                                       class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-2">
+                                        Details
+                                    </a>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -107,37 +118,97 @@ include 'includes/sidebar.php';
 <!-- Processing Modal -->
 <div id="processingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
     <div class="flex items-center justify-center min-h-screen">
-        <div class="bg-white rounded-lg p-6 w-96">
-            <h3 class="text-xl font-bold mb-4">Process Update Request</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Process Update Request</h3>
             <form method="POST" enctype="multipart/form-data">
             <?php echo csrf_input_field(); ?>
                 <input type="hidden" name="request_id" id="modalRequestId">
                 <input type="hidden" name="complete_request" value="1">
                 
                 <div class="mb-4">
-                    <label class="block mb-2">Upload Updated File</label>
+                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Upload Updated File</label>
                     <input type="file" name="updated_file" required 
-                           class="w-full p-2 border rounded" accept=".bin">
+                           class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white" accept=".bin">
                 </div>
                 
                 <div class="mb-4">
-                    <label class="block mb-2">Admin Notes</label>
+                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Admin Notes</label>
                     <textarea name="admin_notes" 
-                              class="w-full p-2 border rounded" rows="3"
+                              class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3"
                               placeholder="Add any notes for the user"></textarea>
                 </div>
                 
                 <div class="flex justify-end gap-4">
                     <button type="button" onclick="toggleProcessingModal()" 
-                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
+                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
                         Cancel
                     </button>
                     <button type="submit" 
-                            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                         Complete Request
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div id="detailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12 max-w-2xl">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">Request Details - #<span id="requestId"></span></h3>
+                <button onclick="toggleDetailsModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                    ✕
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">File:</label>
+                        <p id="fileTitle" class="text-gray-600 dark:text-gray-400"></p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">User:</label>
+                        <p id="userInfo" class="text-gray-600 dark:text-gray-400"></p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Status:</label>
+                        <p id="requestStatus" class="text-gray-600 dark:text-gray-400"></p>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-700 dark:text-gray-300">Created:</label>
+                        <p id="createdAt" class="text-gray-600 dark:text-gray-400"></p>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4 dark:border-gray-700">
+                    <label class="font-semibold text-gray-700 dark:text-gray-300">User's Message:</label>
+                    <p id="userMessage" class="text-gray-600 dark:text-gray-400 whitespace-pre-line"></p>
+                </div>
+                
+                <div class="border-t pt-4 dark:border-gray-700">
+                    <label class="font-semibold text-gray-700 dark:text-gray-300">Admin Notes:</label>
+                    <p id="adminNotes" class="text-gray-600 dark:text-gray-400 whitespace-pre-line"></p>
+                </div>
+                
+                <div class="border-t pt-4 dark:border-gray-700">
+                    <label class="font-semibold text-gray-700 dark:text-gray-300">Current File Version:</label>
+                    <p id="fileVersion" class="text-gray-600 dark:text-gray-400"></p>
+                    <a id="fileDownload" href="#" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300" download>
+                        Download Latest Version
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                <button onclick="toggleDetailsModal()" 
+                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -151,102 +222,39 @@ function toggleProcessingModal(requestId = null) {
     modal.classList.toggle('hidden');
 }
 
-function showRequestDetails(requestId) {
-    // AJAX implementation for details would go here
-    alert('Detailed view implementation would go here');
-}
-</script>
-<!-- Details Modal -->
-<div id="detailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-    <div class="flex items-center justify-center min-h-screen">
-        <div class="bg-white rounded-lg p-6 w-11/12 max-w-2xl">
-            <div class="flex justify-between items-start mb-4">
-                <h3 class="text-xl font-bold">Request Details - #<span id="requestId"></span></h3>
-                <button onclick="toggleDetailsModal()" class="text-gray-500 hover:text-gray-700">
-                    ✕
-                </button>
-            </div>
-            
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="font-semibold">File:</label>
-                        <p id="fileTitle" class="text-gray-600"></p>
-                    </div>
-                    <div>
-                        <label class="font-semibold">User:</label>
-                        <p id="userInfo" class="text-gray-600"></p>
-                    </div>
-                    <div>
-                        <label class="font-semibold">Status:</label>
-                        <p id="requestStatus" class="text-gray-600"></p>
-                    </div>
-                    <div>
-                        <label class="font-semibold">Created:</label>
-                        <p id="createdAt" class="text-gray-600"></p>
-                    </div>
-                </div>
-                
-                <div class="border-t pt-4">
-                    <label class="font-semibold">User's Message:</label>
-                    <p id="userMessage" class="text-gray-600 whitespace-pre-line"></p>
-                </div>
-                
-                <div class="border-t pt-4">
-                    <label class="font-semibold">Admin Notes:</label>
-                    <p id="adminNotes" class="text-gray-600 whitespace-pre-line"></p>
-                </div>
-                
-                <div class="border-t pt-4">
-                    <label class="font-semibold">Current File Version:</label>
-                    <p id="fileVersion" class="text-gray-600"></p>
-                    <a id="fileDownload" href="#" class="text-red-600 hover:text-red-800" download>
-                        Download Latest Version
-                    </a>
-                </div>
-            </div>
-            
-            <div class="mt-6 flex justify-end">
-                <button onclick="toggleDetailsModal()" 
-                        class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+async function showRequestDetails(requestId) {
+    try {
+        const response = await fetch(`get_request_details.php?id=${requestId}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-<script>
-function showRequestDetails(requestId) {
-    fetch(`get_request_details.php?id=${requestId}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Request failed');
-            return response.json();
-        })
-        .then(data => {
-            // Populate modal
-            document.getElementById('requestId').textContent = data.id;
-            document.getElementById('fileTitle').textContent = data.file_title;
-            document.getElementById('userInfo').textContent = `${data.username} (${data.email})`;
-            document.getElementById('requestStatus').textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
-            document.getElementById('createdAt').textContent = new Date(data.created_at).toLocaleString();
-            document.getElementById('userMessage').textContent = data.message;
-            document.getElementById('adminNotes').textContent = data.admin_notes || 'No admin notes';
-            
-            if(data.file_path) {
-                document.getElementById('fileVersion').textContent = new Date(data.file_updated).toLocaleString();
-                document.getElementById('fileDownload').href = `uploads/${data.file_path}`;
-            } else {
-                document.getElementById('fileVersion').textContent = 'No file available';
-                document.getElementById('fileDownload').classList.add('hidden');
-            }
-            
-            toggleDetailsModal();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to load request details');
-        });
+        const data = await response.json();
+
+        // Populate the modal with request details
+        document.getElementById('requestId').textContent = data.id;
+        document.getElementById('fileTitle').textContent = data.file_title;
+        document.getElementById('userInfo').textContent = `${data.username} (${data.email})`;
+        document.getElementById('requestStatus').textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+        document.getElementById('createdAt').textContent = new Date(data.created_at).toLocaleString();
+        document.getElementById('userMessage').textContent = data.message;
+        document.getElementById('adminNotes').textContent = data.admin_notes || 'No admin notes';
+        
+        if(data.file_path) {
+            document.getElementById('fileVersion').textContent = new Date(data.file_updated).toLocaleString();
+            document.getElementById('fileDownload').href = `uploads/${data.file_path}`;
+            document.getElementById('fileDownload').classList.remove('hidden');
+        } else {
+            document.getElementById('fileVersion').textContent = 'No file available';
+            document.getElementById('fileDownload').classList.add('hidden');
+        }
+        
+        toggleDetailsModal();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load request details');
+    }
 }
 
 function toggleDetailsModal() {
@@ -256,3 +264,4 @@ function toggleDetailsModal() {
 </script>
 
 <?php include 'footer.php'; ?>
+
