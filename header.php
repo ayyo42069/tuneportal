@@ -8,25 +8,78 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#ff4d4d',
-                        secondary: '#3d3d3d',
-                    },
-                },
-            },
-        }
-    </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .glassmorphism {
-                @apply bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg;
-            }
-        }
-    </style>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          // Define your black and white color palette
+          primary: "#000000", // Black
+          secondary: "#FFFFFF", // White
+          accent: "#808080", // Gray (optional, for subtle contrast)
+          neutral: "#F0F0F0", // Light gray for backgrounds
+          text: "#333333", // Dark gray for text on light backgrounds
+          textLight: "#FFFFFF", // White for text on dark backgrounds
+        },
+        fontFamily: {
+          sans: ["Inter", "sans-serif"],
+          serif: ["Merriweather", "serif"],
+        },
+      },
+    },
+  };
+</script>
+<style type="text/tailwindcss">
+  @layer base {
+    body {
+      @apply bg-neutral text-text; /* Set default background and text */
+    }
+  }
+
+  @layer components {
+    .card {
+      @apply bg-secondary dark:bg-gray-800 rounded-xl shadow-sm p-6;
+    }
+
+    .form-input {
+      @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:text-white;
+    }
+
+    .btn-primary {
+      @apply bg-primary text-textLight px-6 py-2.5 rounded-lg hover:bg-gray-800 transition-colors inline-flex items-center gap-2;
+    }
+
+    .table-header {
+      @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider;
+    }
+
+    .table-row {
+      @apply hover:bg-gray-50 dark:hover:bg-gray-700;
+    }
+
+    .notification-new {
+      @apply bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200;
+    }
+
+    .notification-read {
+      @apply bg-gray-50 dark:bg-gray-700;
+    }
+
+    .notification-unread {
+      @apply bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700;
+    }
+
+    .notification-link {
+      @apply text-primary dark:text-secondary hover:text-gray-800 dark:hover:text-gray-300;
+    }
+  }
+
+  @layer utilities {
+    .glassmorphism {
+      @apply bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg;
+    }
+  }
+</style>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
 <header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 shadow-md">
