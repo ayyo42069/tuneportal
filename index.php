@@ -1,226 +1,158 @@
 <?php include 'header.php'; ?>
 
-<!-- Splash Screen -->
-<div id="splash-screen" class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-gray-900 transition-opacity duration-500">
-    <div class="relative w-48 h-48 mb-8">
-        <img src="path_to_your_logo.png" alt="TunePortal" class="object-contain w-full h-full">
-    </div>
-
-    <!-- Matrix-style loading text -->
-    <div id="matrix-text" class="font-mono text-white mb-4 h-6"></div>
-
-    <!-- Progress bar container -->
-    <div class="w-64 h-1 bg-gray-700 rounded-full overflow-hidden">
-        <div id="progress-bar" class="h-full bg-white transition-all duration-100 ease-out" style="width: 0%"></div>
-    </div>
-
-    <!-- Progress percentage -->
-    <div id="progress-percentage" class="mt-2 font-mono text-sm text-white">0%</div>
-</div>
-
-<!-- Rest of your index.php content -->
-<div id="main-content" class="hidden">
-    <!-- Hero Section with Video Background -->
-    <section class="relative h-screen flex items-center justify-center overflow-hidden">
-        <video autoplay loop muted class="absolute w-full h-full object-cover">
-            <source src="path_to_your_sports_car_video.mp4" type="video/mp4">
-        </video>
-        <div class="absolute inset-0 bg-black opacity-60"></div>
-        <div class="relative z-10 text-center text-white px-4">
-            <h1 class="text-5xl md:text-7xl font-bold mb-4 animate-fade-in-up">Unleash Your Car's Potential</h1>
-            <p class="text-xl md:text-2xl mb-8 animate-fade-in-up animate-delay-100">Experience the thrill of optimized performance with TunePortal</p>
-            <a href="#get-started" class="bg-primary text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-red-600 transition duration-300 animate-fade-in-up animate-delay-200 inline-block">
-                Start Tuning Now
-            </a>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="py-20 bg-gray-100">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">Why Choose TunePortal?</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
-                    <div class="text-primary text-4xl mb-4"><i class="fas fa-tachometer-alt"></i></div>
-                    <h3 class="text-xl font-semibold mb-2">Precision Tuning</h3>
-                    <p>Our advanced algorithms ensure your car performs at its absolute best, tailored to your specific needs.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
-                    <div class="text-primary text-4xl mb-4"><i class="fas fa-shield-alt"></i></div>
-                    <h3 class="text-xl font-semibold mb-2">Safety First</h3>
-                    <p>We prioritize your vehicle's longevity, ensuring performance gains without compromising reliability.</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
-                    <div class="text-primary text-4xl mb-4"><i class="fas fa-users"></i></div>
-                    <h3 class="text-xl font-semibold mb-2">Expert Support</h3>
-                    <p>Our team of experienced tuners is always ready to assist you with personalized solutions.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">How It Works</h2>
-            <div class="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-8">
-                <div class="text-center">
-                    <div class="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold mb-4 mx-auto">1</div>
-                    <h3 class="text-xl font-semibold mb-2">Select Your Vehicle</h3>
-                    <p>Choose your car make, model, and year from our extensive database.</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold mb-4 mx-auto">2</div>
-                    <h3 class="text-xl font-semibold mb-2">Customize Your Tune</h3>
-                    <p>Pick your desired performance upgrades and tuning options.</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-primary text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold mb-4 mx-auto">3</div>
-                    <h3 class="text-xl font-semibold mb-2">Receive Your Tune</h3>
-                    <p>Download your custom tune file and flash it to your ECU.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="py-20 bg-gray-100">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">What Our Customers Say</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <div class="flex items-center mb-4">
-                        <img src="path_to_customer_image1.jpg" alt="Customer" class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <h4 class="font-semibold">John Doe</h4>
-                            <p class="text-gray-600">BMW M3 Owner</p>
+<main class="flex-grow mt-16">
+    <!-- Hero Section with Particle.js Background -->
+    <section class="relative h-screen bg-gradient-to-r from-primary to-secondary overflow-hidden">
+        <div id="particles-js" class="absolute inset-0 z-0"></div>
+        
+        <div class="relative z-10 h-full flex items-center">
+            <div class="container mx-auto px-4 text-center text-white">
+                <div class="live-stats absolute top-4 right-4 glassmorphism p-4 rounded-lg">
+                    <div class="flex space-x-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold count-up" data-count="2543">0</div>
+                            <div class="text-sm">Tuned Vehicles</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold count-up" data-count="178">0</div>
+                            <div class="text-sm">Expert Tuners</div>
                         </div>
                     </div>
-                    <p class="text-gray-700">"TunePortal transformed my M3. The power gains are incredible, and the throttle response is now razor-sharp!"</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <div class="flex items-center mb-4">
-                        <img src="path_to_customer_image2.jpg" alt="Customer" class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <h4 class="font-semibold">Jane Smith</h4>
-                            <p class="text-gray-600">Audi RS6 Owner</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-700">"I'm amazed at how much untapped potential my RS6 had. TunePortal unleashed a whole new level of performance!"</p>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <div class="flex items-center mb-4">
-                        <img src="path_to_customer_image3.jpg" alt="Customer" class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <h4 class="font-semibold">Mike Johnson</h4>
-                            <p class="text-gray-600">Ford Mustang GT Owner</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-700">"The customer support at TunePortal is unmatched. They helped me every step of the way to achieve the perfect tune for my Mustang."</p>
-                </div>
+                
+                <h1 class="text-6xl md:text-7xl font-bold mb-6 animate-fade-in-up">
+                    Unleash Your Car's<br><span class="text-secondary dark:text-primary">True Potential</span>
+                </h1>
+                <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90 animate-fade-in-up animation-delay-300">
+                    Experience the pinnacle of automotive performance with our cutting-edge ECU tuning solutions
+                </p>
+                <?php if(!isset($_SESSION['user_id'])): ?>
+                    <a href="register.php" 
+                       class="inline-block bg-white text-primary px-8 py-3 rounded-full text-lg font-semibold 
+                              hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 animate-fade-in-up animation-delay-600">
+                        Start Tuning Now
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
+        
+        
     </section>
 
-    <!-- CTA Section -->
-    <section id="get-started" class="py-20 bg-primary text-white">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-4xl font-bold mb-4">Ready to Elevate Your Ride?</h2>
-            <p class="text-xl mb-8">Join thousands of satisfied customers and experience the TunePortal difference today!</p>
-            <a href="register.php" class="bg-white text-primary px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition duration-300 inline-block">
-                Get Your Free Tune Estimate
-            </a>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="py-20 bg-white">
+    <!-- Features Grid with Hover Effects -->
+    <section class="py-20 bg-gray-50 dark:bg-gray-900">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-            <div class="max-w-3xl mx-auto space-y-6">
-                <div class="bg-gray-100 p-6 rounded-lg">
-                    <h3 class="text-xl font-semibold mb-2">Is tuning safe for my car?</h3>
-                    <p>Yes, when done properly. Our tunes are developed by experts to maximize performance while maintaining reliability.</p>
+            <h2 class="text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">Why Choose TunePortal?</h2>
+            
+            <div class="grid md:grid-cols-3 gap-12">
+                <!-- Feature 1 -->
+                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-white">Advanced ECU Tuning</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Precision-engineered performance upgrades for maximum power and efficiency</p>
                 </div>
-                <div class="bg-gray-100 p-6 rounded-lg">
-                    <h3 class="text-xl font-semibold mb-2">Will tuning void my warranty?</h3>
-                    <p>It depends on your manufacturer. We offer warranty-friendly tunes and can advise on the best options for your situation.</p>
+
+                <!-- Feature 2 -->
+                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-secondary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-white">Real-time Diagnostics</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Instant performance feedback and diagnostics for optimal tuning results</p>
                 </div>
-                <div class="bg-gray-100 p-6 rounded-lg">
-                    <h3 class="text-xl font-semibold mb-2">How much horsepower can I gain?</h3>
-                    <p>Gains vary by vehicle, but many customers see 10-15% increases in horsepower and torque.</p>
+
+                <!-- Feature 3 -->
+                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h3m-3 4h3m-6 4h3M9 7h3m-3 4h3m-6 4h3M6 17v-4m9 4V7m3 10v-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-white">Custom Mapping</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Tailor-made performance maps for your specific vehicle and driving style</p>
                 </div>
             </div>
         </div>
     </section>
 
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const splashScreen = document.getElementById('splash-screen');
-    const mainContent = document.getElementById('main-content');
-    const progressBar = document.getElementById('progress-bar');
-    const progressPercentage = document.getElementById('progress-percentage');
-    const matrixText = document.getElementById('matrix-text');
-
-    let progress = 0;
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%";
-
-    // Matrix text effect
-    const matrixInterval = setInterval(() => {
-        const randomText = Array(8).fill(0).map(() => characters.charAt(Math.floor(Math.random() * characters.length))).join("");
-        matrixText.textContent = `LOADING_SYSTEM: ${randomText}`;
-    }, 50);
-
-    // Progress bar animation
-    const interval = setInterval(() => {
-        progress += 1;
-        progressBar.style.width = `${progress}%`;
-        progressPercentage.textContent = `${progress}%`;
-
-        if (progress >= 100) {
-            clearInterval(interval);
-            clearInterval(matrixInterval);
-            setTimeout(() => {
-                splashScreen.classList.add('opacity-0', 'pointer-events-none');
-                mainContent.classList.remove('hidden');
-            }, 500);
-        }
-    }, 30);
-});
-</script>
-
-<script>
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-});
-
-// Animate elements when they come into view
-const animateOnScroll = (entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('animate-fade-in-up');
-            observer.unobserve(entry.target);
-        }
-    });
-};
-
-const observer = new IntersectionObserver(animateOnScroll, {
-    root: null,
-    threshold: 0.1
-});
-
-document.querySelectorAll('section > div > *').forEach(el => {
-    observer.observe(el);
-});
-</script>
+    <!-- CTA Section with Animated Background -->
+    <section class="relative py-20 bg-primary text-white overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <svg class="w-full h-full" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
+                <path fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" d="M0,600 C600,200 900,100 1200,600" />
+                <path fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" d="M0,450 C300,50 900,50 1200,450" />
+            </svg>
+        </div>
+        <div class="container mx-auto px-4 relative z-10">
+            <h2 class="text-4xl font-bold mb-6 text-center">Start Your Tuning Journey Today</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto text-center opacity-90">
+                Join the ranks of satisfied tuners and unleash your vehicle's true potential
+            </p>
+            <div class="flex justify-center space-x-4">
+                <a href="register.php" 
+                   class="bg-white text-primary px-8 py-3 rounded-lg font-semibold 
+                          hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
+                    Create Free Account
+                </a>
+                <a href="#features" 
+                   class="border border-white hover:bg-white hover:text-primary px-8 py-3 rounded-lg font-semibold transition-colors">
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
 
 <?php include 'footer.php'; ?>
+
+<script>
+    // Particle.js configuration
+    particlesJS("particles-js", {
+        particles: {
+            number: { value: 80, density: { enable: true, value_area: 800 } },
+            color: { value: "#ffffff" },
+            shape: { type: "circle" },
+            opacity: { value: 0.5, random: false },
+            size: { value: 3, random: true },
+            line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+            move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+        },
+        interactivity: {
+            detect_on: "canvas",
+            events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+            modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+        },
+        retina_detect: true
+    });
+
+    // Animate count-up
+    const countUpElements = document.querySelectorAll('.count-up');
+    countUpElements.forEach(element => {
+        const target = parseInt(element.getAttribute('data-count'), 10);
+        let count = 0;
+        const duration = 2000; // 2 seconds
+        const increment = target / (duration / 16); // 60 FPS
+
+        const updateCount = () => {
+            count += increment;
+            if (count < target) {
+                element.textContent = Math.round(count);
+                requestAnimationFrame(updateCount);
+            } else {
+                element.textContent = target;
+            }
+        };
+
+        updateCount();
+    });
+</script>
+
+</body>
+</html>
 
