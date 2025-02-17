@@ -42,17 +42,19 @@ require_once __DIR__ . '/includes/encryption.php';
 require_once __DIR__ . '/includes/logging.php';
 require_once __DIR__ . '/includes/file_handler.php';
 
-// Set secure session cookie parameters
-$cookieParams = session_get_cookie_params();
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path'     => $cookieParams['path'],
-    'domain'   => $cookieParams['domain'],
-    'secure'   => true,
-    'httponly' => true,
-    'samesite' => 'Lax'
-]);
-session_start();
+// Set secure session cookie parameters and start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    $cookieParams = session_get_cookie_params();
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => $cookieParams['path'],
+        'domain'   => $cookieParams['domain'],
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+    session_start();
+}
 
 // Create a new MySQLi connection using environment variables
 $conn = new mysqli(
