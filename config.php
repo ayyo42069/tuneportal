@@ -1,7 +1,15 @@
 <?php
+// Error reporting
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// Define constants
+define('ENVIRONMENT', 'development');
+define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
+define('ALLOWED_EXTENSIONS', ['bin']);
+define('ERROR_LOG_PATH', __DIR__ . '/logs/error.log');
+
 // Load environment variables from .env file
 function load_env() {
     $env_file = __DIR__ . '/.env';
@@ -20,13 +28,20 @@ function load_env() {
         }
     }
 }
-// Include encryption functions
-require_once __DIR__ . '/includes/encryption.php';
 
 // Load environment variables
 load_env();
 
-// Set secure session cookie parameters BEFORE starting the session
+// Create logs directory if it doesn't exist
+if (!file_exists(__DIR__ . '/logs')) {
+    mkdir(__DIR__ . '/logs', 0755, true);
+}
+
+// Include required files
+require_once __DIR__ . '/includes/encryption.php';
+require_once __DIR__ . '/includes/logging.php';
+
+// Set secure session cookie parameters
 $cookieParams = session_get_cookie_params();
 session_set_cookie_params([
     'lifetime' => 0,
@@ -37,9 +52,6 @@ session_set_cookie_params([
     'samesite' => 'Lax'
 ]);
 session_start();
-
-// Load environment variables
-load_env();
 
 // Create a new MySQLi connection using environment variables
 $conn = new mysqli(
@@ -53,23 +65,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-function log_error($message, $severity = 'ERROR', $context = []) {
-    $timestamp = date('Y-m-d H:i:s');
-    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'guest';
-    $request_uri = $_SERVER['REQUEST_URI'] ?? 'unknown';
-    
-    $log_entry = sprintf(
-        "[%s] [%s] [User: %s] [URL: %s] %s %s\n",
-        $timestamp,
-        $severity,
-        $user_id,
-        $request_uri,
-        $message,
-        !empty($context) ? json_encode($context) : ''
-    );
-    
-    error_log($log_entry, 3, ERROR_LOG_PATH);
-}
+// Set charset
+$conn->set_charset("utf8mb4");
 
 function handle_db_error($query, $error) {
     $context = [
@@ -127,58 +124,6 @@ function validate_file($file) {
     return [true, ""];
 }
 
-function encrypt_file($source, $destination) {
-    try {
-        $content = file_get_contents($source);
-        if ($content === false) {
-            throw new Exception("Could not read source file");
-        }
-
-        $iv = random_bytes(16);
-        $encrypted = openssl_encrypt($content, 'AES-256-CBC', ENCRYPTION_KEY, 0, $iv);
-        
-        if ($encrypted === false) {
-            throw new Exception("Encryption failed");
-        }
-
-        $final = base64_encode($iv) . ':' . $encrypted;
-        if (file_put_contents($destination, $final) === false) {
-            throw new Exception("Could not write encrypted file");
-        }
-
-        return true;
-    } catch (Exception $e) {
-        log_error("File encryption failed", "ERROR", ['error' => $e->getMessage()]);
-        return false;
-    }
-}
-
-function decrypt_file($source, $destination) {
-    try {
-        $content = file_get_contents($source);
-        if ($content === false) {
-            throw new Exception("Could not read encrypted file");
-        }
-
-        list($iv, $encrypted) = explode(':', $content);
-        $iv = base64_decode($iv);
-        
-        $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', ENCRYPTION_KEY, 0, $iv);
-        if ($decrypted === false) {
-            throw new Exception("Decryption failed");
-        }
-
-        if (file_put_contents($destination, $decrypted) === false) {
-            throw new Exception("Could not write decrypted file");
-        }
-
-        return true;
-    } catch (Exception $e) {
-        log_error("File decryption failed", "ERROR", ['error' => $e->getMessage()]);
-        return false;
-    }
-}
-
 function generate_csrf_token() {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -194,4 +139,12 @@ function csrf_input_field() {
     $token = generate_csrf_token();
     return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
 }
+
+// Register shutdown function to handle fatal errors
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== NULL && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        log_error("Fatal Error", "CRITICAL", $error);
+    }
+});
 ?>
