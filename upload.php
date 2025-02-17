@@ -3,40 +3,38 @@ include 'config.php';
 require_auth();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Verify the CSRF token before proceeding
-    $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-    if (!verify_csrf_token($token)) {
-        die("Error: Invalid CSRF token.");
-    }
-
-    // Start transaction for data consistency
-    $conn->begin_transaction();
-    
     try {
-        // Validate file
-        $file = $_FILES['bin_file'];
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-        
-        if ($ext !== 'bin') {
-            $_SESSION['error'] = "Only .bin files are allowed";
-            header("Location: dashboard.php");
-            exit();
+        if (!verify_csrf_token($_POST['csrf_token'])) {
+            throw new Exception("Invalid CSRF token");
         }
 
-        // Calculate total credits needed
+        // Validate file
+        list($valid, $message) = validate_file($_FILES['bin_file']);
+        if (!$valid) {
+            throw new Exception($message);
+        }
+
+        $conn->begin_transaction();
+
+        // Calculate total credits
         $totalCredits = 0;
         if(isset($_POST['tuning_options'])) {
-            $options = implode(",", array_map('intval', $_POST['tuning_options']));
-            $creditQuery = $conn->query("SELECT SUM(credit_cost) AS total FROM tuning_options WHERE id IN ($options)");
-            $totalCredits = $creditQuery->fetch_assoc()['total'];
+            $options = array_map('intval', $_POST['tuning_options']);
+            $placeholders = str_repeat('?,', count($options) - 1) . '?';
+            $stmt = $conn->prepare("SELECT SUM(credit_cost) AS total FROM tuning_options WHERE id IN ($placeholders)");
+            $stmt->bind_param(str_repeat('i', count($options)), ...$options);
+            $stmt->execute();
+            $totalCredits = $stmt->get_result()->fetch_assoc()['total'];
         }
 
         // Check user credits
-        $user = $conn->query("SELECT credits FROM users WHERE id = {$_SESSION['user_id']}")->fetch_assoc();
+        $stmt = $conn->prepare("SELECT credits FROM users WHERE id = ?");
+        $stmt->bind_param("i", $_SESSION['user_id']);
+        $stmt->execute();
+        $user = $stmt->get_result()->fetch_assoc();
+        
         if ($user['credits'] < $totalCredits) {
-            $_SESSION['error'] = "Insufficient credits";
-            header("Location: dashboard.php");
-            exit();
+            throw new Exception("Insufficient credits");
         }
 
         // Create file record
@@ -45,37 +43,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         $fileId = $stmt->insert_id;
 
-        // Store file
         $uploadDir = __DIR__ . '/uploads/';
         $filename = "file_{$fileId}_v1.bin";
-        move_uploaded_file($file['tmp_name'], $uploadDir . $filename);
+        
+        // Encrypt and store the file
+        if (!encrypt_file($_FILES['bin_file']['tmp_name'], $uploadDir . $filename)) {
+            throw new Exception("Failed to encrypt file");
+        }
 
-        // Create version record
-        $conn->query("INSERT INTO file_versions (file_id, version, file_path) 
-                     VALUES ($fileId, 1, '$filename')");
+        // Calculate file hash
+        $file_hash = hash_file('sha256', $uploadDir . $filename);
+
+        // Create version record with hash
+        $stmt = $conn->prepare("INSERT INTO file_versions (file_id, version, file_path, file_hash) VALUES (?, 1, ?, ?)");
+        $stmt->bind_param("iss", $fileId, $filename, $file_hash);
+        $stmt->execute();
 
         // Deduct credits and log transaction
-        $conn->query("UPDATE users SET credits = credits - $totalCredits WHERE id = {$_SESSION['user_id']}");
+        $stmt = $conn->prepare("UPDATE users SET credits = credits - ? WHERE id = ?");
+        $stmt->bind_param("ii", $totalCredits, $_SESSION['user_id']);
+        $stmt->execute();
         
-        // Log credit transaction with negative amount
-        $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description) 
-                              VALUES (?, ?, 'file_upload', ?)");
-        $description = "Credits used for file upload: " . htmlspecialchars($_POST['title']);
-        $negativeAmount = -$totalCredits; // Convert to negative for deduction
+        // Log credit transaction
+        $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description) VALUES (?, ?, 'file_upload', ?)");
+        $description = "Credits used for file upload: " . $_POST['title'];
+        $negativeAmount = -$totalCredits;
         $stmt->bind_param("iis", $_SESSION['user_id'], $negativeAmount, $description);
         $stmt->execute();
 
-        // Commit transaction
         $conn->commit();
+
+        log_error("File uploaded successfully", "INFO", [
+            'file_id' => $fileId,
+            'user_id' => $_SESSION['user_id'],
+            'credits_used' => $totalCredits
+        ]);
 
         $_SESSION['success'] = "File uploaded successfully";
         header("Location: file_details.php?id=$fileId");
         exit();
         
     } catch (Exception $e) {
-        // Rollback transaction on error
         $conn->rollback();
-        $_SESSION['error'] = "An error occurred during file upload";
+        log_error("File upload failed", "ERROR", [
+            'error' => $e->getMessage(),
+            'user_id' => $_SESSION['user_id']
+        ]);
+        $_SESSION['error'] = "Upload failed: " . $e->getMessage();
         header("Location: dashboard.php");
         exit();
     }

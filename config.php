@@ -17,6 +17,8 @@ function load_env() {
         }
     }
 }
+// Include encryption functions
+require_once __DIR__ . '/includes/encryption.php';
 
 // Load environment variables
 load_env();

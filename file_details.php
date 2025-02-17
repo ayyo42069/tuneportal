@@ -8,8 +8,67 @@ if (!isset($_GET['id'])) {
 }
 
 $fileId = (int)$_GET['id'];
-$file = $conn->query("SELECT * FROM files WHERE id = $fileId")->fetch_assoc();
-$versions = $conn->query("SELECT * FROM file_versions WHERE file_id = $fileId ORDER BY version DESC");
+
+// Use prepared statements for security
+$stmt = $conn->prepare("SELECT f.*, u.username FROM files f JOIN users u ON f.user_id = u.id WHERE f.id = ?");
+$stmt->bind_param("i", $fileId);
+$stmt->execute();
+$file = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+if (!$file) {
+    log_error("File not found", "WARNING", ['file_id' => $fileId]);
+    $_SESSION['error'] = "File not found";
+    header("Location: dashboard.php");
+    exit();
+}
+
+$stmt = $conn->prepare("SELECT * FROM file_versions WHERE file_id = ? ORDER BY version DESC");
+$stmt->bind_param("i", $fileId);
+$stmt->execute();
+$versions = $stmt->get_result();
+$stmt->close();
+
+// Handle file download requests
+if (isset($_GET['download'])) {
+    $version_id = isset($_GET['version']) ? (int)$_GET['version'] : $file['current_version'];
+    
+    // Get file path for specific version
+    $stmt = $conn->prepare("SELECT * FROM file_versions WHERE file_id = ? AND version = ?");
+    $stmt->bind_param("ii", $fileId, $version_id);
+    $stmt->execute();
+    $version_file = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if ($version_file) {
+        $file_path = __DIR__ . '/uploads/' . $version_file['file_path'];
+        
+        // Log download attempt
+        $stmt = $conn->prepare("INSERT INTO file_download_log (file_id, version_id, user_id, user_ip) VALUES (?, ?, ?, ?)");
+        $user_ip = $_SERVER['REMOTE_ADDR'];
+        $user_id = $_SESSION['user_id'];
+        $stmt->bind_param("iiis", $fileId, $version_file['id'], $user_id, $user_ip);
+        $stmt->execute();
+        $stmt->close();
+
+        if (!serve_file($file_path, basename($version_file['file_path']))) {
+            log_error("File download failed", "ERROR", [
+                'file_id' => $fileId,
+                'version_id' => $version_id,
+                'path' => $file_path
+            ]);
+            $_SESSION['error'] = "Download failed";
+        }
+    } else {
+        log_error("Version not found", "WARNING", [
+            'file_id' => $fileId,
+            'version' => $version_id
+        ]);
+        $_SESSION['error'] = "Version not found";
+    }
+    header("Location: file_details.php?id=" . $fileId);
+    exit();
+}
 
 include 'header.php';
 ?>
@@ -39,7 +98,8 @@ include 'header.php';
                         <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">File Actions</h3>
                         <div class="space-y-2">
                             <?php if($file['status'] === 'processed'): ?>
-                                <a href="#" class="block w-full bg-red-600 text-white text-center py-2 rounded hover:bg-red-700 transition-colors">
+                                <a href="?id=<?= $fileId ?>&download=true" 
+                                   class="block w-full bg-red-600 text-white text-center py-2 rounded hover:bg-red-700 transition-colors">
                                     Download Processed File
                                 </a>
                             <?php endif; ?>
@@ -63,7 +123,10 @@ include 'header.php';
                                     <span class="text-sm text-gray-500 dark:text-gray-400 ml-2"><?= $version['uploaded_at'] ?></span>
                                 </div>
                                 <div class="space-x-2">
-                                    <a href="#" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Download</a>
+                                    <a href="?id=<?= $fileId ?>&download=true&version=<?= $version['version'] ?>" 
+                                       class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                        Download
+                                    </a>
                                     <?php if($version['version'] !== $file['current_version']): ?>
                                         <a href="revert_version.php?file_id=<?= $fileId ?>&version=<?= $version['version'] ?>" 
                                            class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">Revert</a>

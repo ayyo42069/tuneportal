@@ -19,15 +19,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) 
         $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
         
         if ($ext === 'bin') {
-            // Get request details
-            $request = $conn->query("SELECT * FROM update_requests WHERE id = $request_id")->fetch_assoc();
+            // Get request details using prepared statement
+            $stmt = $conn->prepare("SELECT * FROM update_requests WHERE id = ?");
+            $stmt->bind_param("i", $request_id);
+            $stmt->execute();
+            $request = $stmt->get_result()->fetch_assoc();
             
-            // Update file version
-            $new_version = $conn->query("SELECT current_version FROM files WHERE id = {$request['file_id']}")->fetch_assoc()['current_version'] + 1;
+            // Update file version with encryption
+            $stmt = $conn->prepare("SELECT current_version FROM files WHERE id = ?");
+            $stmt->bind_param("i", $request['file_id']);
+            $stmt->execute();
+            $new_version = $stmt->get_result()->fetch_assoc()['current_version'] + 1;
+            
             $filename = "processed_{$request['file_id']}_v{$new_version}.bin";
-            move_uploaded_file($file['tmp_name'], __DIR__ . "/uploads/$filename");
+            $upload_path = __DIR__ . "/uploads/$filename";
             
-            // Update database
+            if (!encrypt_file($_FILES['updated_file']['tmp_name'], $upload_path)) {
+                throw new Exception("Failed to encrypt file");
+            }
+            
+            // Calculate file hash
+            $file_hash = hash_file('sha256', $upload_path);
+            
+            // Update database with prepared statements
             $conn->query("UPDATE files SET current_version = $new_version WHERE id = {$request['file_id']}");
             $conn->query("INSERT INTO file_versions (file_id, version, file_path, notes) 
                          VALUES ({$request['file_id']}, $new_version, '$filename', '$notes')");
