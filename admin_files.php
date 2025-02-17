@@ -2,8 +2,7 @@
 include 'config.php';
 require_auth(true); // Admin only
 
-// Generate CSRF token
-session_start();
+// Generate CSRF token if not exists (without starting a new session)
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
