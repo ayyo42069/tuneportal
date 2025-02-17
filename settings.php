@@ -120,14 +120,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
     header("Location: settings.php");
     exit();
 }
-
-// Fetch current preferences
+// After fetching preferences
 $stmt = $conn->prepare("SELECT * FROM user_preferences WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $preferences = $stmt->get_result()->fetch_assoc();
 
-// Fetch profile data
+// Add this code to create default preferences if none exist
+if (!$preferences) {
+    $stmt = $conn->prepare("INSERT INTO user_preferences (user_id, dark_mode, email_notifications, language) VALUES (?, 0, 1, 'en')");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    
+    $preferences = [
+        'dark_mode' => 0,
+        'email_notifications' => 1,
+        'language' => 'en'
+    ];
+}
+
+// Same for profile data
+if (!$profile) {
+    $stmt = $conn->prepare("INSERT INTO user_profiles (user_id, timezone) VALUES (?, 'UTC')");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    
+    $profile = [
+        'timezone' => 'UTC',
+        'company' => '',
+        'phone' => ''
+    ];
+}
 $stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
