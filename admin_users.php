@@ -13,26 +13,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = (int)$_POST['user_id'];
     $action = sanitize($_POST['action']);
     
+    // Log the attempt
+    log_error("Admin user action attempted", "INFO", [
+        'admin_id' => $admin_id,
+        'target_user_id' => $user_id,
+        'action' => $action
+    ]);
+    
     if ($_SESSION['user_id'] === $user_id) {
+        log_error("Admin attempted to modify own status", "WARNING", [
+            'admin_id' => $admin_id,
+            'action' => $action
+        ]);
         $_SESSION['error'] = "You cannot modify your own status";
     } else {
         switch ($action) {
             case 'ban':
                 $ban_reason = sanitize($_POST['ban_reason']);
                 if (empty($ban_reason)) {
+                    log_error("Ban attempt without reason", "WARNING", [
+                        'admin_id' => $admin_id,
+                        'target_user_id' => $user_id
+                    ]);
                     $_SESSION['error'] = "Ban reason is required.";
                 } else {
                     $stmt = $conn->prepare("UPDATE users SET banned = TRUE, ban_reason = ? WHERE id = ?");
                     $stmt->bind_param("si", $ban_reason, $user_id);
-                    $stmt->execute();
-                    $_SESSION['success'] = "User banned successfully.";
+                    if ($stmt->execute()) {
+                        log_error("User banned successfully", "INFO", [
+                            'admin_id' => $admin_id,
+                            'target_user_id' => $user_id,
+                            'reason' => $ban_reason
+                        ]);
+                        $_SESSION['success'] = "User banned successfully.";
+                    } else {
+                        log_error("Failed to ban user", "ERROR", [
+                            'admin_id' => $admin_id,
+                            'target_user_id' => $user_id,
+                            'reason' => $ban_reason,
+                            'sql_error' => $stmt->error
+                        ]);
+                        $_SESSION['error'] = "Failed to ban user.";
+                    }
                 }
                 break;
+                
             case 'unban':
                 $stmt = $conn->prepare("UPDATE users SET banned = FALSE, ban_reason = NULL WHERE id = ?");
                 $stmt->bind_param("i", $user_id);
-                $stmt->execute();
-                $_SESSION['success'] = "User unbanned successfully.";
+                if ($stmt->execute()) {
+                    log_error("User unbanned successfully", "INFO", [
+                        'admin_id' => $admin_id,
+                        'target_user_id' => $user_id
+                    ]);
+                    $_SESSION['success'] = "User unbanned successfully.";
+                } else {
+                    log_error("Failed to unban user", "ERROR", [
+                        'admin_id' => $admin_id,
+                        'target_user_id' => $user_id,
+                        'sql_error' => $stmt->error
+                    ]);
+                    $_SESSION['error'] = "Failed to unban user.";
+                }
                 break;
         }
     }
