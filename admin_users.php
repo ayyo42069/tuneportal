@@ -2,6 +2,9 @@
 include 'config.php';
 require_auth(true);
 
+// Add this line to define admin_id
+$admin_id = $_SESSION['user_id'];
+
 // Handle ban/unban actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verify the CSRF token before proceeding
@@ -13,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = (int)$_POST['user_id'];
     $action = sanitize($_POST['action']);
     
-    // Log the attempt
+    // Log the attempt (now $admin_id is defined)
     log_error("Admin user action attempted", "INFO", [
         'admin_id' => $admin_id,
         'target_user_id' => $user_id,
