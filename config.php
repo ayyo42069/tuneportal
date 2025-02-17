@@ -133,7 +133,28 @@ function generate_csrf_token() {
 }
 
 function verify_csrf_token($token) {
-    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+    if (!isset($_SESSION['csrf_token']) || !$token) {
+        log_error("CSRF token missing", "WARNING", [
+            'user_id' => $_SESSION['user_id'] ?? 'guest',
+            'page' => $_SERVER['PHP_SELF'],
+            'ip' => $_SERVER['REMOTE_ADDR'],
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
+        ]);
+        return false;
+    }
+
+    if (!hash_equals($_SESSION['csrf_token'], $token)) {
+        log_error("CSRF token mismatch", "WARNING", [
+            'user_id' => $_SESSION['user_id'] ?? 'guest',
+            'provided_token' => $token,
+            'page' => $_SERVER['PHP_SELF'],
+            'ip' => $_SERVER['REMOTE_ADDR'],
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
+        ]);
+        return false;
+    }
+
+    return true;
 }
 
 function csrf_input_field() {
