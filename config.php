@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 // Load environment variables from .env file
 function load_env() {
     $env_file = __DIR__ . '/.env';
@@ -34,6 +37,9 @@ session_set_cookie_params([
     'samesite' => 'Lax'
 ]);
 session_start();
+
+// Load environment variables
+load_env();
 
 // Create a new MySQLi connection using environment variables
 $conn = new mysqli(
