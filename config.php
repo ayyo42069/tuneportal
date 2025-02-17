@@ -40,6 +40,7 @@ if (!file_exists(__DIR__ . '/logs')) {
 // Include required files
 require_once __DIR__ . '/includes/encryption.php';
 require_once __DIR__ . '/includes/logging.php';
+require_once __DIR__ . '/includes/file_handler.php';
 
 // Set secure session cookie parameters
 $cookieParams = session_get_cookie_params();

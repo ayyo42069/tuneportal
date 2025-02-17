@@ -2,6 +2,13 @@
 function log_error($message, $severity = "ERROR", $context = []) {
     global $conn;
     
+    // Validate severity
+    $allowed_severities = ['ERROR', 'WARNING', 'INFO', 'CRITICAL'];
+    $severity = strtoupper($severity);
+    if (!in_array($severity, $allowed_severities)) {
+        $severity = 'ERROR';
+    }
+    
     // Add error details to context
     if (error_get_last()) {
         $context['php_error'] = error_get_last();
