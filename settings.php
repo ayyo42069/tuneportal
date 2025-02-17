@@ -138,38 +138,38 @@ if (!$preferences) {
         'language' => 'en'
     ];
 }
-
-// Same for profile data
-if (!$profile) {
-    $stmt = $conn->prepare("INSERT INTO user_profiles (user_id, timezone) VALUES (?, 'UTC')");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    
-    $profile = [
-        'timezone' => 'UTC',
-        'company' => '',
-        'phone' => ''
-    ];
-}
-// First fetch profile data
-$stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$profile = $stmt->get_result()->fetch_assoc();
-
-// Then check and create if it doesn't exist
-if (!$profile) {
-    // Check if the profile already exists (to prevent duplicate key error)
-    $stmt = $conn->prepare("INSERT IGNORE INTO user_profiles (user_id, timezone) VALUES (?, 'UTC')");
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    
-    // Fetch the profile again
+// Single, clean profile handling section
+try {
+    // First attempt to fetch existing profile
     $stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $profile = $stmt->get_result()->fetch_assoc();
+
+    // If no profile exists, create one
+    if (!$profile) {
+        $stmt = $conn->prepare("INSERT INTO user_profiles (user_id, timezone, company, phone) VALUES (?, 'UTC', '', '')");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        
+        // Fetch the newly created profile
+        $stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $profile = $stmt->get_result()->fetch_assoc();
+    }
+} catch (mysqli_sql_exception $e) {
+    // Handle potential race condition
+    if ($e->getCode() === 1062) { // Duplicate key error
+        $stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $profile = $stmt->get_result()->fetch_assoc();
+    } else {
+        throw $e; // Re-throw other errors
+    }
 }
+// Remove all other profile fetching/creation code and continue with the rest of the file
 $stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
