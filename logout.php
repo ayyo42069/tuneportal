@@ -1,20 +1,34 @@
 <?php
-include 'config.php';
-
-// Regenerate session ID to prevent session fixation attacks
-session_regenerate_id(true);
-
-// Unset all session variables
-$_SESSION = [];
-
-// Destroy the session
-if (session_id() !== '' || isset($_COOKIE[session_name()])) {
-    session_destroy();
-    // Optionally, clear the session cookie securely
-    setcookie(session_name(), '', time() - 3600, '/', '', true, true); // Secure and HttpOnly flags
+// Start the session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// Redirect to the index page
-header("Location: index.php");
+// Log the logout event
+if (isset($_SESSION['user_id'])) {
+    require_once 'config.php';
+    log_error("User logged out", "INFO", [
+        'user_id' => $_SESSION['user_id'],
+        'username' => $_SESSION['username'] ?? 'unknown'
+    ]);
+}
+
+// Clear all session variables
+$_SESSION = array();
+
+// Destroy the session cookie
+if (isset($_COOKIE[session_name()])) {
+    setcookie(session_name(), '', time() - 3600, '/');
+}
+
+// Destroy the session
+session_destroy();
+
+// Clear any other cookies set by the application
+setcookie('darkMode', '', time() - 3600, '/');
+setcookie('PHPSESSID', '', time() - 3600, '/');
+
+// Redirect to login page
+header("Location: login.php");
 exit();
 ?>
