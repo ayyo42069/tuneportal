@@ -141,7 +141,19 @@ include 'header.php';
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full p-6">
             <div class="flex justify-between items-start mb-4">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Log Details</h3>
+                <div class="flex items-center gap-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Log Details</h3>
+                    <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                        <button onclick="toggleView('formatted')" id="formattedBtn" 
+                                class="px-3 py-1 rounded-md text-sm font-medium transition-colors">
+                            Formatted
+                        </button>
+                        <button onclick="toggleView('raw')" id="rawBtn"
+                                class="px-3 py-1 rounded-md text-sm font-medium transition-colors">
+                            Raw
+                        </button>
+                    </div>
+                </div>
                 <button onclick="hideContext()" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -149,6 +161,7 @@ include 'header.php';
                 </button>
             </div>
             <div id="contextContent" class="space-y-4"></div>
+            <div id="rawContent" class="hidden space-y-4"></div>
         </div>
     </div>
 </div>
@@ -170,11 +183,34 @@ function formatKeyValue(key, value) {
     </div>`;
 }
 
+function toggleView(view) {
+    const formattedContent = document.getElementById('contextContent');
+    const rawContent = document.getElementById('rawContent');
+    const formattedBtn = document.getElementById('formattedBtn');
+    const rawBtn = document.getElementById('rawBtn');
+
+    if (view === 'raw') {
+        formattedContent.classList.add('hidden');
+        rawContent.classList.remove('hidden');
+        rawBtn.classList.add('bg-red-600', 'text-white');
+        formattedBtn.classList.remove('bg-red-600', 'text-white');
+    } else {
+        formattedContent.classList.remove('hidden');
+        rawContent.classList.add('hidden');
+        formattedBtn.classList.add('bg-red-600', 'text-white');
+        rawBtn.classList.remove('bg-red-600', 'text-white');
+    }
+}
+
 function showContext(context) {
     const modal = document.getElementById('contextModal');
     const content = document.getElementById('contextContent');
+    const rawContent = document.getElementById('rawContent');
+    
     try {
         const parsed = JSON.parse(context);
+        
+        // Formatted view
         content.innerHTML = `
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
                 ${Object.entries(parsed).map(([key, value]) => {
@@ -184,14 +220,23 @@ function showContext(context) {
                 }).join('')}
             </div>
         `;
+        
+        // Raw view
+        rawContent.innerHTML = `
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <pre class="text-sm text-gray-600 dark:text-gray-300 overflow-x-auto">${JSON.stringify(parsed, null, 2)}</pre>
+            </div>
+        `;
     } catch (e) {
-        content.innerHTML = `
+        content.innerHTML = rawContent.innerHTML = `
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
                 <pre class="text-sm text-gray-600 dark:text-gray-300">${context}</pre>
             </div>
         `;
     }
+    
     modal.classList.remove('hidden');
+    toggleView('formatted'); // Default to formatted view
 }
 
 function hideContext() {
