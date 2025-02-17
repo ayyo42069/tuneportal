@@ -169,17 +169,43 @@ include 'header.php';
 <script>
 function formatValue(value) {
     if (typeof value === 'object' && value !== null) {
-        return `<div class="pl-4 border-l-2 border-gray-300 dark:border-gray-600">
+        if (Array.isArray(value)) {
+            return `<div class="pl-4 space-y-2">
+                ${value.map((item, index) => `
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400">${index + 1}.</span>
+                        ${formatValue(item)}
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+        return `<div class="pl-4 space-y-2 mt-2">
             ${Object.entries(value).map(([k, v]) => formatKeyValue(k, v)).join('')}
         </div>`;
+    }
+    if (typeof value === 'string' && (value.startsWith('http://') || value.startsWith('https://'))) {
+        return `<a href="${value}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">${value}</a>`;
+    }
+    if (typeof value === 'boolean') {
+        return `<span class="px-2 py-1 text-xs rounded-full ${value ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">${value}</span>`;
     }
     return `<span class="text-gray-600 dark:text-gray-300">${value}</span>`;
 }
 
 function formatKeyValue(key, value) {
-    return `<div class="py-2">
-        <span class="font-semibold text-gray-700 dark:text-gray-200">${key}:</span> 
-        ${formatValue(value)}
+    return `<div class="bg-white dark:bg-gray-700 rounded-lg p-3 shadow-sm">
+        <div class="flex items-center gap-2">
+            <span class="font-medium text-gray-700 dark:text-gray-200">${key}</span>
+            ${typeof value === 'object' && value !== null ? 
+                `<span class="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full">
+                    ${Array.isArray(value) ? 'Array' : 'Object'}
+                </span>` 
+                : ''
+            }
+        </div>
+        <div class="mt-1">
+            ${formatValue(value)}
+        </div>
     </div>`;
 }
 
@@ -212,19 +238,15 @@ function showContext(context) {
         
         // Formatted view
         content.innerHTML = `
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
-                ${Object.entries(parsed).map(([key, value]) => {
-                    return `<div class="border-b border-gray-200 dark:border-gray-700 last:border-0 pb-3 last:pb-0">
-                        ${formatKeyValue(key, value)}
-                    </div>`;
-                }).join('')}
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3 max-h-[70vh] overflow-y-auto">
+                ${Object.entries(parsed).map(([key, value]) => formatKeyValue(key, value)).join('')}
             </div>
         `;
         
         // Raw view
         rawContent.innerHTML = `
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                <pre class="text-sm text-gray-600 dark:text-gray-300 overflow-x-auto">${JSON.stringify(parsed, null, 2)}</pre>
+                <pre class="text-sm text-gray-600 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap">${JSON.stringify(parsed, null, 2)}</pre>
             </div>
         `;
     } catch (e) {
