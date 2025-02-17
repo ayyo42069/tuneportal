@@ -139,7 +139,7 @@ include 'header.php';
 <!-- Context Modal -->
 <div id="contextModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full p-6">
+        <div class="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full p-6">
             <div class="flex justify-between items-start mb-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Log Details</h3>
                 <button onclick="hideContext()" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
@@ -148,20 +148,48 @@ include 'header.php';
                     </svg>
                 </button>
             </div>
-            <pre id="contextContent" class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto text-sm text-gray-600 dark:text-gray-300"></pre>
+            <div id="contextContent" class="space-y-4"></div>
         </div>
     </div>
 </div>
 
 <script>
+function formatValue(value) {
+    if (typeof value === 'object' && value !== null) {
+        return `<div class="pl-4 border-l-2 border-gray-300 dark:border-gray-600">
+            ${Object.entries(value).map(([k, v]) => formatKeyValue(k, v)).join('')}
+        </div>`;
+    }
+    return `<span class="text-gray-600 dark:text-gray-300">${value}</span>`;
+}
+
+function formatKeyValue(key, value) {
+    return `<div class="py-2">
+        <span class="font-semibold text-gray-700 dark:text-gray-200">${key}:</span> 
+        ${formatValue(value)}
+    </div>`;
+}
+
 function showContext(context) {
     const modal = document.getElementById('contextModal');
     const content = document.getElementById('contextContent');
     try {
         const parsed = JSON.parse(context);
-        content.textContent = JSON.stringify(parsed, null, 2);
+        content.innerHTML = `
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
+                ${Object.entries(parsed).map(([key, value]) => {
+                    return `<div class="border-b border-gray-200 dark:border-gray-700 last:border-0 pb-3 last:pb-0">
+                        ${formatKeyValue(key, value)}
+                    </div>`;
+                }).join('')}
+            </div>
+        `;
     } catch (e) {
-        content.textContent = context;
+        content.innerHTML = `
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <pre class="text-sm text-gray-600 dark:text-gray-300">${context}</pre>
+            </div>
+        `;
     }
     modal.classList.remove('hidden');
 }
@@ -169,6 +197,18 @@ function showContext(context) {
 function hideContext() {
     document.getElementById('contextModal').classList.add('hidden');
 }
+
+// Close modal when clicking outside
+document.getElementById('contextModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideContext();
+    }
+});
+
+// Prevent modal close when clicking inside
+document.querySelector('#contextModal > div').addEventListener('click', function(e) {
+    e.stopPropagation();
+});
 </script>
 
 <?php include 'footer.php'; ?>
