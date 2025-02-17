@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'target_user_id' => $user_id,
         'action' => $action
     ]);
-    
+
     if ($_SESSION['user_id'] === $user_id) {
         log_error("Admin attempted to modify own status", "WARNING", [
             'admin_id' => $admin_id,
@@ -100,7 +100,7 @@ include 'header.php';
                     <input type="text" id="searchInput" placeholder="Search users..." 
                            class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 </div>
-
+    
                 <div class="overflow-x-auto">
                     <table class="w-full" id="usersTable">
                         <thead>
@@ -234,7 +234,7 @@ include 'header.php';
                         <p id="detailBanReason" class="text-gray-600 dark:text-gray-400"></p>
                     </div>
                 </div>
-
+    
                 <!-- Column 2: Statistics -->
                 <div class="space-y-4">
                     <div>
@@ -251,7 +251,7 @@ include 'header.php';
                     </div>
                 </div>
             </div>
-
+    
             <!-- Tabs -->
             <div class="mt-6 border-b dark:border-gray-700">
                 <button onclick="showTab('loginHistory', event)" class="tab-link px-4 py-2 font-semibold text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400">
@@ -264,7 +264,7 @@ include 'header.php';
                     Transactions
                 </button>
             </div>
-
+    
             <!-- Tab Content -->
             <div id="loginHistory" class="tab-content py-4">
                 <table class="w-full">
@@ -278,7 +278,7 @@ include 'header.php';
                     <tbody id="loginHistoryBody"></tbody>
                 </table>
             </div>
-
+    
             <div id="files" class="tab-content py-4 hidden">
                 <table class="w-full">
                     <thead>
@@ -291,7 +291,7 @@ include 'header.php';
                     <tbody id="userFilesBody"></tbody>
                 </table>
             </div>
-
+    
             <div id="transactions" class="tab-content py-4 hidden">
                 <table class="w-full">
                     <thead>
@@ -304,7 +304,7 @@ include 'header.php';
                     <tbody id="transactionsBody"></tbody>
                 </table>
             </div>
-
+    
             <div class="mt-6 flex justify-end">
                 <button onclick="toggleUserModal()" 
                         class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
@@ -344,9 +344,9 @@ async function showUserDetails(userId) {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
+    
         const data = await response.json();
-
+    
         // Populate the modal with user details
         document.getElementById('userId').textContent = userId;
         document.getElementById('detailUsername').textContent = data.user.username;
@@ -357,7 +357,7 @@ async function showUserDetails(userId) {
         document.getElementById('detailCredits').textContent = data.user.credits;
         document.getElementById('detailLastActivity').textContent = data.stats.last_activity || 'Never';
         document.getElementById('detailBanReason').textContent = data.user.ban_reason || 'Not banned';
-
+    
         // Populate login history
         const loginBody = document.getElementById('loginHistoryBody');
         loginBody.innerHTML = data.login_history.map(login => `
@@ -371,7 +371,7 @@ async function showUserDetails(userId) {
                 </td>
             </tr>
         `).join('');
-
+    
         // Populate files
         const filesBody = document.getElementById('userFilesBody');
         filesBody.innerHTML = data.files.map(file => `
@@ -385,7 +385,7 @@ async function showUserDetails(userId) {
                 <td class="p-2 text-gray-700 dark:text-gray-300">${new Date(file.created_at).toLocaleDateString()}</td>
             </tr>
         `).join('');
-
+    
         // Populate transactions
         const transactionsBody = document.getElementById('transactionsBody');
         transactionsBody.innerHTML = data.transactions.map(tx => `
@@ -397,7 +397,7 @@ async function showUserDetails(userId) {
                 <td class="p-2 text-gray-700 dark:text-gray-300">${tx.description}</td>
             </tr>
         `).join('');
-
+    
         // Show the modal
         toggleUserModal();
         showTab('loginHistory'); // Call showTab without the event object
@@ -414,16 +414,16 @@ function toggleUserModal() {
 function showTab(tabName, event = null) {
     // Hide all tab content
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-
+    
     // Remove active styles from all tab links
     document.querySelectorAll('.tab-link').forEach(link => {
         link.classList.remove('text-red-600', 'dark:text-red-400', 'border-red-600', 'dark:border-red-400');
         link.classList.add('text-gray-500', 'dark:text-gray-400');
     });
-
+    
     // Show the selected tab content
     document.getElementById(tabName).classList.remove('hidden');
-
+    
     // Add active styles to the clicked tab link (if event is provided)
     if (event) {
         event.target.classList.add('text-red-600', 'dark:text-red-400', 'border-red-600', 'dark:border-red-400');
