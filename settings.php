@@ -333,56 +333,6 @@ include 'header.php';
                         <div class="space-y-2">
                             <label class="block text-sm text-gray-700 dark:text-gray-300">Phone Number (Optional)</label>
                             <input type="tel" name="phone" value="<?= htmlspecialchars($profile['phone'] ?? '') ?>"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Current Password</label>
-                            <input type="password" name="current_password" required
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">New Password</label>
-                            <input type="password" name="new_password" required minlength="8"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Confirm New Password</label>
-                            <input type="password" name="confirm_password" required minlength="8"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
-
-                        <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                            Change Password
-                        </button>
-                    </form>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Profile Settings</h3>
-                    <form method="POST" class="space-y-4">
-                        <?php echo csrf_input_field(); ?>
-                        <input type="hidden" name="action" value="update_profile">
-                        
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Timezone</label>
-                            <select name="timezone" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600">
-                                <?php
-                                $timezones = DateTimeZone::listIdentifiers();
-                                foreach ($timezones as $tz) {
-                                    $selected = $profile['timezone'] === $tz ? 'selected' : '';
-                                    echo "<option value=\"$tz\" $selected>$tz</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Company Name (Optional)</label>
-                            <input type="text" name="company" value="<?= htmlspecialchars($profile['company'] ?? '') ?>"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Phone Number (Optional)</label>
-                            <input type="tel" name="phone" value="<?= htmlspecialchars($profile['phone'] ?? '') ?>"
                                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                         </div>
                         <div class="space-y-2">
