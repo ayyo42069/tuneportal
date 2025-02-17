@@ -151,6 +151,25 @@ if (!$profile) {
         'phone' => ''
     ];
 }
+// First fetch profile data
+$stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$profile = $stmt->get_result()->fetch_assoc();
+
+// Then check and create if it doesn't exist
+if (!$profile) {
+    // Check if the profile already exists (to prevent duplicate key error)
+    $stmt = $conn->prepare("INSERT IGNORE INTO user_profiles (user_id, timezone) VALUES (?, 'UTC')");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    
+    // Fetch the profile again
+    $stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $profile = $stmt->get_result()->fetch_assoc();
+}
 $stmt = $conn->prepare("SELECT * FROM user_profiles WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
