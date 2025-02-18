@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
             $stmt = $conn->prepare("UPDATE user_preferences SET dark_mode = ?, email_notifications = ?, language = ? WHERE user_id = ?");
             $stmt->bind_param("iisi", $dark_mode, $email_notifications, $language, $user_id);
             $_SESSION['language'] = $language; // Add this line
+            $_SESSION['dark_mode'] = $dark_mode;
             $_SESSION['success'] = __('preferences_updated', 'settings');
             $stmt->execute();
             break;
@@ -118,6 +119,10 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $preferences = $stmt->get_result()->fetch_assoc();
 
+// Set session language from preferences
+if ($preferences) {
+    $_SESSION['language'] = $preferences['language'];
+}
 // Add this code to create default preferences if none exist
 if (!$preferences) {
     $stmt = $conn->prepare("INSERT INTO user_preferences (user_id, dark_mode, email_notifications, language) VALUES (?, 0, 1, 'en')");
