@@ -172,8 +172,36 @@ $stmt = $conn->prepare("SELECT * FROM email_change_requests WHERE user_id = ? AN
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $pending_email_request = $stmt->get_result()->fetch_assoc();
-// Fetch login history
 
+// Check if login_attempts table exists and create if needed
+$table_check = $conn->query("SHOW TABLES LIKE 'login_attempts'");
+if ($table_check->num_rows == 0) {
+    $conn->query("
+        CREATE TABLE login_attempts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            attempted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            success TINYINT(1) DEFAULT 0,
+            ip_address VARCHAR(45),
+            user_agent VARCHAR(255),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    ");
+}
+
+// Initialize login history as empty array if no records exist
+$login_history = [];
+
+// Fetch login history
+$stmt = $conn->prepare("
+    SELECT * FROM login_attempts 
+    WHERE user_id = ? 
+    ORDER BY attempted_at DESC 
+    LIMIT 10
+");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$login_history = $stmt->get_result();
 
 include 'header.php';
 ?>
