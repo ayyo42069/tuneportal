@@ -23,11 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
         
             $stmt = $conn->prepare("UPDATE user_preferences SET dark_mode = ?, email_notifications = ?, language = ? WHERE user_id = ?");
             $stmt->bind_param("iisi", $dark_mode, $email_notifications, $language, $user_id);
-            
-            if ($stmt->execute()) {
-                $_SESSION['dark_mode'] = $dark_mode; // Add this line to update session
-                $_SESSION['success'] = "Preferences updated successfully.";
-            }
+            $_SESSION['language'] = $language; // Add this line
+            $_SESSION['success'] = "Preferences updated successfully.";
+            $stmt->execute();
             break;
 
         case 'change_email':
