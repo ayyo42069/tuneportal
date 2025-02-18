@@ -112,24 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
     header("Location: settings.php");
     exit();
 }
-// Check if user_preferences table exists and create if needed
-$table_check = $conn->query("SHOW TABLES LIKE 'user_preferences'");
-if ($table_check->num_rows == 0) {
-    $conn->query("
-        CREATE TABLE user_preferences (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            dark_mode TINYINT(1) DEFAULT 0,
-            email_notifications TINYINT(1) DEFAULT 1,
-            language VARCHAR(5) DEFAULT 'en',
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id),
-            UNIQUE KEY unique_user (user_id)
-        )
-    ");
-}
-
 // After fetching preferences
 $stmt = $conn->prepare("SELECT * FROM user_preferences WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
@@ -190,36 +172,6 @@ $stmt = $conn->prepare("SELECT * FROM email_change_requests WHERE user_id = ? AN
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $pending_email_request = $stmt->get_result()->fetch_assoc();
-
-// Check if login_attempts table exists and create if needed
-$table_check = $conn->query("SHOW TABLES LIKE 'login_attempts'");
-if ($table_check->num_rows == 0) {
-    $conn->query("
-        CREATE TABLE login_attempts (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            attempted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            success TINYINT(1) DEFAULT 0,
-            ip_address VARCHAR(45),
-            user_agent VARCHAR(255),
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        )
-    ");
-}
-
-// Initialize login history as empty array if no records exist
-$login_history = [];
-
-// Fetch login history
-$stmt = $conn->prepare("
-    SELECT * FROM login_attempts 
-    WHERE user_id = ? 
-    ORDER BY attempted_at DESC 
-    LIMIT 10
-");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$login_history = $stmt->get_result();
 
 include 'header.php';
 ?>
@@ -402,7 +354,7 @@ include 'header.php';
                         <?php endwhile; ?>
                     </div>
                 </div>
-              
+                <!-- Active Sessions -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('active_sessions', 'settings') ?></h3>
                     <div class="space-y-4">
