@@ -37,7 +37,8 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $fileId);
 $stmt->execute();
 $downloads = $stmt->get_result()->fetch_assoc()['download_count'];
-// Update the query to include proper timestamp fields
+
+// Update the query to include proper timestamp fields and execute it
 $stmt = $conn->prepare("
     SELECT 
         f.*,
@@ -47,6 +48,13 @@ $stmt = $conn->prepare("
     JOIN users u ON f.user_id = u.id 
     WHERE f.id = ?
 ");
+$stmt->bind_param("i", $fileId);
+$stmt->execute();
+$file_details = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+// Update the file array with the new details
+$file = array_merge($file, $file_details);
 $stmt = $conn->prepare("
     SELECT ft.*, u.username 
     FROM file_transactions ft 
