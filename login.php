@@ -54,11 +54,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 session_regenerate_id(true);
 
                 // Set session with role
+                // After setting the session variables and before the redirect
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['role'] = $user['role'];
-
+                
+                // Add active session tracking
+                $session_id = session_id();
+                $ip = $_SERVER['REMOTE_ADDR'];
+                $user_agent = $_SERVER['HTTP_USER_AGENT'];
+                $device_type = get_device_type($user_agent); // Add this function to config.php
+                $expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
+                
+                $stmt = $conn->prepare("
+                    INSERT INTO active_sessions (user_id, session_id, ip_address, user_agent, device_type, expires, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, NOW())
+                ");
+                $stmt->bind_param("isssss", $user['id'], $session_id, $ip, $user_agent, $device_type, $expires);
+                $stmt->execute();
+                $stmt->close();
+                
                 header("Location: dashboard.php");
                 exit();
             } else {

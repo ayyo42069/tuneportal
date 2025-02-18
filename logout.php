@@ -12,7 +12,14 @@ if (isset($_SESSION['user_id'])) {
         'username' => $_SESSION['username'] ?? 'unknown'
     ]);
 }
+// Before destroying the session
+$session_id = session_id();
+$stmt = $conn->prepare("DELETE FROM active_sessions WHERE session_id = ?");
+$stmt->bind_param("s", $session_id);
+$stmt->execute();
+$stmt->close();
 
+// Then continue with session destruction
 // Clear all session variables
 $_SESSION = array();
 

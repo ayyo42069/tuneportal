@@ -9,7 +9,33 @@ define('ENVIRONMENT', 'development');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 define('ALLOWED_EXTENSIONS', ['bin']);
 define('ERROR_LOG_PATH', __DIR__ . '/logs/error.log');
-
+function get_device_type($user_agent) {
+    if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', strtolower($user_agent))) {
+        return 'Tablet';
+    }
+    
+    if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|android|iemobile)/i', strtolower($user_agent))) {
+        return 'Mobile';
+    }
+    
+    if (preg_match('/(ipod|iphone|ipad)/i', strtolower($user_agent))) {
+        return 'iOS Device';
+    }
+    
+    if (preg_match('/macintosh|mac os x/i', $user_agent)) {
+        return 'Mac';
+    }
+    
+    if (preg_match('/windows|win32/i', $user_agent)) {
+        return 'Windows';
+    }
+    
+    if (preg_match('/linux/i', $user_agent)) {
+        return 'Linux';
+    }
+    
+    return 'Unknown';
+}
 
 // Load environment variables from .env file
 function load_env() {
