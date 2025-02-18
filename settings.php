@@ -384,7 +384,7 @@ include 'header.php';
                         <?php endwhile; ?>
                     </div>
                 </div>
-                <!-- Active Sessions -->
+              
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('active_sessions', 'settings') ?></h3>
                     <div class="space-y-4">
