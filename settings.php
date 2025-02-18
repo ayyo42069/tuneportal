@@ -173,15 +173,7 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $pending_email_request = $stmt->get_result()->fetch_assoc();
 // Fetch login history
-$stmt = $conn->prepare("
-    SELECT * FROM login_attempts 
-    WHERE user_id = ? 
-    ORDER BY attempted_at DESC 
-    LIMIT 10
-");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$login_history = $stmt->get_result()->fetch_assoc();
+
 
 include 'header.php';
 ?>
