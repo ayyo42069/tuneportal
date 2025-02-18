@@ -8,7 +8,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <div class="relative">
                 <button id="profileDropdown" class="flex items-center space-x-3 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <img src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full">
-                    <span class="font-medium">My Profile</span>
+                    <span class="font-medium"><?= __('my_profile', 'sidebar') ?></span>
                 </button>
                 <!-- Dropdown Menu -->
                 <div id="profileMenu" class="hidden absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
@@ -19,10 +19,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         </div>
                         <hr class="border-gray-200 dark:border-gray-600">
                         <a href="settings.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-                            Settings
+                            <?= __('settings', 'sidebar') ?>
                         </a>
                         <a href="logout.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
-                            Logout
+                            <?= __('logout', 'sidebar') ?>
                         </a>
                     </div>
                 </div>
@@ -34,13 +34,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
-                    <span>Dashboard</span>
+                    <span><?= __('dashboard', 'sidebar') ?></span>
                 </a>
                 <a href="files.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'files.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    <span>My Files</span>
+                    <span><?= __('my_files', 'sidebar') ?></span>
                 </a>
                 <a href="credits.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'credits.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -60,7 +60,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <!-- Admin Section with improved styling -->
             <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                 <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p class="px-4 text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Admin Tools</p>
+                    <p class="px-4 text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider"><?= __('admin_tools', 'sidebar') ?></p>
                     <div class="mt-3 space-y-2">
                         <a href="admin_credits.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'admin_credits.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
