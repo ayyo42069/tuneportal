@@ -131,7 +131,7 @@ include 'header.php';
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><?= __('select_bin_file', 'dashboard') ?></label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><?= __('select_file', 'dashboard') ?></label>
                                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg hover:border-red-500 transition-colors">
                                         <div class="space-y-1 text-center">
                                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
