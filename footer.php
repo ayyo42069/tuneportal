@@ -63,37 +63,8 @@ $footerClass = $isLoggedIn ? 'lg:ml-64' : '';
 <!-- Add this before closing body tag -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const darkModeToggle = document.getElementById('dark-mode-toggle');
     const footer = document.querySelector('footer');
     const sidebar = document.getElementById('sidebar');
-
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-            
-            // Update footer classes for dark mode
-            if (footer) {
-                footer.classList.toggle('bg-gray-100');
-                footer.classList.toggle('dark:bg-gray-800');
-                footer.classList.toggle('text-gray-800');
-                footer.classList.toggle('dark:text-white');
-            }
-        });
-
-        // Check for saved dark mode preference
-        if (localStorage.getItem('darkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-            
-            // Update footer classes for dark mode
-            if (footer) {
-                footer.classList.remove('bg-gray-100');
-                footer.classList.add('dark:bg-gray-800');
-                footer.classList.remove('text-gray-800');
-                footer.classList.add('dark:text-white');
-            }
-        }
-    }
 
     // Adjust footer position when sidebar toggles
     const sidebarToggle = document.getElementById('sidebar-toggle');
