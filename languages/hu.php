@@ -91,21 +91,51 @@ return [
         'server_error' => 'Szerverhiba'
     ],
 'sidebar' => [
-'my_profile' => 'Profilom',
-'settings' => 'Beállítások',
-'logout' => 'Kijelentkezés',
-'dashboard' => 'Vezérlőpult',
-'my_files' => 'Fájljaim',
-'credits' => 'Kreditek',
-'tools' => 'Eszközök',
-'admin_tools' => 'Admin eszközök',
-'manage_credits' => 'Kreditek kezelése',
-'manage_tools' => 'Eszközök kezelése',
-'manage_files' => 'Fájlok kezelése',
-'manage_users' => 'Felhasználók kezelése',
-'manage_tune_options' => 'Tune opciók kezelése',
-'manage_notifications' => 'Értesítések kezelése',
-'system_logs' => 'Rendszernapló',
-]
+    'my_profile' => 'Profilom',
+    'settings' => 'Beállítások',
+    'logout' => 'Kijelentkezés',
+    'dashboard' => 'Vezérlőpult',
+    'my_files' => 'Fájljaim',
+    'credits' => 'Kreditek',
+    'tools' => 'Eszközök',
+    'admin_tools' => 'Admin eszközök',
+    'manage_credits' => 'Kreditek kezelése',
+    'manage_tools' => 'Eszközök kezelése',
+    'manage_files' => 'Fájlok kezelése',
+    'manage_users' => 'Felhasználók kezelése',
+    'manage_tune_options' => 'Tune opciók kezelése',
+    'manage_notifications' => 'Értesítések kezelése',
+    'system_logs' => 'Rendszernapló',
+    'phpmyadmin' => 'phpMyAdmin'
+],
 
+'notifications' => [
+    'success' => 'Siker',
+    'error' => 'Hiba',
+    'warning' => 'Figyelmeztetés',
+    'info' => 'Információ',
+    'file_uploaded' => 'Fájl sikeresen feltöltve',
+    'profile_updated' => 'Profil sikeresen frissítve',
+    'settings_saved' => 'Beállítások mentve',
+    'password_changed' => 'Jelszó sikeresen megváltoztatva',
+    'email_change_requested' => 'Email változtatási kérelem elküldve',
+    'credits_updated' => 'Kreditek sikeresen frissítve'
+],
+
+'system' => [
+    'processing' => 'Feldolgozás',
+    'please_wait' => 'Kérem várjon...',
+    'confirm_action' => 'Biztos benne?',
+    'yes' => 'Igen',
+    'no' => 'Nem',
+    'cancel' => 'Mégse',
+    'save' => 'Mentés',
+    'delete' => 'Törlés',
+    'edit' => 'Szerkesztés',
+    'update' => 'Frissítés',
+    'create' => 'Létrehozás',
+    'back' => 'Vissza',
+    'next' => 'Következő',
+    'previous' => 'Előző'
+]
 ];

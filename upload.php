@@ -79,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'credits_used' => $totalCredits
         ]);
 
-        $_SESSION['success'] = "File uploaded successfully";
+        // Replace hardcoded success message
+        $_SESSION['success'] = __('file_uploaded', 'notifications');
         header("Location: file_details.php?id=$fileId");
         exit();
         

@@ -70,8 +70,54 @@ return [
         'download' => 'Download',
         'status' => 'Status'
     ],
-    
+    'sidebar' => [
+        'my_profile' => 'My Profile',
+        'settings' => 'Settings',
+        'logout' => 'Logout',
+        'dashboard' => 'Dashboard',
+        'my_files' => 'My Files',
+        'credits' => 'Credits',
+        'tools' => 'Tools',
+        'admin_tools' => 'Admin Tools',
+        'manage_credits' => 'Manage Credits',
+        'manage_tools' => 'Manage Tools',
+        'manage_files' => 'Manage Files',
+        'manage_users' => 'Manage Users',
+        'manage_tune_options' => 'Manage Tune Options',
+        'manage_notifications' => 'Manage Notifications',
+        'system_logs' => 'System Logs',
+        'phpmyadmin' => 'phpMyAdmin'
+    ],
+    'notifications' => [
+        'success' => 'Success',
+        'error' => 'Error',
+        'warning' => 'Warning',
+        'info' => 'Information',
+        'file_uploaded' => 'File uploaded successfully',
+        'profile_updated' => 'Profile updated successfully',
+        'settings_saved' => 'Settings saved successfully',
+        'password_changed' => 'Password changed successfully',
+        'email_change_requested' => 'Email change request submitted',
+        'credits_updated' => 'Credits updated successfully'
+    ],
+    'system' => [
+        'processing' => 'Processing',
+        'please_wait' => 'Please wait...',
+        'confirm_action' => 'Are you sure?',
+        'yes' => 'Yes',
+        'no' => 'No',
+        'cancel' => 'Cancel',
+        'save' => 'Save',
+        'delete' => 'Delete',
+        'edit' => 'Edit',
+        'update' => 'Update',
+        'create' => 'Create',
+        'back' => 'Back',
+        'next' => 'Next',
+        'previous' => 'Previous'
+    ],
     'admin' => [
+
         'update_requests' => 'Update Requests',
         'request_id' => 'Request ID',
         'file' => 'File',

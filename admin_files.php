@@ -114,18 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $conn->prepare("UPDATE files SET status = 'processed', current_version = ? WHERE id = ?");
                 $stmt->bind_param("ii", $new_version, $file_id);
                 $stmt->execute();
+                // Replace hardcoded messages with translations
+                $_SESSION['success'] = __('file_uploaded', 'notifications');
+                $_SESSION['error'] = __('error', 'notifications') . ": " . htmlspecialchars($e->getMessage());
                 
-                // Create notification
-                $stmt = $conn->prepare("INSERT INTO notifications (user_id, message, link) VALUES (?, ?, ?)");
-                $message = "Your file #$file_id has been processed!";
-                $link = "file_details.php?id=$file_id";
-                $stmt->bind_param("iss", $user_id, $message, $link);
-                $stmt->execute();
-                $stmt->close();
-                
-                $conn->commit();
-                $_SESSION['success'] = "File processed successfully";
-                
+                if (file_exists($uploadDir . $filename)) {
+                    unlink($uploadDir . $filename);
+                }
             } catch (Exception $e) {
                 $conn->rollback();
                 log_error("File processing failed", "ERROR", [

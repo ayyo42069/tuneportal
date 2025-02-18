@@ -69,7 +69,52 @@ return [
         'download' => 'Herunterladen',
         'status' => 'Status'
     ],
-    
+    'sidebar' => [
+        'my_profile' => 'Mein Profil',
+        'settings' => 'Einstellungen',
+        'logout' => 'Abmelden',
+        'dashboard' => 'Dashboard',
+        'my_files' => 'Meine Dateien',
+        'credits' => 'Guthaben',
+        'tools' => 'Werkzeuge',
+        'admin_tools' => 'Admin-Werkzeuge',
+        'manage_credits' => 'Guthaben verwalten',
+        'manage_tools' => 'Werkzeuge verwalten',
+        'manage_files' => 'Dateien verwalten',
+        'manage_users' => 'Benutzer verwalten',
+        'manage_tune_options' => 'Tune-Optionen verwalten',
+        'manage_notifications' => 'Benachrichtigungen verwalten',
+        'system_logs' => 'Systemprotokolle',
+        'phpmyadmin' => 'phpMyAdmin'
+    ],
+    'notifications' => [
+        'success' => 'Erfolg',
+        'error' => 'Fehler',
+        'warning' => 'Warnung',
+        'info' => 'Information',
+        'file_uploaded' => 'Datei erfolgreich hochgeladen',
+        'profile_updated' => 'Profil erfolgreich aktualisiert',
+        'settings_saved' => 'Einstellungen erfolgreich gespeichert',
+        'password_changed' => 'Passwort erfolgreich geändert',
+        'email_change_requested' => 'Anfrage zur E-Mail-Änderung gesendet',
+        'credits_updated' => 'Guthaben erfolgreich aktualisiert'
+    ],
+    'system' => [
+        'processing' => 'Verarbeitung',
+        'please_wait' => 'Bitte warten...',
+        'confirm_action' => 'Sind Sie sicher?',
+        'yes' => 'Ja',
+        'no' => 'Nein',
+        'cancel' => 'Abbrechen',
+        'save' => 'Speichern',
+        'delete' => 'Löschen',
+        'edit' => 'Bearbeiten',
+        'update' => 'Aktualisieren',
+        'create' => 'Erstellen',
+        'back' => 'Zurück',
+        'next' => 'Weiter',
+        'previous' => 'Zurück'
+    ],
     'admin' => [
         'update_requests' => 'Aktualisierungsanfragen',
         'request_id' => 'Anfrage-ID',
