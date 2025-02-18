@@ -7,7 +7,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <!-- Profile Section -->
             <div class="relative">
                 <button id="profileDropdown" class="flex items-center space-x-3 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <img src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full">
+                    <img src="uploads/profiles/<?= htmlspecialchars($profile['profile_picture']) ?>" 
+                         alt="Profile" 
+                         class="w-10 h-10 rounded-full object-cover">
                     <span class="font-medium"><?= __('my_profile', 'sidebar') ?></span>
                 </button>
                 <!-- Dropdown Menu -->

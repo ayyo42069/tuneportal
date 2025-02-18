@@ -89,13 +89,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
             }
             break;
 
-        case 'update_profile':
             $timezone = sanitize($_POST['timezone']);
             $company = sanitize($_POST['company']);
             $phone = sanitize($_POST['phone']);
-
-            $stmt = $conn->prepare("UPDATE user_profiles SET timezone = ?, company = ?, phone = ? WHERE user_id = ?");
-            $stmt->bind_param("sssi", $timezone, $company, $phone, $user_id);
+        
+            // Handle profile picture upload
+            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
+                $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+                $filename = $_FILES['profile_picture']['name'];
+                $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        
+                if (in_array($ext, $allowed)) {
+                    $new_filename = 'profile_' . $user_id . '_' . time() . '.' . $ext;
+                    $upload_path = __DIR__ . '/uploads/profiles/';
+                    
+                    // Create directory if it doesn't exist
+                    if (!file_exists($upload_path)) {
+                        mkdir($upload_path, 0777, true);
+                    }
+        
+                    // Delete old profile picture if it exists and isn't the default
+                    if ($profile['profile_picture'] !== 'default_profile.jpg') {
+                        $old_file = $upload_path . $profile['profile_picture'];
+                        if (file_exists($old_file)) {
+                            unlink($old_file);
+                        }
+                    }
+        
+                    if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $upload_path . $new_filename)) {
+                        $stmt = $conn->prepare("UPDATE user_profiles SET timezone = ?, company = ?, phone = ?, profile_picture = ? WHERE user_id = ?");
+                        $stmt->bind_param("ssssi", $timezone, $company, $phone, $new_filename, $user_id);
+                    }
+                } else {
+                    $_SESSION['error'] = "Invalid file type. Allowed types: jpg, jpeg, png, gif";
+                    header("Location: settings.php");
+                    exit();
+                }
+            } else {
+                $stmt = $conn->prepare("UPDATE user_profiles SET timezone = ?, company = ?, phone = ? WHERE user_id = ?");
+                $stmt->bind_param("sssi", $timezone, $company, $phone, $user_id);
+            }
             
             if ($stmt->execute()) {
                 $_SESSION['success'] = "Profile updated successfully.";
@@ -303,7 +336,34 @@ include 'header.php';
                     <form method="POST" class="space-y-4">
                         <?php echo csrf_input_field(); ?>
                         <input type="hidden" name="action" value="update_profile">
-                        
+                        <!-- Profile Settings -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('profile_settings', 'settings') ?></h3>
+    <form method="POST" class="space-y-4" enctype="multipart/form-data">
+        <?php echo csrf_input_field(); ?>
+        <input type="hidden" name="action" value="update_profile">
+        
+        <!-- Profile Picture -->
+        <div class="space-y-2">
+            <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('profile_picture', 'profile') ?></label>
+            <div class="flex items-center space-x-4">
+                <img src="uploads/profiles/<?= htmlspecialchars($profile['profile_picture']) ?>" 
+                     alt="Profile Picture" 
+                     class="w-20 h-20 rounded-full object-cover">
+                <div>
+                    <input type="file" 
+                           name="profile_picture" 
+                           accept=".jpg,.jpeg,.png,.gif"
+                           class="block w-full text-sm text-gray-500
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-red-50 file:text-red-700
+                                  hover:file:bg-red-100">
+                    <p class="mt-1 text-xs text-gray-500">JPG, PNG or GIF (MAX. 800x800px)</p>
+                </div>
+            </div>
+        </div>
                         <div class="space-y-2">
                             <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('timezone', 'profile') ?></label>
                             <select name="timezone" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600">
@@ -328,6 +388,7 @@ include 'header.php';
                             <input type="tel" name="phone" value="<?= htmlspecialchars($profile['phone'] ?? '') ?>"
                                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                         </div>
+                        
                         <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                             <?= __('update_profile', 'settings') ?>
                         </button>
