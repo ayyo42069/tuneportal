@@ -5,13 +5,19 @@ require_auth();
 $userId = $_SESSION['user_id'];
 
 // Use a prepared statement to fetch user files
+// Update the query to include more information
 $stmt = $conn->prepare("
-    SELECT f.*, fv.uploaded_at, fv.file_path 
+    SELECT 
+        f.*, 
+        fv.uploaded_at, 
+        fv.file_path,
+        (SELECT COUNT(*) FROM file_download_log WHERE file_id = f.id) as download_count,
+        (SELECT COUNT(*) FROM file_versions WHERE file_id = f.id) as version_count
     FROM files f
-    LEFT JOIN file_versions fv 
-        ON f.id = fv.file_id AND f.current_version = fv.version
-    WHERE f.user_id = ?
-    ORDER BY f.created_at DESC
+    LEFT JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
+    WHERE f.user_id = ? " . 
+    ($_SESSION['role'] === 'admin' ? "OR 1=1 " : "") . // Admins can see all files
+    "ORDER BY f.created_at DESC
 ");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
@@ -40,7 +46,8 @@ include 'header.php';
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Title</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Car Model</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Status</th>
-                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Current Version</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Versions</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Downloads</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Last Updated</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Actions</th>
                             </tr>
@@ -48,16 +55,33 @@ include 'header.php';
                         <tbody>
                             <?php if ($files->num_rows > 0): ?>
                                 <?php while ($file = $files->fetch_assoc()): ?>
-                                    <tr class="border-b dark:border-gray-700">
-                                        <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['title']) ?></td>
+                                    <!-- Update the table row content -->
+                                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="p-3 text-gray-700 dark:text-gray-300">
+                                            <?= htmlspecialchars($file['title']) ?>
+                                            <?php if($_SESSION['role'] === 'admin'): ?>
+                                                <p class="text-xs text-gray-500">by <?= htmlspecialchars($file['username']) ?></p>
+                                            <?php endif; ?>
+                                        </td>
                                         <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['car_model']) ?></td>
                                         <td class="p-3">
-                                            <span class="px-2 py-1 rounded <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' ?>">
+                                            <span class="px-2 py-1 rounded <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' ?>">
                                                 <?= ucfirst(htmlspecialchars($file['status'])) ?>
                                             </span>
                                         </td>
-                                        <td class="p-3 text-gray-700 dark:text-gray-300">v<?= htmlspecialchars($file['current_version']) ?></td>
-                                        <td class="p-3 text-gray-700 dark:text-gray-300"><?= $file['uploaded_at'] ? date('M j, Y H:i', strtotime($file['uploaded_at'])) : 'N/A' ?></td>
+                                        <td class="p-3 text-gray-700 dark:text-gray-300">
+                                            <span class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                                <?= $file['version_count'] ?>
+                                            </span>
+                                        </td>
+                                        <td class="p-3 text-gray-700 dark:text-gray-300">
+                                            <span class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                                <?= $file['download_count'] ?>
+                                            </span>
+                                        </td>
+                                        <td class="p-3 text-gray-700 dark:text-gray-300">
+                                            <?= $file['uploaded_at'] ? date('M j, Y H:i', strtotime($file['uploaded_at'])) : 'N/A' ?>
+                                        </td>
                                         <td class="p-3">
                                             <div class="flex items-center gap-2">
                                                 <a href="file_details.php?id=<?= htmlspecialchars($file['id']) ?>" 
@@ -65,9 +89,8 @@ include 'header.php';
                                                     View
                                                 </a>
                                                 <?php if ($file['status'] === 'processed' && !empty($file['file_path'])): ?>
-                                                    <a href="uploads/<?= htmlspecialchars($file['file_path']) ?>" 
-                                                       class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
-                                                       download>
+                                                    <a href="download.php?file_id=<?= htmlspecialchars($file['id']) ?>" 
+                                                       class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
                                                         Download
                                                     </a>
                                                 <?php endif; ?>

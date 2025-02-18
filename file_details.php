@@ -10,10 +10,45 @@ if (!isset($_GET['id'])) {
 $fileId = (int)$_GET['id'];
 
 // Use prepared statements for security
+// After fetching the file, add ownership check
 $stmt = $conn->prepare("SELECT f.*, u.username FROM files f JOIN users u ON f.user_id = u.id WHERE f.id = ?");
 $stmt->bind_param("i", $fileId);
 $stmt->execute();
 $file = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+// Add security check
+if (!$file || ($file['user_id'] !== $_SESSION['user_id'] && $_SESSION['role'] !== 'admin')) {
+    log_error("Unauthorized file access attempt", "WARNING", [
+        'file_id' => $fileId,
+        'user_id' => $_SESSION['user_id']
+    ]);
+    $_SESSION['error'] = "You don't have permission to view this file";
+    header("Location: files.php");
+    exit();
+}
+
+// Add these new queries for enhanced details
+$stmt = $conn->prepare("
+    SELECT COUNT(*) as download_count 
+    FROM file_download_log 
+    WHERE file_id = ?
+");
+$stmt->bind_param("i", $fileId);
+$stmt->execute();
+$downloads = $stmt->get_result()->fetch_assoc()['download_count'];
+
+$stmt = $conn->prepare("
+    SELECT ft.*, u.username 
+    FROM file_transactions ft 
+    JOIN users u ON ft.user_id = u.id 
+    WHERE ft.file_id = ? 
+    ORDER BY ft.created_at DESC 
+    LIMIT 5
+");
+$stmt->bind_param("i", $fileId);
+$stmt->execute();
+$transactions = $stmt->get_result();
 $stmt->close();
 
 if (!$file) {
@@ -113,7 +148,47 @@ include 'header.php';
 
                 <!-- Version History (Hidden by Default) -->
                 <div id="versionHistory" class="hidden">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Version History</h3>
+                    <!-- File Statistics -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">File Statistics</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Total Downloads</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-gray-200"><?= $downloads ?></p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Created</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-gray-200"><?= date('M j, Y', strtotime($file['created_at'])) ?></p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Last Modified</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-gray-200"><?= date('M j, Y', strtotime($file['updated_at'])) ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Recent Activity -->
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Recent Activity</h3>
+                        <div class="space-y-3">
+                            <?php while($transaction = $transactions->fetch_assoc()): ?>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                                                <?= htmlspecialchars($transaction['action_type']) ?>
+                                            </p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                by <?= htmlspecialchars($transaction['username']) ?>
+                                            </p>
+                                        </div>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <?= date('M j, Y H:i', strtotime($transaction['created_at'])) ?>
+                                        </p>
+                                    </div>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
+                    </div>
                     <div class="space-y-3">
                         <?php while($version = $versions->fetch_assoc()): ?>
                         <div class="border rounded p-3 dark:border-gray-700">
