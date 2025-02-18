@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
             $stmt = $conn->prepare("UPDATE user_preferences SET dark_mode = ?, email_notifications = ?, language = ? WHERE user_id = ?");
             $stmt->bind_param("iisi", $dark_mode, $email_notifications, $language, $user_id);
             $_SESSION['language'] = $language; // Add this line
-            $_SESSION['success'] = "Preferences updated successfully.";
+            $_SESSION['success'] = __('preferences_updated', 'settings');
             $stmt->execute();
             break;
 
@@ -184,49 +184,49 @@ include 'header.php';
             <div class="grid gap-8 grid-cols-1 lg:grid-cols-2">
                 <!-- Preferences -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Preferences</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('preferences', 'settings') ?></h3>
                     <form method="POST" class="space-y-4">
                         <?php echo csrf_input_field(); ?>
                         <input type="hidden" name="action" value="update_preferences">
                         
                         <div class="flex items-center justify-between">
-                            <label class="text-sm text-gray-700 dark:text-gray-300">Dark Mode</label>
+                            <label class="text-sm text-gray-700 dark:text-gray-300"><?= __('dark_mode', 'settings') ?></label>
                             <label class="switch">
                                 <input type="checkbox" name="dark_mode" <?= $preferences['dark_mode'] ? 'checked' : '' ?>>
                                 <span class="slider round"></span>
                             </label>
                         </div>
-
+                        
                         <div class="flex items-center justify-between">
-                            <label class="text-sm text-gray-700 dark:text-gray-300">Email Notifications</label>
+                            <label class="text-sm text-gray-700 dark:text-gray-300"><?= __('email_notifications', 'settings') ?></label>
                             <label class="switch">
                                 <input type="checkbox" name="email_notifications" <?= $preferences['email_notifications'] ? 'checked' : '' ?>>
                                 <span class="slider round"></span>
                             </label>
                         </div>
-
+                        
                         <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Language</label>
+                            <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('language', 'settings') ?></label>
                             <select name="language" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600">
                                 <option value="en" <?= $preferences['language'] === 'en' ? 'selected' : '' ?>>English</option>
-                                <option value="de" <?= $preferences['language'] === 'de' ? 'selected' : '' ?>>German</option>
-                                <option value="fr" <?= $preferences['language'] === 'fr' ? 'selected' : '' ?>>French</option>
+                                <option value="de" <?= $preferences['language'] === 'de' ? 'selected' : '' ?>>Deutsch</option>
+                                <option value="hu" <?= $preferences['language'] === 'hu' ? 'selected' : '' ?>>Magyar</option>
                             </select>
                         </div>
-
+                        
                         <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                            Save Preferences
+                            <?= __('save_preferences', 'settings') ?>
                         </button>
                     </form>
                 </div>
-
+                
                 <!-- Email Change -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Change Email</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('change_email', 'settings') ?></h3>
                     <?php if ($pending_email_request): ?>
                         <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg mb-4">
                             <p class="text-yellow-800 dark:text-yellow-200">
-                                Pending request to change email to: <?= htmlspecialchars($pending_email_request['new_email']) ?>
+                                <?= __('pending_email_request', 'settings') ?>: <?= htmlspecialchars($pending_email_request['new_email']) ?>
                             </p>
                         </div>
                     <?php else: ?>
@@ -239,72 +239,68 @@ include 'header.php';
                                 <input type="email" value="<?= htmlspecialchars($user['email']) ?>" disabled
                                        class="w-full px-3 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:border-gray-600">
                             </div>
-
+                            
                             <div class="space-y-2">
                                 <label class="block text-sm text-gray-700 dark:text-gray-300">New Email</label>
                                 <input type="email" name="new_email" required
                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                             </div>
-
                             <div class="space-y-2">
                                 <label class="block text-sm text-gray-700 dark:text-gray-300">Reason for Change</label>
                                 <textarea name="reason" required rows="3"
                                           class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600"></textarea>
                             </div>
-
                             <div class="space-y-2">
                                 <label class="block text-sm text-gray-700 dark:text-gray-300">Current Password</label>
                                 <input type="password" name="current_password" required
                                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                             </div>
-
                             <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                                 Request Email Change
                             </button>
                         </form>
                     <?php endif; ?>
                 </div>
-
+                
                 <!-- Password Change -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Change Password</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('change_password', 'settings') ?></h3>
                     <form method="POST" class="space-y-4">
                         <?php echo csrf_input_field(); ?>
                         <input type="hidden" name="action" value="change_password">
                         
                         <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Current Password</label>
+                            <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('current_password', 'settings') ?></label>
                             <input type="password" name="current_password" required
                                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                         </div>
-
+                        
                         <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">New Password</label>
+                            <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('new_password', 'settings') ?></label>
                             <input type="password" name="new_password" required minlength="8"
                                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                         </div>
-
+                        
                         <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Confirm New Password</label>
+                            <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('confirm_password', 'settings') ?></label>
                             <input type="password" name="confirm_password" required minlength="8"
                                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                         </div>
-
                         <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                            Change Password
+                            <?= __('change_password', 'settings') ?>
                         </button>
                     </form>
                 </div>
-
+                
                 <!-- Profile Settings -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Profile Settings</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('profile_settings', 'settings') ?></h3>
                     <form method="POST" class="space-y-4">
                         <?php echo csrf_input_field(); ?>
                         <input type="hidden" name="action" value="update_profile">
                         
                         <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Timezone</label>
+                            <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('timezone', 'profile') ?></label>
                             <select name="timezone" class="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600">
                                 <?php
                                 $timezones = DateTimeZone::listIdentifiers();
@@ -315,59 +311,32 @@ include 'header.php';
                                 ?>
                             </select>
                         </div>
-
+                        
                         <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Company Name (Optional)</label>
+                            <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('company', 'profile') ?></label>
                             <input type="text" name="company" value="<?= htmlspecialchars($profile['company'] ?? '') ?>"
                                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                         </div>
-
+                        
                         <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Phone Number (Optional)</label>
+                            <label class="block text-sm text-gray-700 dark:text-gray-300"><?= __('phone', 'profile') ?></label>
                             <input type="tel" name="phone" value="<?= htmlspecialchars($profile['phone'] ?? '') ?>"
                                    class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
                         </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Current Password</label>
-                            <input type="password" name="current_password" required
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">New Password</label>
-                            <input type="password" name="new_password" required minlength="8"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="block text-sm text-gray-700 dark:text-gray-300">Confirm New Password</label>
-                            <input type="password" name="confirm_password" required minlength="8"
-                                   class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
-                        </div>
                         <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                            Update Profile
+                            <?= __('update_profile', 'settings') ?>
                         </button>
                     </form>
                 </div>
                 <!-- Account Activity -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Recent Account Activity</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('recent_activity', 'settings') ?></h3>
                     <div class="space-y-4">
-                        <?php
-                        $stmt = $conn->prepare("
-                            SELECT * FROM login_history 
-                            WHERE user_id = ? 
-                            ORDER BY attempted_at DESC 
-                            LIMIT 5
-                        ");
-                        $stmt->bind_param("i", $user_id);
-                        $stmt->execute();
-                        $login_history = $stmt->get_result();
-                        
-                        while ($login = $login_history->fetch_assoc()):
-                        ?>
+                        <?php while ($login = $login_history->fetch_assoc()): ?>
                         <div class="flex items-center justify-between p-3 border rounded-lg dark:border-gray-700">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    <?= $login['success'] ? 'Successful Login' : 'Failed Login Attempt' ?>
+                                    <?= $login['success'] ? __('successful_login', 'settings') : __('failed_login', 'settings') ?>
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">
                                     IP: <?= htmlspecialchars($login['ip_address']) ?>
@@ -387,7 +356,7 @@ include 'header.php';
                 </div>
                 <!-- Active Sessions -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Active Sessions</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('active_sessions', 'settings') ?></h3>
                     <div class="space-y-4">
                         <?php
                         $stmt = $conn->prepare("
