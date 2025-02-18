@@ -45,4 +45,53 @@ return [
         'view_details' => 'View Details',
         'no_notifications' => 'No new notifications'
     ],
+    
+    'files' => [
+        'my_files' => 'My Files',
+        'upload_new' => 'Upload New File',
+        'title' => 'Title',
+        'car_model' => 'Car Model',
+        'status' => 'Status',
+        'current_version' => 'Current Version',
+        'last_updated' => 'Last Updated',
+        'actions' => 'Actions',
+        'no_files' => 'No files found.',
+        'upload_first' => 'Upload your first file',
+        'pending' => 'Pending',
+        'approved' => 'Approved'
+    ],
+    
+    'file_details' => [
+        'description' => 'Description',
+        'request_update' => 'Request File Update',
+        'version_history' => 'Version History',
+        'version' => 'Version',
+        'uploaded_at' => 'Uploaded At',
+        'download' => 'Download',
+        'status' => 'Status'
+    ],
+    
+    'admin' => [
+        'update_requests' => 'Update Requests',
+        'request_id' => 'Request ID',
+        'file' => 'File',
+        'user' => 'User',
+        'status' => 'Status',
+        'actions' => 'Actions',
+        'users' => 'Users',
+        'credits' => 'Credits',
+        'logs' => 'Logs',
+        'tools' => 'Tools',
+        'severity' => 'Severity',
+        'message' => 'Message',
+        'created_at' => 'Created At',
+        'manage_tunes' => 'Manage Tunes'
+    ],
+    
+    'errors' => [
+        'unauthorized' => 'Unauthorized access',
+        'forbidden' => 'Access forbidden',
+        'not_found' => 'Not found',
+        'server_error' => 'Server error'
+    ]
 ];
