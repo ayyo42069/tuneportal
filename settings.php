@@ -336,12 +336,6 @@ include 'header.php';
                     <form method="POST" class="space-y-4">
                         <?php echo csrf_input_field(); ?>
                         <input type="hidden" name="action" value="update_profile">
-                        <!-- Profile Settings -->
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('profile_settings', 'settings') ?></h3>
-    <form method="POST" class="space-y-4" enctype="multipart/form-data">
-        <?php echo csrf_input_field(); ?>
-        <input type="hidden" name="action" value="update_profile">
         
         <!-- Profile Picture -->
         <div class="space-y-2">
