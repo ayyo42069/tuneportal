@@ -15,24 +15,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
     $action = $_POST['action'];
 
     switch ($action) {
+        // In the update_preferences case
         case 'update_preferences':
             $dark_mode = isset($_POST['dark_mode']) ? 1 : 0;
             $email_notifications = isset($_POST['email_notifications']) ? 1 : 0;
             $language = sanitize($_POST['language']);
-
+        
             $stmt = $conn->prepare("UPDATE user_preferences SET dark_mode = ?, email_notifications = ?, language = ? WHERE user_id = ?");
             $stmt->bind_param("iisi", $dark_mode, $email_notifications, $language, $user_id);
             
             if ($stmt->execute()) {
+                $_SESSION['dark_mode'] = $dark_mode; // Add this line to update session
                 $_SESSION['success'] = "Preferences updated successfully.";
-                log_error("User updated preferences", "INFO", [
-                    'user_id' => $user_id,
-                    'changes' => [
-                        'dark_mode' => $dark_mode,
-                        'email_notifications' => $email_notifications,
-                        'language' => $language
-                    ]
-                ]);
             }
             break;
 
@@ -487,5 +481,19 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dark mode from PHP session
+    if (<?= isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'true' : 'false' ?>) {
+        document.documentElement.classList.add('dark');
+    }
 
+    // Listen for form submission
+    const preferencesForm = document.querySelector('form[action="settings.php"]');
+    preferencesForm.addEventListener('submit', function() {
+        const darkModeEnabled = this.querySelector('input[name="dark_mode"]').checked;
+        document.documentElement.classList.toggle('dark', darkModeEnabled);
+    });
+});
+</script>
 <?php include 'footer.php'; ?>

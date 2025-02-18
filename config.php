@@ -55,7 +55,16 @@ if (session_status() === PHP_SESSION_NONE) {
     ]);
     session_start();
 }
-
+// Add after successful authentication
+if (isset($_SESSION['user_id'])) {
+    $stmt = $conn->prepare("SELECT dark_mode FROM user_preferences WHERE user_id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($pref = $result->fetch_assoc()) {
+        $_SESSION['dark_mode'] = $pref['dark_mode'];
+    }
+}
 // Create a new MySQLi connection using environment variables
 $conn = new mysqli(
     getenv('DB_HOST'),
