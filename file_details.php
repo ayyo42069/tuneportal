@@ -247,7 +247,7 @@ include 'header.php';
                                 <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
                                     <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Request File Update</h3>
                                     <form action="request_update.php" method="POST">
-                                    <?php echo csrf_input_field(); ?>
+                                        <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
                                         <input type="hidden" name="file_id" value="<?= $fileId ?>">
                                         <div class="mb-4">
                                             <label class="block mb-2 text-gray-700 dark:text-gray-300">Update Instructions</label>

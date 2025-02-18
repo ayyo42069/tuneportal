@@ -2,7 +2,7 @@
 include 'config.php';
 require_auth();
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !verify_csrf_token()) {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !verify_csrf_token($_POST['csrf_token'])) {
     $_SESSION['error'] = "Invalid request";
     header("Location: files.php");
     exit();
