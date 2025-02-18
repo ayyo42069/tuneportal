@@ -28,7 +28,7 @@ return [
         'phone' => 'Phone Number'
     ],
     'dashboard' => [
-        'credit_balance' => 'Credit Balance',
+        'credit_balance' => 'Credit Balanceeee',
         'credits' => 'Credits',
         'transaction_history' => 'Transaction History',
         'welcome_back' => 'Welcome Back',
