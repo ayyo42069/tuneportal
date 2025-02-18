@@ -3,18 +3,16 @@ include 'config.php';
 require_auth(true);
 
 // Handle request completion
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) {
-    // Verify the CSRF token before proceeding
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
     if (!verify_csrf_token($token)) {
         die("Error: Invalid CSRF token.");
     }
 
-    $request_id = (int)$_POST['request_id'];
-    $notes = sanitize($_POST['admin_notes']);
-    // Update the processing status when admin starts working
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['start_processing'])) {
-        if (verify_csrf_token($_POST['csrf_token'])) {
+    try {
+        $conn->begin_transaction();
+
+        if (isset($_POST['start_processing'])) {
             $request_id = (int)$_POST['request_id'];
             $stmt = $conn->prepare("UPDATE update_requests SET status = 'processing' WHERE id = ?");
             $stmt->bind_param("i", $request_id);
@@ -24,57 +22,117 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) 
             $stmt = $conn->prepare("INSERT INTO file_transactions (file_id, user_id, action_type, details) VALUES (?, ?, 'processing_started', 'Admin started processing update request')");
             $stmt->bind_param("ii", $file_id, $_SESSION['user_id']);
             $stmt->execute();
+            $conn->commit();
+            $_SESSION['success'] = "Request status updated to processing";
+            header("Location: admin_requests.php");
+            exit();
         }
-    }
-    
-    // When completing the request
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) {
-        // Handle file upload
-        if (!empty($_FILES['updated_file']['name'])) {
-            $file = $_FILES['updated_file'];
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        
+        if (isset($_POST['reject_request'])) {
+            $request_id = (int)$_POST['request_id'];
+            $reject_notes = sanitize($_POST['reject_notes'] ?? 'Request rejected by admin');
             
-            if ($ext === 'bin') {
-                // Get request details using prepared statement
-                $stmt = $conn->prepare("SELECT * FROM update_requests WHERE id = ?");
-                $stmt->bind_param("i", $request_id);
-                $stmt->execute();
-                $request = $stmt->get_result()->fetch_assoc();
-                
-                // Update file version with encryption
-                $stmt = $conn->prepare("SELECT current_version FROM files WHERE id = ?");
-                $stmt->bind_param("i", $request['file_id']);
-                $stmt->execute();
-                $new_version = $stmt->get_result()->fetch_assoc()['current_version'] + 1;
-                
-                $filename = "processed_{$request['file_id']}_v{$new_version}.bin";
-                $upload_path = __DIR__ . "/uploads/$filename";
-                
-                if (!encrypt_file($_FILES['updated_file']['tmp_name'], $upload_path)) {
-                    throw new Exception("Failed to encrypt file");
+            // Update request status
+            $stmt = $conn->prepare("UPDATE update_requests SET status = 'rejected', admin_notes = ? WHERE id = ?");
+            $stmt->bind_param("si", $reject_notes, $request_id);
+            $stmt->execute();
+            
+            // Get request details for notification
+            $stmt = $conn->prepare("SELECT user_id, file_id FROM update_requests WHERE id = ?");
+            $stmt->bind_param("i", $request_id);
+            $stmt->execute();
+            $request = $stmt->get_result()->fetch_assoc();
+            
+            // Add notification
+            $user_msg = "Your update request #$request_id has been rejected";
+            $stmt = $conn->prepare("INSERT INTO notifications (user_id, message, link) VALUES (?, ?, ?)");
+            $link = "file_details.php?id=" . $request['file_id'];
+            $stmt->bind_param("iss", $request['user_id'], $user_msg, $link);
+            $stmt->execute();
+            $conn->commit();
+            $_SESSION['success'] = "Request rejected successfully";
+            header("Location: admin_requests.php");
+            exit();
+        }
+
+        if (isset($_POST['complete_request'])) {
+            // Verify the CSRF token before proceeding
+            $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+            if (!verify_csrf_token($token)) {
+                die("Error: Invalid CSRF token.");
+            }
+            $request_id = (int)$_POST['request_id'];
+            $notes = sanitize($_POST['admin_notes']);
+            // Update the processing status when admin starts working
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['start_processing'])) {
+                if (verify_csrf_token($_POST['csrf_token'])) {
+                    $request_id = (int)$_POST['request_id'];
+                    $stmt = $conn->prepare("UPDATE update_requests SET status = 'processing' WHERE id = ?");
+                    $stmt->bind_param("i", $request_id);
+                    $stmt->execute();
+                    
+                    // Add to transactions log
+                    $stmt = $conn->prepare("INSERT INTO file_transactions (file_id, user_id, action_type, details) VALUES (?, ?, 'processing_started', 'Admin started processing update request')");
+                    $stmt->bind_param("ii", $file_id, $_SESSION['user_id']);
+                    $stmt->execute();
                 }
-                
-                // Calculate file hash
-                $file_hash = hash_file('sha256', $upload_path);
-                
-                // Update database with prepared statements
-                $conn->query("UPDATE files SET current_version = $new_version WHERE id = {$request['file_id']}");
-                $conn->query("INSERT INTO file_versions (file_id, version, file_path, notes) 
-                             VALUES ({$request['file_id']}, $new_version, '$filename', '$notes')");
-                
-                // Update request status
-                $conn->query("UPDATE update_requests SET status = 'completed', admin_notes = '$notes' WHERE id = $request_id");
-                
-                // Notify user
-                $user_msg = "Your update request #$request_id has been completed";
-                $conn->query("INSERT INTO notifications (user_id, message, link) 
-                             VALUES ({$request['user_id']}, '$user_msg', 'file_details.php?id={$request['file_id']}')");
-                
-                $_SESSION['success'] = "Request completed successfully";
-            } else {
-                $_SESSION['error'] = "Only .bin files accepted";
+            }
+            
+            // When completing the request
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) {
+                // Handle file upload
+                if (!empty($_FILES['updated_file']['name'])) {
+                    $file = $_FILES['updated_file'];
+                    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                    
+                    if ($ext === 'bin') {
+                        // Get request details using prepared statement
+                        $stmt = $conn->prepare("SELECT * FROM update_requests WHERE id = ?");
+                        $stmt->bind_param("i", $request_id);
+                        $stmt->execute();
+                        $request = $stmt->get_result()->fetch_assoc();
+                        
+                        // Update file version with encryption
+                        $stmt = $conn->prepare("SELECT current_version FROM files WHERE id = ?");
+                        $stmt->bind_param("i", $request['file_id']);
+                        $stmt->execute();
+                        $new_version = $stmt->get_result()->fetch_assoc()['current_version'] + 1;
+                        
+                        $filename = "processed_{$request['file_id']}_v{$new_version}.bin";
+                        $upload_path = __DIR__ . "/uploads/$filename";
+                        
+                        if (!encrypt_file($_FILES['updated_file']['tmp_name'], $upload_path)) {
+                            throw new Exception("Failed to encrypt file");
+                        }
+                        
+                        // Calculate file hash
+                        $file_hash = hash_file('sha256', $upload_path);
+                        
+                        // Update database with prepared statements
+                        $conn->query("UPDATE files SET current_version = $new_version WHERE id = {$request['file_id']}");
+                        $conn->query("INSERT INTO file_versions (file_id, version, file_path, notes) 
+                                     VALUES ({$request['file_id']}, $new_version, '$filename', '$notes')");
+                        
+                        // Update request status
+                        $conn->query("UPDATE update_requests SET status = 'completed', admin_notes = '$notes' WHERE id = $request_id");
+                        
+                        // Notify user
+                        $user_msg = "Your update request #$request_id has been completed";
+                        $conn->query("INSERT INTO notifications (user_id, message, link) 
+                                     VALUES ({$request['user_id']}, '$user_msg', 'file_details.php?id={$request['file_id']}')");
+                        
+                        $_SESSION['success'] = "Request completed successfully";
+                    } else {
+                        $_SESSION['error'] = "Only .bin files accepted";
+                    }
+                }
             }
         }
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['error'] = "Error: " . $e->getMessage();
+        header("Location: admin_requests.php");
+        exit();
     }
 }
 
@@ -302,6 +360,53 @@ function toggleDetailsModal() {
     modal.classList.toggle('hidden');
 }
 </script>
+<!-- Add this before the closing </body> tag -->
+<!-- Reject Modal -->
+<div id="rejectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
+            <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Reject Update Request</h3>
+            <form method="POST">
+                <?php echo csrf_input_field(); ?>
+                <input type="hidden" name="request_id" id="rejectRequestId">
+                <input type="hidden" name="reject_request" value="1">
+                
+                <div class="mb-4">
+                    <label class="block mb-2 text-gray-700 dark:text-gray-300">Rejection Reason</label>
+                    <textarea name="reject_notes" required
+                              class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                              rows="3"
+                              placeholder="Provide a reason for rejection"></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="toggleRejectModal()" 
+                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                        Reject Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
+<script>
+// Add these functions to your existing JavaScript
+function toggleRejectModal(requestId = null) {
+    const modal = document.getElementById('rejectModal');
+    if(requestId) {
+        document.getElementById('rejectRequestId').value = requestId;
+    }
+    modal.classList.toggle('hidden');
+}
+
+function rejectRequest(requestId) {
+    toggleRejectModal(requestId);
+}
+</script>
 <?php include 'footer.php'; ?>
 
