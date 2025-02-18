@@ -89,5 +89,23 @@ return [
         'forbidden' => 'Hozzáférés megtagadva',
         'not_found' => 'Nem található',
         'server_error' => 'Szerverhiba'
-    ]
+    ],
+'sidebar' => [
+'my_profile' => 'Profilom',
+'settings' => 'Beállítások',
+'logout' => 'Kijelentkezés',
+'dashboard' => 'Vezérlőpult',
+'my_files' => 'Fájljaim',
+'credits' => 'Kreditek',
+'tools' => 'Eszközök',
+'admin_tools' => 'Admin eszközök',
+'manage_credits' => 'Kreditek kezelése',
+'manage_tools' => 'Eszközök kezelése',
+'manage_files' => 'Fájlok kezelése',
+'manage_users' => 'Felhasználók kezelése',
+'manage_tune_options' => 'Tune opciók kezelése',
+'manage_notifications' => 'Értesítések kezelése',
+'system_logs' => 'Rendszernapló',
+]
+
 ];
