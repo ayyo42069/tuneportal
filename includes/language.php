@@ -4,33 +4,47 @@ function init_language() {
         $_SESSION['language'] = 'en';
     }
     
-    // Try to load selected language
-    $language_file = __DIR__ . '/../languages/' . $_SESSION['language'] . '.php';
-    if (file_exists($language_file)) {
-        return require $language_file;
-    }
-    
-    // Fallback to English if selected language file doesn't exist
+    // Load English translations for fallback
     $en_file = __DIR__ . '/../languages/en.php';
     if (!file_exists($en_file)) {
         die('English language file not found');
     }
+    $en_translations = require $en_file;
     
-    $_SESSION['language'] = 'en';
-    return require $en_file;
+    // If not English, load selected language
+    if ($_SESSION['language'] !== 'en') {
+        $language_file = __DIR__ . '/../languages/' . $_SESSION['language'] . '.php';
+        if (file_exists($language_file)) {
+            $selected_translations = require $language_file;
+            return [
+                'current' => $selected_translations,
+                'fallback' => $en_translations,
+                'current_language' => $_SESSION['language']
+            ];
+        }
+    }
+    
+    return [
+        'current' => $en_translations,
+        'fallback' => $en_translations,
+        'current_language' => 'en'
+    ];
 }
-
 
 function __($key, $section = null) {
     static $translations = null;
-    if ($translations === null || (isset($_SESSION['language']) && isset($translations['current_language']) && $translations['current_language'] !== $_SESSION['language'])) {
+    if ($translations === null || (isset($_SESSION['language']) && $translations['current_language'] !== $_SESSION['language'])) {
         $translations = init_language();
-        $translations['current_language'] = $_SESSION['language'];
     }
     
     if ($section) {
-        return $translations[$section][$key] ?? $key;
+        // Try current language first, then fallback to English
+        return $translations['current'][$section][$key] 
+            ?? $translations['fallback'][$section][$key] 
+            ?? $key;
     }
     
-    return $translations[$key] ?? $key;
+    return $translations['current'][$key] 
+        ?? $translations['fallback'][$key] 
+        ?? $key;
 }
