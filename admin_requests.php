@@ -416,27 +416,94 @@ function toggleDetailsModal() {
 // Add this to your existing JavaScript
 function switchTab(tabName) {
     // Update tab styles
-    document.getElementById('requests-tab').classList.remove('text-red-600', 'border-red-600');
-    document.getElementById('files-tab').classList.remove('text-red-600', 'border-red-600');
+    document.querySelectorAll('[id$="-tab"]').forEach(tab => {
+        tab.classList.remove('text-red-600', 'border-red-600');
+        tab.classList.add('text-gray-500', 'border-transparent');
+    });
     document.getElementById(`${tabName}-tab`).classList.add('text-red-600', 'border-red-600');
+    document.getElementById(`${tabName}-tab`).classList.remove('text-gray-500', 'border-transparent');
 
     // Show/hide content
     document.getElementById('requests-content').classList.add('hidden');
     document.getElementById('files-content').classList.add('hidden');
     document.getElementById(`${tabName}-content`).classList.remove('hidden');
+
+    // Load files data if switching to files tab
+    if (tabName === 'files') {
+        loadFiles();
+    }
 }
 
-// Load files data via AJAX when switching to files tab
-document.getElementById('files-tab').addEventListener('click', async () => {
+async function loadFiles() {
     try {
         const response = await fetch('get_admin_files.php');
-        const data = await response.json();
-        // Update files table content
-        updateFilesTable(data);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const files = await response.json();
+        const tbody = document.getElementById('filesTableBody');
+        tbody.innerHTML = files.map(file => `
+            <tr class="border-b dark:border-gray-700">
+                <td class="p-3 text-gray-700 dark:text-gray-300">${file.title}</td>
+                <td class="p-3 text-gray-700 dark:text-gray-300">${file.username}</td>
+                <td class="p-3">
+                    <span class="px-2 py-1 rounded ${
+                        file.status === 'pending' 
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                    }">
+                        ${file.status.charAt(0).toUpperCase() + file.status.slice(1)}
+                    </span>
+                </td>
+                <td class="p-3 text-gray-700 dark:text-gray-300">${file.version_count}</td>
+                <td class="p-3 text-gray-700 dark:text-gray-300">${file.download_count}</td>
+                <td class="p-3">
+                    <div class="flex space-x-2">
+                        <a href="file_details.php?id=${file.id}" 
+                           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            View
+                        </a>
+                        <button onclick="deleteFile(${file.id})" 
+                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
     } catch (error) {
         console.error('Error loading files:', error);
+        alert('Failed to load files. Please try again.');
     }
-});
+}
+
+// Add delete file function
+async function deleteFile(fileId) {
+    if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('file_id', fileId);
+        formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+
+        const response = await fetch('admin_files.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        loadFiles(); // Reload the files list
+    } catch (error) {
+        console.error('Error deleting file:', error);
+        alert('Failed to delete file. Please try again.');
+    }
+}
 </script>
 <?php include 'footer.php'; ?>
 
