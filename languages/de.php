@@ -26,5 +26,23 @@ return [
         'timezone' => 'Zeitzone',
         'company' => 'Firmenname',
         'phone' => 'Telefonnummer'
-    ]
+    ],
+    'dashboard' => [
+        'credit_balance' => 'Guthaben',
+        'credits' => 'Credits',
+        'transaction_history' => 'Transaktionsverlauf',
+        'welcome_back' => 'Willkommen zurück',
+        'notifications' => 'Benachrichtigungen',
+        'upload_new_file' => 'Neue Datei hochladen',
+        'file_title' => 'Dateititel',
+        'car_model' => 'Automodell',
+        'description' => 'Beschreibung',
+        'tuning_options' => 'Tuning-Optionen',
+        'select_file' => '.bin Datei auswählen',
+        'upload_file' => 'Datei hochladen',
+        'recent_files' => 'Aktuelle Dateien',
+        'new' => 'Neu',
+        'view_details' => 'Details anzeigen',
+        'no_notifications' => 'Keine neuen Benachrichtigungen'
+    ],
 ];
