@@ -23,30 +23,30 @@ include 'header.php';
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Credit Balance</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white"><?= __('credit_balance', 'dashboard') ?></h3>
                         <p class="text-3xl font-bold text-red-600">
-                            <?= number_format($_SESSION['credits']) ?> Credits
+                            <?= number_format($_SESSION['credits']) ?> <?= __('credits', 'dashboard') ?>
                         </p>
                     </div>
                     <a href="credits.php" class="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors inline-flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
-                        Transaction History
+                        <?= __('transaction_history', 'dashboard') ?>
                     </a>
                 </div>
             </div>
 
             <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Welcome Back, <?= htmlspecialchars($_SESSION['username']) ?>!</h2>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6"><?= __('welcome_back', 'dashboard') ?>, <?= htmlspecialchars($_SESSION['username']) ?>!</h2>
                 
                 <!-- Grid Layout for Cards -->
                 <div class="grid gap-8 grid-cols-1 lg:grid-cols-2">
                     <!-- Notifications Card -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Notifications</h3>
-                            <span class="bg-red-100 text-red-600 text-sm py-1 px-3 rounded-full">New</span>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white"><?= __('notifications', 'dashboard') ?></h3>
+                            <span class="bg-red-100 text-red-600 text-sm py-1 px-3 rounded-full"><?= __('new', 'dashboard') ?></span>
                         </div>
                         <?php
                         $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? OR user_id IS NULL ORDER BY created_at DESC LIMIT 5");
@@ -74,7 +74,7 @@ include 'header.php';
                                     <?php if ($note['link']): ?>
                                     <a href="<?= htmlspecialchars($note['link']) ?>" 
                                        class="text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium">
-                                        View Details →
+                                        <?= __('view_details', 'dashboard') ?> →
                                     </a>
                                     <?php endif; ?>
                                 </div>
@@ -82,39 +82,36 @@ include 'header.php';
                             <?php endwhile; ?>
                         </div>
                         <?php else: ?>
-                        <p class="text-gray-500 dark:text-gray-400 text-center py-4">No new notifications</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-center py-4"><?= __('no_notifications', 'dashboard') ?></p>
                         <?php endif; ?>
                         <?php $stmt->close(); ?>
                     </div>
-
                     <!-- File Upload Card -->
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Upload New File</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4"><?= __('upload_new_file', 'dashboard') ?></h3>
                         <form action="upload.php" method="POST" enctype="multipart/form-data" class="space-y-4">
                             <?php echo csrf_input_field(); ?>
                             
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">File Title</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><?= __('file_title', 'dashboard') ?></label>
                                     <input type="text" name="title" required 
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Car Model</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><?= __('car_model', 'dashboard') ?></label>
                                     <input type="text" name="car_model" required 
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white">
                                 </div>
                             </div>
-
                             <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><?= __('description', 'dashboard') ?></label>
                                 <textarea name="description" rows="3" 
                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white"></textarea>
                             </div>
-
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tuning Options</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><?= __('tuning_options', 'dashboard') ?></label>
                                     <div class="space-y-2 max-h-40 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
                                         <?php
                                         $options = $conn->query("SELECT * FROM tuning_options");
@@ -125,7 +122,7 @@ include 'header.php';
                                                    class="rounded border-gray-300 text-red-600 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700">
                                             <span class="text-sm text-gray-700 dark:text-gray-300">
                                                 <?= htmlspecialchars($opt['name']) ?> 
-                                                <span class="text-gray-500 dark:text-gray-400">(<?= $opt['credit_cost'] ?> credits)</span>
+                                                <span class="text-gray-500 dark:text-gray-400">(<?= $opt['credit_cost'] ?> <?= __('credits_cost', 'dashboard') ?>)</span>
                                             </span>
                                         </label>
                                         <?php
@@ -134,7 +131,7 @@ include 'header.php';
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select .bin File</label>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><?= __('select_bin_file', 'dashboard') ?></label>
                                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg hover:border-red-500 transition-colors">
                                         <div class="space-y-1 text-center">
                                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -152,7 +149,6 @@ include 'header.php';
                                     </div>
                                 </div>
                             </div>
-
                             <div class="flex justify-end">
                                 <button type="submit" class="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,61 +160,58 @@ include 'header.php';
                         </form>
                     </div>
                 </div>
-
                 <!-- Recent Files Table -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm mt-8">
                     <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Recent Files</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white"><?= __('recent_files', 'dashboard') ?></h3>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-50 dark:bg-gray-700">
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Car Model</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Version</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <?php
-                                $stmt = $conn->prepare("SELECT * FROM files WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
-                                $stmt->bind_param("i", $_SESSION['user_id']);
-                                $stmt->execute();
-                                $files = $stmt->get_result();
-                                while ($file = $files->fetch_assoc()) :
-                                ?>
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                            <?= htmlspecialchars($file['title']) ?>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            <?= htmlspecialchars($file['car_model']) ?>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' ?>">
-                                            <?= ucfirst($file['status']) ?>
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        v<?= htmlspecialchars($file['current_version']) ?>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="file_details.php?id=<?= htmlspecialchars($file['id']) ?>" 
-                                           class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">View Details</a>
-                                    </td>
-                                </tr>
-                                <?php endwhile; ?>
-                                <?php $stmt->close(); ?>
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 dark:bg-gray-700">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"><?= __('title', 'dashboard') ?></th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"><?= __('car_model', 'dashboard') ?></th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"><?= __('status', 'dashboard') ?></th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"><?= __('version', 'dashboard') ?></th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"><?= __('actions', 'dashboard') ?></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <?php
+                            $stmt = $conn->prepare("SELECT * FROM files WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
+                            $stmt->bind_param("i", $_SESSION['user_id']);
+                            $stmt->execute();
+                            $files = $stmt->get_result();
+                            while ($file = $files->fetch_assoc()) :
+                            ?>
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        <?= htmlspecialchars($file['title']) ?>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        <?= htmlspecialchars($file['car_model']) ?>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' ?>">
+                                        <?= ucfirst($file['status']) ?>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    v<?= htmlspecialchars($file['current_version']) ?>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <a href="file_details.php?id=<?= htmlspecialchars($file['id']) ?>" 
+                                       class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"><?= __('view_details', 'dashboard') ?></a>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
+                            <?php $stmt->close(); ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -10,6 +10,7 @@ define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 define('ALLOWED_EXTENSIONS', ['bin']);
 define('ERROR_LOG_PATH', __DIR__ . '/logs/error.log');
 
+
 // Load environment variables from .env file
 function load_env() {
     $env_file = __DIR__ . '/.env';
@@ -41,6 +42,8 @@ if (!file_exists(__DIR__ . '/logs')) {
 require_once __DIR__ . '/includes/encryption.php';
 require_once __DIR__ . '/includes/logging.php';
 require_once __DIR__ . '/includes/file_handler.php';
+// Add after other requires
+require_once __DIR__ . '/includes/language.php';
 
 // Set secure session cookie parameters and start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
