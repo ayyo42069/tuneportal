@@ -181,7 +181,7 @@ $stmt = $conn->prepare("
 ");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$login_history = $stmt->get_result();
+$login_history = $stmt->get_result()->fetch_assoc();
 
 include 'header.php';
 ?>
