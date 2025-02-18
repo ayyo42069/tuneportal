@@ -144,7 +144,26 @@ include 'header.php';
     
     <div class="flex-1 transition-all duration-300 lg:ml-64">
         <div class="container mx-auto px-4 py-8 mt-16">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <!-- Add Tab Navigation -->
+            <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
+                <ul class="flex flex-wrap -mb-px">
+                    <li class="mr-2">
+                        <a href="#" onclick="switchTab('requests')" id="requests-tab" 
+                           class="inline-block p-4 text-red-600 border-b-2 border-red-600 rounded-t-lg active">
+                            Update Requests
+                        </a>
+                    </li>
+                    <li class="mr-2">
+                        <a href="#" onclick="switchTab('files')" id="files-tab"
+                           class="inline-block p-4 text-gray-500 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">
+                            File Management
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Requests Content -->
+            <div id="requests-content" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-6">Update Requests</h2>
                 
                 <div class="overflow-x-auto">
@@ -393,20 +412,31 @@ function toggleDetailsModal() {
         </div>
     </div>
 </div>
-
 <script>
-// Add these functions to your existing JavaScript
-function toggleRejectModal(requestId = null) {
-    const modal = document.getElementById('rejectModal');
-    if(requestId) {
-        document.getElementById('rejectRequestId').value = requestId;
-    }
-    modal.classList.toggle('hidden');
+// Add this to your existing JavaScript
+function switchTab(tabName) {
+    // Update tab styles
+    document.getElementById('requests-tab').classList.remove('text-red-600', 'border-red-600');
+    document.getElementById('files-tab').classList.remove('text-red-600', 'border-red-600');
+    document.getElementById(`${tabName}-tab`).classList.add('text-red-600', 'border-red-600');
+
+    // Show/hide content
+    document.getElementById('requests-content').classList.add('hidden');
+    document.getElementById('files-content').classList.add('hidden');
+    document.getElementById(`${tabName}-content`).classList.remove('hidden');
 }
 
-function rejectRequest(requestId) {
-    toggleRejectModal(requestId);
-}
+// Load files data via AJAX when switching to files tab
+document.getElementById('files-tab').addEventListener('click', async () => {
+    try {
+        const response = await fetch('get_admin_files.php');
+        const data = await response.json();
+        // Update files table content
+        updateFilesTable(data);
+    } catch (error) {
+        console.error('Error loading files:', error);
+    }
+});
 </script>
 <?php include 'footer.php'; ?>
 
