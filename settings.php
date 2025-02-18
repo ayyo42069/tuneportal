@@ -151,6 +151,18 @@ $stmt = $conn->prepare("SELECT * FROM user_preferences WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $preferences = $stmt->get_result()->fetch_assoc();
+// Add this before the Account Activity section
+$stmt = $conn->prepare("
+    SELECT * FROM login_history 
+    WHERE user_id = ? 
+    ORDER BY attempted_at DESC 
+    LIMIT 10
+");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$login_history = $stmt->get_result();
+
+// Then the existing loop will work
 
 // Set session language from preferences
 if ($preferences) {
