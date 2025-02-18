@@ -144,26 +144,7 @@ include 'header.php';
     
     <div class="flex-1 transition-all duration-300 lg:ml-64">
         <div class="container mx-auto px-4 py-8 mt-16">
-            <!-- Add Tab Navigation -->
-            <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
-                <ul class="flex flex-wrap -mb-px">
-                    <li class="mr-2">
-                        <a href="#" onclick="switchTab('requests')" id="requests-tab" 
-                           class="inline-block p-4 text-red-600 border-b-2 border-red-600 rounded-t-lg active">
-                            Update Requests
-                        </a>
-                    </li>
-                    <li class="mr-2">
-                        <a href="#" onclick="switchTab('files')" id="files-tab"
-                           class="inline-block p-4 text-gray-500 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">
-                            File Management
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Requests Content -->
-            <div id="requests-content" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <h2 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-6">Update Requests</h2>
                 
                 <div class="overflow-x-auto">
@@ -412,97 +393,19 @@ function toggleDetailsModal() {
         </div>
     </div>
 </div>
+
 <script>
-// Add this to your existing JavaScript
-function switchTab(tabName) {
-    // Update tab styles
-    document.querySelectorAll('[id$="-tab"]').forEach(tab => {
-        tab.classList.remove('text-red-600', 'border-red-600');
-        tab.classList.add('text-gray-500', 'border-transparent');
-    });
-    document.getElementById(`${tabName}-tab`).classList.add('text-red-600', 'border-red-600');
-    document.getElementById(`${tabName}-tab`).classList.remove('text-gray-500', 'border-transparent');
-
-    // Show/hide content
-    document.getElementById('requests-content').classList.add('hidden');
-    document.getElementById('files-content').classList.add('hidden');
-    document.getElementById(`${tabName}-content`).classList.remove('hidden');
-
-    // Load files data if switching to files tab
-    if (tabName === 'files') {
-        loadFiles();
+// Add these functions to your existing JavaScript
+function toggleRejectModal(requestId = null) {
+    const modal = document.getElementById('rejectModal');
+    if(requestId) {
+        document.getElementById('rejectRequestId').value = requestId;
     }
+    modal.classList.toggle('hidden');
 }
 
-async function loadFiles() {
-    try {
-        const response = await fetch('get_admin_files.php');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const files = await response.json();
-        const tbody = document.getElementById('filesTableBody');
-        tbody.innerHTML = files.map(file => `
-            <tr class="border-b dark:border-gray-700">
-                <td class="p-3 text-gray-700 dark:text-gray-300">${file.title}</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300">${file.username}</td>
-                <td class="p-3">
-                    <span class="px-2 py-1 rounded ${
-                        file.status === 'pending' 
-                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                            : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                    }">
-                        ${file.status.charAt(0).toUpperCase() + file.status.slice(1)}
-                    </span>
-                </td>
-                <td class="p-3 text-gray-700 dark:text-gray-300">${file.version_count}</td>
-                <td class="p-3 text-gray-700 dark:text-gray-300">${file.download_count}</td>
-                <td class="p-3">
-                    <div class="flex space-x-2">
-                        <a href="file_details.php?id=${file.id}" 
-                           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                            View
-                        </a>
-                        <button onclick="deleteFile(${file.id})" 
-                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                            Delete
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-    } catch (error) {
-        console.error('Error loading files:', error);
-        alert('Failed to load files. Please try again.');
-    }
-}
-
-// Add delete file function
-async function deleteFile(fileId) {
-    if (!confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
-        return;
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append('action', 'delete');
-        formData.append('file_id', fileId);
-        formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
-
-        const response = await fetch('admin_files.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        loadFiles(); // Reload the files list
-    } catch (error) {
-        console.error('Error deleting file:', error);
-        alert('Failed to delete file. Please try again.');
-    }
+function rejectRequest(requestId) {
+    toggleRejectModal(requestId);
 }
 </script>
 <?php include 'footer.php'; ?>
