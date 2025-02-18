@@ -123,7 +123,6 @@ include 'header.php';
                                         <?= ucfirst($request['status']) ?>
                                     </span>
                                 </td>
-                                // Add to the actions column in the table
                                 <td class="p-3">
                                     <?php if($request['status'] === 'pending'): ?>
                                         <button onclick="toggleProcessingModal(<?= $request['id'] ?>)" 

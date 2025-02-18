@@ -216,7 +216,7 @@ include 'header.php';
                                     <span class="font-semibold text-gray-800 dark:text-gray-200">Version <?= $version['version'] ?></span>
                                     <span class="text-sm text-gray-500 dark:text-gray-400 ml-2"><?= $version['uploaded_at'] ?></span>
                                 </div>
-                                // Remove the revert links from version history
+                            
                                 <div class="space-x-2">
                                     <a href="?id=<?= $fileId ?>&download=true&version=<?= $version['version'] ?>" 
                                        class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
