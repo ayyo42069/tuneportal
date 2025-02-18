@@ -13,12 +13,12 @@ $message = trim($_POST['message']);
 $userId = $_SESSION['user_id'];
 
 // Verify file exists and user has access
-$stmt = $conn->prepare("SELECT * FROM files WHERE id = ? AND (user_id = ? OR ? IN (SELECT user_id FROM file_shares WHERE file_id = ?))");
-$stmt->bind_param("iiii", $fileId, $userId, $userId, $fileId);
+$stmt = $conn->prepare("SELECT * FROM files WHERE id = ? AND user_id = ?");
+$stmt->bind_param("ii", $fileId, $userId);
 $stmt->execute();
 $file = $stmt->get_result()->fetch_assoc();
 
-if (!$file) {
+if (!$file && $_SESSION['role'] !== 'admin') {
     $_SESSION['error'] = "File not found or access denied";
     header("Location: files.php");
     exit();
