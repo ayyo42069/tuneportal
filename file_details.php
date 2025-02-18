@@ -37,7 +37,16 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $fileId);
 $stmt->execute();
 $downloads = $stmt->get_result()->fetch_assoc()['download_count'];
-
+// Update the query to include proper timestamp fields
+$stmt = $conn->prepare("
+    SELECT 
+        f.*,
+        COALESCE(f.updated_at, f.created_at) as last_modified,
+        u.username 
+    FROM files f 
+    JOIN users u ON f.user_id = u.id 
+    WHERE f.id = ?
+");
 $stmt = $conn->prepare("
     SELECT ft.*, u.username 
     FROM file_transactions ft 
@@ -162,7 +171,9 @@ include 'header.php';
                             </div>
                             <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Last Modified</p>
-                                <p class="text-2xl font-bold text-gray-800 dark:text-gray-200"><?= date('M j, Y', strtotime($file['updated_at'])) ?></p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                                    <?= date('M j, Y', strtotime($file['last_modified'])) ?>
+                                </p>
                             </div>
                         </div>
                     </div>
