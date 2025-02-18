@@ -6,15 +6,18 @@ $userId = $_SESSION['user_id'];
 
 // Use a prepared statement to fetch user files
 // Update the query to include more information
+// Update the query to include username from users table
 $stmt = $conn->prepare("
     SELECT 
         f.*, 
         fv.uploaded_at, 
         fv.file_path,
+        u.username,
         (SELECT COUNT(*) FROM file_download_log WHERE file_id = f.id) as download_count,
         (SELECT COUNT(*) FROM file_versions WHERE file_id = f.id) as version_count
     FROM files f
     LEFT JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
+    LEFT JOIN users u ON f.user_id = u.id
     WHERE f.user_id = ? " . 
     ($_SESSION['role'] === 'admin' ? "OR 1=1 " : "") . // Admins can see all files
     "ORDER BY f.created_at DESC
@@ -60,7 +63,7 @@ include 'header.php';
                                         <td class="p-3 text-gray-700 dark:text-gray-300">
                                             <?= htmlspecialchars($file['title']) ?>
                                             <?php if($_SESSION['role'] === 'admin'): ?>
-                                                <p class="text-xs text-gray-500">by <?= htmlspecialchars($file['username']) ?></p>
+                                                <p class="text-xs text-gray-500">by <?= htmlspecialchars($file['username'] ?? 'Unknown User') ?></p>
                                             <?php endif; ?>
                                         </td>
                                         <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['car_model']) ?></td>
