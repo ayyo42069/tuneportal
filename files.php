@@ -7,6 +7,7 @@ $userId = $_SESSION['user_id'];
 // Use a prepared statement to fetch user files
 // Update the query to include more information
 // Update the query to include username from users table
+// Update the query to include update request status
 $stmt = $conn->prepare("
     SELECT 
         f.*, 
@@ -14,7 +15,8 @@ $stmt = $conn->prepare("
         fv.file_path,
         u.username,
         (SELECT COUNT(*) FROM file_download_log WHERE file_id = f.id) as download_count,
-        (SELECT COUNT(*) FROM file_versions WHERE file_id = f.id) as version_count
+        (SELECT COUNT(*) FROM file_versions WHERE file_id = f.id) as version_count,
+        (SELECT status FROM update_requests WHERE file_id = f.id ORDER BY created_at DESC LIMIT 1) as update_status
     FROM files f
     LEFT JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
     LEFT JOIN users u ON f.user_id = u.id
@@ -67,9 +69,28 @@ include 'header.php';
                                             <?php endif; ?>
                                         </td>
                                         <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['car_model']) ?></td>
+                                        // Update the status display
                                         <td class="p-3">
-                                            <span class="px-2 py-1 rounded <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' ?>">
-                                                <?= ucfirst(htmlspecialchars($file['status'])) ?>
+                                            <?php
+                                            $statusClass = '';
+                                            $statusText = '';
+                                            
+                                            if ($file['update_status'] === 'pending') {
+                                                $statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+                                                $statusText = 'Update Requested';
+                                            } elseif ($file['update_status'] === 'processing') {
+                                                $statusClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+                                                $statusText = 'Processing Update';
+                                            } elseif ($file['status'] === 'pending') {
+                                                $statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+                                                $statusText = 'Never Processed';
+                                            } else {
+                                                $statusClass = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+                                                $statusText = 'Processed';
+                                            }
+                                            ?>
+                                            <span class="px-2 py-1 rounded <?= $statusClass ?>">
+                                                <?= $statusText ?>
                                             </span>
                                         </td>
                                         <td class="p-3 text-gray-700 dark:text-gray-300">

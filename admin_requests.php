@@ -12,51 +12,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) 
 
     $request_id = (int)$_POST['request_id'];
     $notes = sanitize($_POST['admin_notes']);
-    
-    // Handle file upload
-    if (!empty($_FILES['updated_file']['name'])) {
-        $file = $_FILES['updated_file'];
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-        
-        if ($ext === 'bin') {
-            // Get request details using prepared statement
-            $stmt = $conn->prepare("SELECT * FROM update_requests WHERE id = ?");
+    // Update the processing status when admin starts working
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['start_processing'])) {
+        if (verify_csrf_token($_POST['csrf_token'])) {
+            $request_id = (int)$_POST['request_id'];
+            $stmt = $conn->prepare("UPDATE update_requests SET status = 'processing' WHERE id = ?");
             $stmt->bind_param("i", $request_id);
             $stmt->execute();
-            $request = $stmt->get_result()->fetch_assoc();
             
-            // Update file version with encryption
-            $stmt = $conn->prepare("SELECT current_version FROM files WHERE id = ?");
-            $stmt->bind_param("i", $request['file_id']);
+            // Add to transactions log
+            $stmt = $conn->prepare("INSERT INTO file_transactions (file_id, user_id, action_type, details) VALUES (?, ?, 'processing_started', 'Admin started processing update request')");
+            $stmt->bind_param("ii", $file_id, $_SESSION['user_id']);
             $stmt->execute();
-            $new_version = $stmt->get_result()->fetch_assoc()['current_version'] + 1;
+        }
+    }
+    
+    // When completing the request
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_request'])) {
+        // Handle file upload
+        if (!empty($_FILES['updated_file']['name'])) {
+            $file = $_FILES['updated_file'];
+            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
             
-            $filename = "processed_{$request['file_id']}_v{$new_version}.bin";
-            $upload_path = __DIR__ . "/uploads/$filename";
-            
-            if (!encrypt_file($_FILES['updated_file']['tmp_name'], $upload_path)) {
-                throw new Exception("Failed to encrypt file");
+            if ($ext === 'bin') {
+                // Get request details using prepared statement
+                $stmt = $conn->prepare("SELECT * FROM update_requests WHERE id = ?");
+                $stmt->bind_param("i", $request_id);
+                $stmt->execute();
+                $request = $stmt->get_result()->fetch_assoc();
+                
+                // Update file version with encryption
+                $stmt = $conn->prepare("SELECT current_version FROM files WHERE id = ?");
+                $stmt->bind_param("i", $request['file_id']);
+                $stmt->execute();
+                $new_version = $stmt->get_result()->fetch_assoc()['current_version'] + 1;
+                
+                $filename = "processed_{$request['file_id']}_v{$new_version}.bin";
+                $upload_path = __DIR__ . "/uploads/$filename";
+                
+                if (!encrypt_file($_FILES['updated_file']['tmp_name'], $upload_path)) {
+                    throw new Exception("Failed to encrypt file");
+                }
+                
+                // Calculate file hash
+                $file_hash = hash_file('sha256', $upload_path);
+                
+                // Update database with prepared statements
+                $conn->query("UPDATE files SET current_version = $new_version WHERE id = {$request['file_id']}");
+                $conn->query("INSERT INTO file_versions (file_id, version, file_path, notes) 
+                             VALUES ({$request['file_id']}, $new_version, '$filename', '$notes')");
+                
+                // Update request status
+                $conn->query("UPDATE update_requests SET status = 'completed', admin_notes = '$notes' WHERE id = $request_id");
+                
+                // Notify user
+                $user_msg = "Your update request #$request_id has been completed";
+                $conn->query("INSERT INTO notifications (user_id, message, link) 
+                             VALUES ({$request['user_id']}, '$user_msg', 'file_details.php?id={$request['file_id']}')");
+                
+                $_SESSION['success'] = "Request completed successfully";
+            } else {
+                $_SESSION['error'] = "Only .bin files accepted";
             }
-            
-            // Calculate file hash
-            $file_hash = hash_file('sha256', $upload_path);
-            
-            // Update database with prepared statements
-            $conn->query("UPDATE files SET current_version = $new_version WHERE id = {$request['file_id']}");
-            $conn->query("INSERT INTO file_versions (file_id, version, file_path, notes) 
-                         VALUES ({$request['file_id']}, $new_version, '$filename', '$notes')");
-            
-            // Update request status
-            $conn->query("UPDATE update_requests SET status = 'completed', admin_notes = '$notes' WHERE id = $request_id");
-            
-            // Notify user
-            $user_msg = "Your update request #$request_id has been completed";
-            $conn->query("INSERT INTO notifications (user_id, message, link) 
-                         VALUES ({$request['user_id']}, '$user_msg', 'file_details.php?id={$request['file_id']}')");
-            
-            $_SESSION['success'] = "Request completed successfully";
-        } else {
-            $_SESSION['error'] = "Only .bin files accepted";
         }
     }
 }
@@ -106,12 +123,22 @@ include 'header.php';
                                         <?= ucfirst($request['status']) ?>
                                     </span>
                                 </td>
+                                // Add to the actions column in the table
                                 <td class="p-3">
-                                    <?php if($request['status'] !== 'completed'): ?>
-                                    <button onclick="toggleProcessingModal(<?= $request['id'] ?>)" 
-                                            class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
-                                        Process
-                                    </button>
+                                    <?php if($request['status'] === 'pending'): ?>
+                                        <button onclick="toggleProcessingModal(<?= $request['id'] ?>)" 
+                                                class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                                            Process
+                                        </button>
+                                        <button onclick="rejectRequest(<?= $request['id'] ?>)" 
+                                                class="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 ml-2">
+                                            Reject
+                                        </button>
+                                    <?php elseif($request['status'] === 'processing'): ?>
+                                        <button onclick="completeRequest(<?= $request['id'] ?>)" 
+                                                class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                                            Complete
+                                        </button>
                                     <?php endif; ?>
                                     <a href="javascript:void(0)" 
                                        onclick="showRequestDetails(<?= $request['id'] ?>)" 
