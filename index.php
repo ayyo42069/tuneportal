@@ -1,38 +1,64 @@
-<?php include 'header.php'; ?>
 
 <?php 
-include 'header.php';
+include 'config.php'; // Add database connection
+include 'header.php'; // Remove duplicate header inclusion
 
-// Fetch statistics
-$stats = $conn->query("
-    SELECT 
-        (SELECT COUNT(*) FROM files WHERE status = 'processed') as tuned_files,
-        (SELECT COUNT(DISTINCT user_id) FROM files WHERE status = 'processed') as active_tuners,
-        (SELECT COUNT(*) FROM file_versions) as total_tunes,
-        (SELECT COUNT(DISTINCT car_model) FROM files) as unique_models
-")->fetch_assoc();
+// Add error handling for database queries
+try {
+    // Fetch statistics
+    $stats = $conn->query("
+        SELECT 
+            (SELECT COUNT(*) FROM files WHERE status = 'processed') as tuned_files,
+            (SELECT COUNT(DISTINCT user_id) FROM files WHERE status = 'processed') as active_tuners,
+            (SELECT COUNT(*) FROM file_versions) as total_tunes,
+            (SELECT COUNT(DISTINCT car_model) FROM files) as unique_models
+    ");
 
-// Fetch latest successful tunes
-$latest_tunes = $conn->query("
-    SELECT f.title, f.car_model, u.username, fv.uploaded_at 
-    FROM files f 
-    JOIN users u ON f.user_id = u.id 
-    JOIN file_versions fv ON f.id = fv.file_id 
-    WHERE f.status = 'processed' 
-    ORDER BY fv.uploaded_at DESC 
-    LIMIT 5
-");
+    if (!$stats) {
+        throw new Exception("Error fetching statistics");
+    }
+    $stats = $stats->fetch_assoc();
 
-// Fetch top tuners
-$top_tuners = $conn->query("
-    SELECT u.username, u.id, COUNT(f.id) as tune_count 
-    FROM users u 
-    JOIN files f ON u.id = f.user_id 
-    WHERE f.status = 'processed' 
-    GROUP BY u.id 
-    ORDER BY tune_count DESC 
-    LIMIT 3
-");
+    // Fetch latest successful tunes
+    $latest_tunes = $conn->query("
+        SELECT f.title, f.car_model, u.username, fv.uploaded_at 
+        FROM files f 
+        JOIN users u ON f.user_id = u.id 
+        JOIN file_versions fv ON f.id = fv.file_id 
+        WHERE f.status = 'processed' 
+        ORDER BY fv.uploaded_at DESC 
+        LIMIT 5
+    ");
+
+    if (!$latest_tunes) {
+        throw new Exception("Error fetching latest tunes");
+    }
+
+    // Fetch top tuners
+    $top_tuners = $conn->query("
+        SELECT u.username, u.id, COUNT(f.id) as tune_count 
+        FROM users u 
+        JOIN files f ON u.id = f.user_id 
+        WHERE f.status = 'processed' 
+        GROUP BY u.id 
+        ORDER BY tune_count DESC 
+        LIMIT 3
+    ");
+
+    if (!$top_tuners) {
+        throw new Exception("Error fetching top tuners");
+    }
+
+} catch (Exception $e) {
+    // Set default values if database queries fail
+    $stats = [
+        'tuned_files' => 0,
+        'active_tuners' => 0,
+        'total_tunes' => 0,
+        'unique_models' => 0
+    ];
+    error_log("Database error: " . $e->getMessage());
+}
 ?>
 
 <main class="flex-grow mt-16">
