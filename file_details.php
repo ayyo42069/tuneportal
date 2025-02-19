@@ -82,12 +82,17 @@ if (!$file) {
     exit();
 }
 // Update the query to include vehicle information
+// Update the file query to include pending update information
 $stmt = $conn->prepare("
     SELECT f.*, u.username,
            m.name AS manufacturer_name,
            cm.name AS model_name,
            et.name AS ecu_name,
-           COALESCE(f.updated_at, f.created_at) as last_modified
+           COALESCE(f.updated_at, f.created_at) as last_modified,
+           (SELECT COUNT(*) FROM file_transactions 
+            WHERE file_id = f.id 
+            AND action_type = 'update_requested' 
+            AND status != 'completed') as has_pending_update
     FROM files f 
     JOIN users u ON f.user_id = u.id 
     JOIN car_manufacturers m ON f.manufacturer_id = m.id
@@ -280,7 +285,7 @@ include 'header.php';
                 <!-- Request File Update Section -->
                 <div class="mt-8">
                     <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Request File Update</h3>
-                    <?php if($file['status'] === 'processed'): ?>
+                    <?php if($file['status'] === 'processed' && !$file['has_pending_update']): ?>
                         <button onclick="toggleRequestModal()" 
                                 class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
                             Request Update
@@ -317,7 +322,13 @@ include 'header.php';
                             </div>
                         </div>
                     <?php else: ?>
-                        <p class="text-gray-500 dark:text-gray-400">Available for processed files only</p>
+                        <p class="text-gray-500 dark:text-gray-400">
+                            <?php if($file['has_pending_update']): ?>
+                                An update request is already pending
+                            <?php else: ?>
+                                Available for processed files only
+                            <?php endif; ?>
+                        </p>
                     <?php endif; ?>
                 </div>
             </div>
