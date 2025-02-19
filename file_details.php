@@ -131,16 +131,37 @@ include 'header.php';
     <div class="flex-1 transition-all duration-300 lg:ml-64">
         <div class="container mx-auto px-4 py-8 mt-16">
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                // Update the query to include vehicle information
+                $stmt = $conn->prepare("
+                    SELECT f.*, u.username,
+                           m.name AS manufacturer_name,
+                           cm.name AS model_name,
+                           et.name AS ecu_name
+                    FROM files f 
+                    JOIN users u ON f.user_id = u.id 
+                    JOIN car_manufacturers m ON f.manufacturer_id = m.id
+                    JOIN car_models cm ON f.model_id = cm.id
+                    JOIN ecu_types et ON f.ecu_type_id = et.id
+                    WHERE f.id = ?
+                ");
+                $stmt->bind_param("i", $fileId);
+                $stmt->execute();
+                $file = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+                // Update the vehicle information display in the HTML section
                 <div class="flex justify-between items-start mb-6">
                     <div>
                         <h2 class="text-2xl font-bold text-red-600 dark:text-red-400"><?= htmlspecialchars($file['title']) ?></h2>
-                        <p class="text-gray-600 dark:text-gray-400"><?= htmlspecialchars($file['car_model']) ?></p>
+                        <div class="text-gray-600 dark:text-gray-400">
+                            <p><?= htmlspecialchars($file['manufacturer_name']) ?> <?= htmlspecialchars($file['model_name']) ?></p>
+                            <p>Year: <?= htmlspecialchars($file['year']) ?></p>
+                            <p>ECU: <?= htmlspecialchars($file['ecu_name']) ?></p>
+                        </div>
                     </div>
                     <span class="px-3 py-1 rounded-full <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' ?>">
                         <?= ucfirst($file['status']) ?>
                     </span>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <div>
                         <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Description</h3>
@@ -162,7 +183,6 @@ include 'header.php';
                         </div>
                     </div>
                 </div>
-
                 <!-- Version History (Hidden by Default) -->
                 <div id="versionHistory" class="hidden">
                     <!-- File Statistics -->
@@ -231,7 +251,6 @@ include 'header.php';
                         <?php endwhile; ?>
                     </div>
                 </div>
-
                 <!-- Request File Update Section -->
                 <div class="mt-8">
                     <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Request File Update</h3>
