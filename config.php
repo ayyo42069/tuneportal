@@ -142,12 +142,23 @@ function get_db_connection($max_retries = 3) {
         }
     }
 }
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Replace the existing database connection code with this
+try {
+    $conn = get_db_connection();
+} catch (Exception $e) {
+    log_error("Database connection failed", "CRITICAL", ['error' => $e->getMessage()]);
+    if (ENVIRONMENT === 'development') {
+        die("Connection failed: " . $e->getMessage());
+    } else {
+        die("A database error occurred. Please try again later.");
+    }
 }
 
-// Set charset
-$conn->set_charset("utf8mb4");
+// Remove these lines since they're now handled in get_db_connection()
+// if ($conn->connect_error) {
+//     die("Connection failed: " . $conn->connect_error);
+// }
+// $conn->set_charset("utf8mb4");
 
 function handle_db_error($query, $error) {
     $context = [
