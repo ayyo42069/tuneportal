@@ -74,6 +74,11 @@ function load_env() {
 
 // Load environment variables
 load_env();
+// Define database constants after loading environment variables
+define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
+define('DB_USER', $_ENV['DB_USER'] ?? 'root');
+define('DB_PASS', $_ENV['DB_PASS'] ?? '');
+define('DB_NAME', $_ENV['DB_NAME'] ?? 'tuneportaldb');
 
 // Create logs directory if it doesn't exist
 if (!file_exists(__DIR__ . '/logs')) {
