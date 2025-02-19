@@ -26,14 +26,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception($message);
         }
 
-        // Validate file type
-        $allowed_types = ['application/octet-stream'];
+        // Modified file type validation
+        $allowed_types = ['application/octet-stream', 'binary/octet-stream', 'application/binary'];
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mime_type = finfo_file($finfo, $_FILES['bin_file']['tmp_name']);
         finfo_close($finfo);
         
-        if (!in_array($mime_type, $allowed_types)) {
-            throw new Exception("Invalid file type");
+        // Additional check for .bin extension
+        $file_extension = strtolower(pathinfo($_FILES['bin_file']['name'], PATHINFO_EXTENSION));
+        if ($file_extension !== 'bin' || !in_array($mime_type, $allowed_types)) {
+            throw new Exception("Invalid file type. Only .bin files are allowed.");
         }
 
         $conn->begin_transaction();
