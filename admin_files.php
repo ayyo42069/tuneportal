@@ -2,19 +2,84 @@
 include 'config.php';
 require_auth(true); // Admin only
 
-// Generate CSRF token if not exists (without starting a new session)
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-// Handle file processing and deletion
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf_token($_POST['csrf_token'])) {
         log_error("Invalid CSRF token", "WARNING", ['admin_id' => $_SESSION['user_id']]);
         die(json_encode(['error' => 'Invalid CSRF token.']));
     }
 
-    // Handle deletion
+    // Handle file processing
+    if (isset($_FILES['processed_file'])) {
+        $file_id = (int)$_POST['file_id'];
+        $user_id = (int)$_POST['user_id'];
+        
+        try {
+            if (empty($_FILES['processed_file']['name'])) {
+                throw new Exception("No file selected");
+            }
+
+            list($valid, $message) = validate_file($_FILES['processed_file']);
+            if (!$valid) {
+                throw new Exception($message);
+            }
+
+            $conn->begin_transaction();
+
+            // Get current version
+            $stmt = $conn->prepare("SELECT current_version, title FROM files WHERE id = ?");
+            $stmt->bind_param("i", $file_id);
+            $stmt->execute();
+            $file_info = $stmt->get_result()->fetch_assoc();
+            $new_version = $file_info['current_version'] + 1;
+            
+            $uploadDir = __DIR__ . '/uploads/';
+            $filename = "processed_{$file_id}_v{$new_version}.bin";
+            
+            // Encrypt and store the file
+            if (!encrypt_file($_FILES['processed_file']['tmp_name'], $uploadDir . $filename)) {
+                throw new Exception("Failed to encrypt file");
+            }
+
+            // Calculate file hash
+            $file_hash = hash_file('sha256', $uploadDir . $filename);
+            
+            // Update database with new version and hash
+            $stmt = $conn->prepare("INSERT INTO file_versions (file_id, version, file_path, file_hash) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("iiss", $file_id, $new_version, $filename, $file_hash);
+            $stmt->execute();
+
+            $stmt = $conn->prepare("UPDATE files SET status = 'processed', current_version = ? WHERE id = ?");
+            $stmt->bind_param("ii", $new_version, $file_id);
+            $stmt->execute();
+
+            // Notify user
+            $notification = "Your file '{$file_info['title']}' has been processed";
+            $link = "file_details.php?id=" . $file_id;
+            
+            $stmt = $conn->prepare("INSERT INTO notifications (user_id, message, link) VALUES (?, ?, ?)");
+            $stmt->bind_param("iss", $user_id, $notification, $link);
+            $stmt->execute();
+
+            $conn->commit();
+            $_SESSION['success'] = "File processed successfully";
+        } catch (Exception $e) {
+            $conn->rollback();
+            log_error("File processing failed", "ERROR", [
+                'file_id' => $file_id,
+                'error' => $e->getMessage()
+            ]);
+            $_SESSION['error'] = "Error processing file: " . htmlspecialchars($e->getMessage());
+            
+            if (isset($uploadDir, $filename) && file_exists($uploadDir . $filename)) {
+                unlink($uploadDir . $filename);
+            }
+        }
+        
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+    
+    // Handle deletion (your existing delete code remains the same)
     if (isset($_POST['action']) && $_POST['action'] === 'delete') {
         $file_id = (int)$_POST['file_id'];
         
@@ -77,11 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $file_id = (int)$_POST['file_id'];
         $user_id = (int)$_POST['user_id'];
         
-        
-            if (empty($_FILES['processed_file']['name'])) {
-                throw new Exception("No file selected");
-            }
-
+        if (!empty($_FILES['processed_file']['name'])) {
             list($valid, $message) = validate_file($_FILES['processed_file']);
             if (!$valid) {
                 $_SESSION['error'] = $message;
@@ -93,11 +154,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             try {
                 // Get current version
-                $stmt = $conn->prepare("SELECT current_version, title FROM files WHERE id = ?");
+                $stmt = $conn->prepare("SELECT current_version FROM files WHERE id = ?");
                 $stmt->bind_param("i", $file_id);
                 $stmt->execute();
-                $file_info = $stmt->get_result()->fetch_assoc();
-                $new_version = $file_info['current_version'] + 1;
+                $current = $stmt->get_result()->fetch_assoc();
+                $new_version = $current['current_version'] + 1;
                 
                 $uploadDir = __DIR__ . '/uploads/';
                 $filename = "processed_{$file_id}_v{$new_version}.bin";
@@ -139,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-
+}
 
 include 'header.php';
 ?>
@@ -324,4 +385,3 @@ include 'header.php';
                     </table>
                 </div>
             </div
-```
