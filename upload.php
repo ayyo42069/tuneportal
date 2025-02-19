@@ -8,10 +8,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Invalid CSRF token");
         }
 
+        // Validate required fields
+        $required_fields = ['title', 'manufacturer', 'model', 'year', 'ecu_type'];
+        foreach ($required_fields as $field) {
+            if (!isset($_POST[$field]) || empty($_POST[$field])) {
+                throw new Exception("Missing required field: $field");
+            }
+        }
+
         // Validate file
+        if (!isset($_FILES['bin_file']) || $_FILES['bin_file']['error'] !== UPLOAD_ERR_OK) {
+            throw new Exception("No file uploaded or upload error occurred");
+        }
+
         list($valid, $message) = validate_file($_FILES['bin_file']);
         if (!$valid) {
             throw new Exception($message);
+        }
+
+        // Validate file type
+        $allowed_types = ['application/octet-stream'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_file($finfo, $_FILES['bin_file']['tmp_name']);
+        finfo_close($finfo);
+        
+        if (!in_array($mime_type, $allowed_types)) {
+            throw new Exception("Invalid file type");
         }
 
         $conn->begin_transaction();
@@ -32,24 +54,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("i", $_SESSION['user_id']);
         $stmt->execute();
         $user = $stmt->get_result()->fetch_assoc();
-        // Add file type validation
-        $allowed_types = ['application/octet-stream'];
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime_type = finfo_file($finfo, $_FILES['file']['tmp_name']);
-        finfo_close($finfo);
-        
-        if (!in_array($mime_type, $allowed_types)) {
-            $_SESSION['error'] = "Invalid file type";
-            header("Location: dashboard.php");
-            exit();
-        }
+
         if ($user['credits'] < $totalCredits) {
             throw new Exception("Insufficient credits");
         }
 
-        // Create file record
-        $stmt = $conn->prepare("INSERT INTO files (user_id, title, description, car_model) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("isss", $_SESSION['user_id'], $_POST['title'], $_POST['description'], $_POST['car_model']);
+        // Validate vehicle information
+        $stmt = $conn->prepare("
+            SELECT cm.name as model_name, cm.year_start, cm.year_end, et.name as ecu_name 
+            FROM car_models cm 
+            JOIN ecu_types et ON et.model_id = cm.id 
+            WHERE cm.id = ? AND et.id = ?
+        ");
+        $stmt->bind_param("ii", $_POST['model'], $_POST['ecu_type']);
+        $stmt->execute();
+        $vehicle_info = $stmt->get_result()->fetch_assoc();
+
+        if (!$vehicle_info) {
+            throw new Exception("Invalid vehicle information");
+        }
+
+        if ($_POST['year'] < $vehicle_info['year_start'] || $_POST['year'] > $vehicle_info['year_end']) {
+            throw new Exception("Invalid year for selected model");
+        }
+
+        // Create file record with vehicle information
+        $stmt = $conn->prepare("
+            INSERT INTO files (
+                user_id, title, description, manufacturer_id, model_id, 
+                year, ecu_type_id, status, current_version
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', 1)
+        ");
+        $stmt->bind_param(
+            "issiiii", 
+            $_SESSION['user_id'], 
+            $_POST['title'], 
+            $_POST['description'], 
+            $_POST['manufacturer'],
+            $_POST['model'],
+            $_POST['year'],
+            $_POST['ecu_type']
+        );
         $stmt->execute();
         $fileId = $stmt->insert_id;
 
@@ -75,7 +120,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         
         // Log credit transaction
-        $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description) VALUES (?, ?, 'file_upload', ?)");
+        $stmt = $conn->prepare("
+            INSERT INTO credit_transactions (user_id, amount, type, description) 
+            VALUES (?, ?, 'file_upload', ?)
+        ");
         $description = "Credits used for file upload: " . $_POST['title'];
         $negativeAmount = -$totalCredits;
         $stmt->bind_param("iis", $_SESSION['user_id'], $negativeAmount, $description);
@@ -86,10 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         log_error("File uploaded successfully", "INFO", [
             'file_id' => $fileId,
             'user_id' => $_SESSION['user_id'],
-            'credits_used' => $totalCredits
+            'credits_used' => $totalCredits,
+            'vehicle_info' => [
+                'manufacturer_id' => $_POST['manufacturer'],
+                'model_id' => $_POST['model'],
+                'year' => $_POST['year'],
+                'ecu_type' => $_POST['ecu_type']
+            ]
         ]);
 
-        // Replace hardcoded success message
         $_SESSION['success'] = __('file_uploaded', 'notifications');
         header("Location: file_details.php?id=$fileId");
         exit();
