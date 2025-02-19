@@ -118,7 +118,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             
             foreach ($_POST['tuning_options'] as $optionId) {
-                $stmt->bind_param("ii", $fileId, (int)$optionId);
+                $optionIdInt = (int)$optionId;
+                $stmt->bind_param("ii", $fileId, $optionIdInt);
                 $stmt->execute();
             }
         }
