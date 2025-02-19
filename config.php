@@ -3,23 +3,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-// Add these security headers
-header("X-Frame-Options: DENY");
-header("X-XSS-Protection: 1; mode=block");
-header("X-Content-Type-Options: nosniff");
-header("Referrer-Policy: strict-origin-when-cross-origin");
-header("Content-Security-Policy: default-src 'self'; script-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:;");
-// Add session security configurations
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.use_strict_mode', 1);
-session_set_cookie_params([
-    'lifetime' => 3600,
-    'path' => '/',
-    'secure' => true,
-    'httponly' => true,
-    'samesite' => 'Strict'
-]);
+
 // Define constants
 define('ENVIRONMENT', 'development');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
@@ -79,36 +63,14 @@ load_env();
 if (!file_exists(__DIR__ . '/logs')) {
     mkdir(__DIR__ . '/logs', 0755, true);
 }
+
 // Include required files
 require_once __DIR__ . '/includes/encryption.php';
 require_once __DIR__ . '/includes/logging.php';
 require_once __DIR__ . '/includes/file_handler.php';
 // Add after other requires
 require_once __DIR__ . '/includes/language.php';
-// Add custom error handler
-function custom_error_handler($errno, $errstr, $errfile, $errline) {
-    $error_message = "Error [$errno] $errstr on line $errline in file $errfile";
-    error_log($error_message);
-    
-    if (!(error_reporting() & $errno)) {
-        return false;
-    }
-    
-    switch ($errno) {
-        case E_USER_ERROR:
-            http_response_code(500);
-            exit(1);
-            break;
-        case E_USER_WARNING:
-            $_SESSION['warning'] = "Warning: $errstr";
-            break;
-        case E_USER_NOTICE:
-            $_SESSION['info'] = "Notice: $errstr";
-            break;
-    }
-    return true;
-}
-set_error_handler("custom_error_handler");
+
 // Set secure session cookie parameters and start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     $cookieParams = session_get_cookie_params();
