@@ -20,17 +20,11 @@ $stmt = $conn->prepare("SELECT COUNT(*) as total FROM error_log");
 $stmt->execute();
 $total_logs = $stmt->get_result()->fetch_assoc()['total'];
 $total_pages = ceil($total_logs / $per_page);
-
+// Replace the existing query with this fixed version
 $stmt = $conn->prepare("
-    SELECT el.*, u.username,
-           f.title as file_title,
-           GROUP_CONCAT(to.name) as tuning_options
+    SELECT el.*, u.username
     FROM error_log el 
     LEFT JOIN users u ON el.user_id = u.id 
-    LEFT JOIN files f ON el.file_id = f.id
-    LEFT JOIN file_tuning_options fto ON f.id = fto.file_id
-    LEFT JOIN tuning_options `to` ON fto.option_id = to.id
-    GROUP BY el.id
     ORDER BY el.created_at DESC 
     LIMIT ? OFFSET ?
 ");
@@ -81,8 +75,28 @@ include 'header.php';
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            <?php while ($log = $logs->fetch_assoc()): ?>
-                            <tr>
+    <?php while ($log = $logs->fetch_assoc()): 
+        $context = json_decode($log['context'], true);
+        $file_info = '';
+        if (isset($context['file_id'])) {
+            $file_stmt = $conn->prepare("
+                SELECT f.title, GROUP_CONCAT(to.name) as tuning_options
+                FROM files f
+                LEFT JOIN file_tuning_options fto ON f.id = fto.file_id
+                LEFT JOIN tuning_options `to` ON fto.option_id = to.id
+                WHERE f.id = ?
+                GROUP BY f.id
+            ");
+            $file_stmt->bind_param("i", $context['file_id']);
+            $file_stmt->execute();
+            $file_result = $file_stmt->get_result()->fetch_assoc();
+            if ($file_result) {
+                $context['file_title'] = $file_result['title'];
+                $context['tuning_options'] = $file_result['tuning_options'];
+            }
+        }
+    ?>
+    <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     <?= htmlspecialchars($log['created_at']) ?>
                                 </td>
