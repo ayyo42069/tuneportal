@@ -306,15 +306,15 @@ include 'header.php';
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="submit" class="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                            </svg>
-                            Upload File
-                        </button>
-                    </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                </svg>
+                                Upload File
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -336,12 +336,19 @@ function loadModels() {
     if (!manufacturerId) return;
 
     fetch(`get_models.php?manufacturer_id=${manufacturerId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             modelSelect.innerHTML = '<option value=""><?= __('select_model', 'dashboard') ?></option>';
             data.forEach(model => {
                 modelSelect.innerHTML += `<option value="${model.id}" data-start="${model.year_start}" data-end="${model.year_end}">${model.name}</option>`;
             });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to load models. Please try again.');
         });
 }
 
