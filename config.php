@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 // Define constants
 define('ENVIRONMENT', 'development');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
-define('ALLOWED_EXTENSIONS', ['bin']);
+define('ALLOWED_EXTENSIONS', ['bin','jpg','png',]);
 define('ERROR_LOG_PATH', __DIR__ . '/logs/error.log');
 function get_device_type($user_agent) {
     if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', strtolower($user_agent))) {
