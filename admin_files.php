@@ -329,18 +329,19 @@ include 'header.php';
                 <!-- Files Table -->
                 <div class="overflow-x-auto">
                     <table class="w-full" id="filesTable">
-                        <thead>
+                    <thead>
                             <tr class="bg-gray-50 dark:bg-gray-700">
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">ID</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">User</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Title</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Vehicle Info</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Tuning Options</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Status</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Version</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Actions</th>
-                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Tuning Options</th>
                             </tr>
                         </thead>
+                      
                         <tbody>
                             <?php
                            $stmt = $conn->prepare("
@@ -368,7 +369,7 @@ include 'header.php';
                             while ($file = $files->fetch_assoc()):
                             ?>
                            
-                            <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                           <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="p-3 text-gray-700 dark:text-gray-300">#<?= htmlspecialchars($file['id']) ?></td>
                                 <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['username']) ?></td>
                                 <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['title']) ?></td>
@@ -377,8 +378,8 @@ include 'header.php';
                                     <span class="text-sm text-gray-500">ECU: <?= htmlspecialchars($file['ecu_type']) ?></span>
                                 </td>
                                 <td class="p-3 text-gray-700 dark:text-gray-300">
-    <?= $file['tuning_options'] ? htmlspecialchars($file['tuning_options']) : '<span class="text-gray-400">None</span>' ?>
-</td>
+                                    <?= $file['tuning_options'] ? htmlspecialchars($file['tuning_options']) : '<span class="text-gray-400">None</span>' ?>
+                                </td>
                                 <td class="p-3">
                                     <span class="px-2 py-1 rounded text-sm font-medium
                                         <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' ?>">
@@ -394,12 +395,12 @@ include 'header.php';
                                         </a>
                                         
                                         <?php if ($file['status'] === 'pending'): ?>
-<button type="button" 
-        onclick="showProcessModal(<?= $file['id'] ?>, <?= $file['user_id'] ?>)"
-        class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-    Process
-</button>
-<?php endif; ?>
+                                        <button type="button" 
+                                                onclick="showProcessModal(<?= $file['id'] ?>, <?= $file['user_id'] ?>)"
+                                                class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                                            Process
+                                        </button>
+                                        <?php endif; ?>
                                         
                                         <form method="POST" class="inline-block"
                                               onsubmit="return confirm('Are you sure you want to delete this file?');">
