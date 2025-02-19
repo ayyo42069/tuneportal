@@ -21,25 +21,31 @@ try {
     $conn->begin_transaction();
 
     // Update file status to pending
-    $stmt = $conn->prepare("UPDATE files SET status = 'pending' WHERE id = ?");
+    $stmt = $conn->prepare("UPDATE files SET status = 'pending', updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("i", $file_id);
     $stmt->execute();
 
-    // Log the update request in file_transactions
+    // Insert into file_transactions
     $stmt = $conn->prepare("
-        INSERT INTO file_transactions (file_id, user_id, action_type, notes)
-        VALUES (?, ?, 'update_requested', ?)
+        INSERT INTO file_transactions 
+        (file_id, user_id, action_type, notes, created_at) 
+        VALUES (?, ?, 'update_requested', ?, NOW())
     ");
     $stmt->bind_param("iis", $file_id, $user_id, $message);
     $stmt->execute();
 
-    // Create notification for admins
+    // Notify admins
     $stmt = $conn->prepare("
-        INSERT INTO notifications (user_id, message, link, type)
-        SELECT u.id, CONCAT('Update requested for file #', ?, ' - ', ?), 
-               CONCAT('admin_files.php#file-', ?), 'file_update'
-        FROM users u 
-        WHERE u.role = 'admin'
+        INSERT INTO notifications 
+        (user_id, message, link, created_at, is_read) 
+        SELECT 
+            id,
+            CONCAT('New update request for file #', ?, ': ', ?),
+            CONCAT('admin_files.php?id=', ?),
+            NOW(),
+            0
+        FROM users 
+        WHERE role = 'admin'
     ");
     $stmt->bind_param("isi", $file_id, $message, $file_id);
     $stmt->execute();

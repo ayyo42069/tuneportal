@@ -53,7 +53,10 @@ $stmt->close();
 // Update the file array with the new details
 $file = array_merge($file, $file_details);
 $stmt = $conn->prepare("
-    SELECT ft.*, u.username 
+    SELECT 
+        ft.*,
+        u.username,
+        DATE_FORMAT(ft.created_at, '%Y-%m-%d %H:%i:%s') as formatted_date
     FROM file_transactions ft 
     JOIN users u ON ft.user_id = u.id 
     WHERE ft.file_id = ? 
@@ -239,24 +242,33 @@ include 'header.php';
                     <div class="mb-8">
                         <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Recent Activity</h3>
                         <div class="space-y-3">
-                            <?php while($transaction = $transactions->fetch_assoc()): ?>
-                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
-                                                <?= htmlspecialchars($transaction['action_type']) ?>
-                                            </p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                by <?= htmlspecialchars($transaction['username']) ?>
-                                            </p>
-                                        </div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                                            <?= date('M j, Y H:i', strtotime($transaction['created_at'])) ?>
-                                        </p>
-                                    </div>
-                                </div>
-                            <?php endwhile; ?>
-                        </div>
+    <?php if($transactions->num_rows > 0): ?>
+        <?php while($transaction = $transactions->fetch_assoc()): ?>
+            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                            <?= ucwords(str_replace('_', ' ', $transaction['action_type'])) ?>
+                        </p>
+                        <?php if($transaction['notes']): ?>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                <?= htmlspecialchars($transaction['notes']) ?>
+                            </p>
+                        <?php endif; ?>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            by <?= htmlspecialchars($transaction['username']) ?>
+                        </p>
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <?= $transaction['formatted_date'] ?>
+                    </p>
+                </div>
+            </div>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <p class="text-gray-500 dark:text-gray-400 text-center">No activity recorded yet</p>
+    <?php endif; ?>
+</div>
                     </div>
                     <div class="space-y-3">
                         <?php while($version = $versions->fetch_assoc()): ?>
