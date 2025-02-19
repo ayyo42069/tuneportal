@@ -79,7 +79,8 @@ $stmt = $conn->prepare("
     SELECT f.*, u.username,
            m.name AS manufacturer_name,
            cm.name AS model_name,
-           et.name AS ecu_name
+           et.name AS ecu_name,
+           COALESCE(f.updated_at, f.created_at) as last_modified
     FROM files f 
     JOIN users u ON f.user_id = u.id 
     JOIN car_manufacturers m ON f.manufacturer_id = m.id
@@ -199,11 +200,12 @@ include 'header.php';
                                 <p class="text-2xl font-bold text-gray-800 dark:text-gray-200"><?= date('M j, Y', strtotime($file['created_at'])) ?></p>
                             </div>
                             <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Last Modified</p>
-                                <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                                    <?= date('M j, Y', strtotime($file['last_modified'])) ?>
-                                </p>
-                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Last Modified</p>
+    <p class="text-2xl font-bold text-gray-800 dark:text-gray-200">
+        <?= $file['last_modified'] ? date('M j, Y', strtotime($file['last_modified'])) : 'N/A' ?>
+    </p>
+</div>
+
                         </div>
                     </div>
                     <!-- Recent Activity -->
