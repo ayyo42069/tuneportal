@@ -28,11 +28,15 @@ $stmt->close();
 // Get recent files
 $stmt = $conn->prepare("
     SELECT f.*, m.name as manufacturer_name, cm.name as model_name, f.status,
-           COALESCE(f.updated_at, f.created_at) as last_modified
+           COALESCE(f.updated_at, f.created_at) as last_modified,
+           GROUP_CONCAT(to.name) as tuning_options
     FROM files f
     JOIN car_manufacturers m ON f.manufacturer_id = m.id
     JOIN car_models cm ON f.model_id = cm.id
+    LEFT JOIN file_tuning_options fto ON f.id = fto.file_id
+    LEFT JOIN tuning_options to ON fto.option_id = to.id
     WHERE f.user_id = ?
+    GROUP BY f.id
     ORDER BY last_modified DESC
     LIMIT 5
 ");

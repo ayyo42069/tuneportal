@@ -22,9 +22,15 @@ $total_logs = $stmt->get_result()->fetch_assoc()['total'];
 $total_pages = ceil($total_logs / $per_page);
 
 $stmt = $conn->prepare("
-    SELECT el.*, u.username 
+    SELECT el.*, u.username,
+           f.title as file_title,
+           GROUP_CONCAT(to.name) as tuning_options
     FROM error_log el 
     LEFT JOIN users u ON el.user_id = u.id 
+    LEFT JOIN files f ON el.file_id = f.id
+    LEFT JOIN file_tuning_options fto ON f.id = fto.file_id
+    LEFT JOIN tuning_options `to` ON fto.option_id = to.id
+    GROUP BY el.id
     ORDER BY el.created_at DESC 
     LIMIT ? OFFSET ?
 ");

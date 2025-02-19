@@ -338,29 +338,35 @@ include 'header.php';
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Status</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Version</th>
                                 <th class="p-3 text-left text-gray-800 dark:text-gray-200">Actions</th>
+                                <th class="p-3 text-left text-gray-800 dark:text-gray-200">Tuning Options</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
-                            $stmt = $conn->prepare("
-                                SELECT f.*, u.username, 
-                                       m.name as manufacturer,
-                                       cm.name as model,
-                                       et.name as ecu_type,
-                                       fv.file_path 
-                                FROM files f
-                                JOIN users u ON f.user_id = u.id
-                                JOIN car_manufacturers m ON f.manufacturer_id = m.id
-                                JOIN car_models cm ON f.model_id = cm.id
-                                JOIN ecu_types et ON f.ecu_type_id = et.id
-                                JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
-                                ORDER BY f.created_at DESC
-                            ");
+                           $stmt = $conn->prepare("
+                           SELECT f.*, u.username, 
+                                  m.name as manufacturer,
+                                  cm.name as model,
+                                  et.name as ecu_type,
+                                  fv.file_path,
+                                  GROUP_CONCAT(to.name) as tuning_options
+                           FROM files f
+                           JOIN users u ON f.user_id = u.id
+                           JOIN car_manufacturers m ON f.manufacturer_id = m.id
+                           JOIN car_models cm ON f.model_id = cm.id
+                           JOIN ecu_types et ON f.ecu_type_id = et.id
+                           JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
+                           LEFT JOIN file_tuning_options fto ON f.id = fto.file_id
+                           LEFT JOIN tuning_options `to` ON fto.option_id = to.id
+                           GROUP BY f.id
+                           ORDER BY f.created_at DESC
+                       ");
                             $stmt->execute();
                             $files = $stmt->get_result();
                             
                             while ($file = $files->fetch_assoc()):
                             ?>
+                           
                             <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td class="p-3 text-gray-700 dark:text-gray-300">#<?= htmlspecialchars($file['id']) ?></td>
                                 <td class="p-3 text-gray-700 dark:text-gray-300"><?= htmlspecialchars($file['username']) ?></td>
@@ -369,6 +375,9 @@ include 'header.php';
                                     <?= htmlspecialchars($file['manufacturer']) ?> <?= htmlspecialchars($file['model']) ?><br>
                                     <span class="text-sm text-gray-500">ECU: <?= htmlspecialchars($file['ecu_type']) ?></span>
                                 </td>
+                                <td class="p-3 text-gray-700 dark:text-gray-300">
+    <?= $file['tuning_options'] ? htmlspecialchars($file['tuning_options']) : '<span class="text-gray-400">None</span>' ?>
+</td>
                                 <td class="p-3">
                                     <span class="px-2 py-1 rounded text-sm font-medium
                                         <?= $file['status'] === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' ?>">
@@ -445,6 +454,25 @@ document.getElementById('processForm').addEventListener('submit', function(e) {
     }
 });
 </script>
+<script>
+function showProcessModal(fileId, userId) {
+    document.getElementById('modal_file_id').value = fileId;
+    document.getElementById('modal_user_id').value = userId;
+    
+    // Fetch tuning options for this file
+    fetch(`get_file_tuning_options.php?file_id=${fileId}`)
+        .then(response => response.json())
+        .then(data => {
+            const optionsList = document.getElementById('tuningOptionsList');
+            optionsList.innerHTML = data.options.length ? 
+                data.options.map(opt => `<div class="text-sm mb-1">• ${opt}</div>`).join('') :
+                '<div class="text-gray-500">No tuning options requested</div>';
+        });
+    
+    document.getElementById('processModal').classList.remove('hidden');
+    document.getElementById('processModal').classList.add('flex');
+}
+</script>
                             <?php endwhile; ?>
                         </tbody>
                     </table>
@@ -462,6 +490,14 @@ document.getElementById('processForm').addEventListener('submit', function(e) {
         <form id="processForm" method="POST" enctype="multipart/form-data" class="space-y-4">
             <input type="hidden" name="file_id" id="modal_file_id">
             <input type="hidden" name="user_id" id="modal_user_id">
+            <div class="space-y-2 mb-4">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        Required Tuning Options
+    </label>
+    <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
+        <div id="tuningOptionsList"></div>
+    </div>
+</div>
             <?php echo csrf_input_field(); ?>
             
             <div class="space-y-2">
