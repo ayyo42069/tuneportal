@@ -27,7 +27,6 @@ if (!$file || ($file['user_id'] !== $_SESSION['user_id'] && $_SESSION['role'] !=
     header("Location: files.php");
     exit();
 }
-
 // Add these new queries for enhanced details
 $stmt = $conn->prepare("
     SELECT COUNT(*) as download_count 
@@ -37,7 +36,6 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $fileId);
 $stmt->execute();
 $downloads = $stmt->get_result()->fetch_assoc()['download_count'];
-
 // Update the query to include proper timestamp fields and execute it
 $stmt = $conn->prepare("
     SELECT 
@@ -52,7 +50,6 @@ $stmt->bind_param("i", $fileId);
 $stmt->execute();
 $file_details = $stmt->get_result()->fetch_assoc();
 $stmt->close();
-
 // Update the file array with the new details
 $file = array_merge($file, $file_details);
 $stmt = $conn->prepare("
@@ -67,7 +64,17 @@ $stmt->bind_param("i", $fileId);
 $stmt->execute();
 $transactions = $stmt->get_result();
 $stmt->close();
-
+// Add this after the initial file query
+$stmt = $conn->prepare("
+    SELECT to.name
+    FROM file_tuning_options fto
+    JOIN tuning_options `to` ON fto.option_id = to.id
+    WHERE fto.file_id = ?
+");
+$stmt->bind_param("i", $fileId);
+$stmt->execute();
+$tuning_options = $stmt->get_result();
+$stmt->close();
 if (!$file) {
     log_error("File not found", "WARNING", ['file_id' => $fileId]);
     $_SESSION['error'] = "File not found";
@@ -92,13 +99,11 @@ $stmt->bind_param("i", $fileId);
 $stmt->execute();
 $file = $stmt->get_result()->fetch_assoc();
 $stmt->close();
-
 $stmt = $conn->prepare("SELECT * FROM file_versions WHERE file_id = ? ORDER BY version DESC");
 $stmt->bind_param("i", $fileId);
 $stmt->execute();
 $versions = $stmt->get_result();
 $stmt->close();
-
 // Handle file download requests
 if (isset($_GET['download'])) {
     $version_id = isset($_GET['version']) ? (int)$_GET['version'] : $file['current_version'];
@@ -205,7 +210,24 @@ include 'header.php';
         <?= $file['last_modified'] ? date('M j, Y', strtotime($file['last_modified'])) : 'N/A' ?>
     </p>
 </div>
-
+<!-- Add this after the ECU information -->
+<div class="mt-4">
+    <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">Requested Tuning Options</h3>
+    <div class="space-y-1">
+        <?php if ($tuning_options->num_rows > 0): ?>
+            <?php while ($option = $tuning_options->fetch_assoc()): ?>
+                <div class="flex items-center">
+                    <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-gray-600 dark:text-gray-400"><?= htmlspecialchars($option['name']) ?></span>
+                </div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p class="text-gray-500 dark:text-gray-400">No tuning options requested</p>
+        <?php endif; ?>
+    </div>
+</div>
                         </div>
                     </div>
                     <!-- Recent Activity -->
@@ -265,6 +287,7 @@ include 'header.php';
                         </button>
                         
                         <!-- Request Modal -->
+                        <!-- Replace the existing request modal with this updated version -->
                         <div id="requestModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
                             <div class="flex items-center justify-center min-h-screen">
                                 <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
@@ -275,16 +298,17 @@ include 'header.php';
                                         <div class="mb-4">
                                             <label class="block mb-2 text-gray-700 dark:text-gray-300">Update Instructions</label>
                                             <textarea name="message" required 
-                                                    class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="4"
-                                                    placeholder="What needs to be updated?"></textarea>
+                                                    class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                                                    rows="4"
+                                                    placeholder="Please describe what changes you need..."></textarea>
                                         </div>
                                         <div class="flex justify-end gap-4">
                                             <button type="button" onclick="toggleRequestModal()" 
-                                                    class="bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                                                    class="bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-500">
                                                 Cancel
                                             </button>
                                             <button type="submit" 
-                                                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
+                                                    class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
                                                 Submit Request
                                             </button>
                                         </div>
