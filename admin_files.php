@@ -8,14 +8,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die(json_encode(['error' => 'Invalid CSRF token.']));
     }
 
-     // Handle file processing
-     if (isset($_FILES['processed_file'])) {
+    // Handle file processing
+    if (isset($_FILES['processed_file'])) {
         $file_id = (int)$_POST['file_id'];
         $user_id = (int)$_POST['user_id'];
         
         try {
             if (empty($_FILES['processed_file']['name'])) {
                 throw new Exception("No file selected");
+            }
+
+            if ($_FILES['processed_file']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception("File upload failed with error code: " . $_FILES['processed_file']['error']);
             }
 
             list($valid, $message) = validate_file($_FILES['processed_file']);
@@ -37,6 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $new_version = $file_info['current_version'] + 1;
             $uploadDir = __DIR__ . '/uploads/';
+            
+            // Create uploads directory if it doesn't exist
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            
             $filename = "processed_{$file_id}_v{$new_version}.bin";
             
             // Encrypt and store the file
@@ -403,6 +413,17 @@ include 'header.php';
                                     </div>
                                 </td>
                             </tr>
+                            <script>
+document.querySelectorAll('form[enctype="multipart/form-data"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        const fileInput = this.querySelector('input[type="file"]');
+        if (fileInput && !fileInput.files.length) {
+            e.preventDefault();
+            alert('Please select a file first');
+        }
+    });
+});
+</script>
                             <?php endwhile; ?>
                         </tbody>
                     </table>
@@ -410,4 +431,6 @@ include 'header.php';
             </div>
         </div> <!-- Close the bg-white div -->
     </div> <!-- Close the flex-1 div -->
-</div> <!-- 
+</div> <!--
+
+
