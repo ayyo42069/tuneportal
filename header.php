@@ -41,7 +41,7 @@
             </button>
             <?php endif; ?>
             
-            <a href="/" class="text-2xl font-bold text-primary hover:text-secondary transition-colors flex items-center space-x-2">
+            <a href="<?php echo isset($_SESSION['user_id']) ? 'dashboard.php' : '/'; ?>" class="text-2xl font-bold text-primary hover:text-secondary transition-colors flex items-center space-x-2">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
@@ -54,6 +54,9 @@
             <?php if(!isset($_SESSION['user_id'])): ?>
                 <a href="register.php" class="hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Register</a>
                 <a href="login.php" class="hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Login</a>
+            <?php else: ?>
+                <a href="dashboard.php" class="hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+                <a href="logout.php" class="hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">Logout</a>
             <?php endif; ?>
         </nav>
 
@@ -72,6 +75,9 @@
         <?php if(!isset($_SESSION['user_id'])): ?>
             <a href="register.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Register</a>
             <a href="login.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Login</a>
+        <?php else: ?>
+            <a href="dashboard.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Dashboard</a>
+            <a href="logout.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Logout</a>
         <?php endif; ?>
     </div>
 </div>
@@ -99,7 +105,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close sidebar on window resize if screen becomes larger
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 1024) { // lg breakpoint
-            sidebar.classList.remove('-translate-x-full');
+            if (sidebar) {
+                sidebar.classList.remove('-translate-x-full');
+            }
             mobileMenu.classList.add('hidden');
         }
     });
