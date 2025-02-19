@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 19, 2025 at 11:40 AM
+-- Generation Time: Feb 19, 2025 at 10:57 PM
 -- Server version: 8.0.41-0ubuntu0.24.04.1
 -- PHP Version: 8.3.16
 
@@ -35,6 +35,31 @@ CREATE TABLE `active_sessions` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `car_manufacturers`
+--
+
+CREATE TABLE `car_manufacturers` (
+  `id` int NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `car_models`
+--
+
+CREATE TABLE `car_models` (
+  `id` int NOT NULL,
+  `manufacturer_id` int DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  `year_start` int NOT NULL,
+  `year_end` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `credit_transactions`
 --
 
@@ -60,6 +85,19 @@ CREATE TABLE `download_log` (
   `user_ip` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
   `downloaded_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ecu_types`
+--
+
+CREATE TABLE `ecu_types` (
+  `id` int NOT NULL,
+  `model_id` int DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -109,7 +147,11 @@ CREATE TABLE `files` (
   `current_version` int DEFAULT '1',
   `status` enum('pending','processed') COLLATE utf8mb4_general_ci DEFAULT 'pending',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `manufacturer_id` int DEFAULT NULL,
+  `model_id` int DEFAULT NULL,
+  `year` int DEFAULT NULL,
+  `ecu_type_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -367,6 +409,19 @@ ALTER TABLE `active_sessions`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `car_manufacturers`
+--
+ALTER TABLE `car_manufacturers`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `car_models`
+--
+ALTER TABLE `car_models`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `manufacturer_id` (`manufacturer_id`);
+
+--
 -- Indexes for table `credit_transactions`
 --
 ALTER TABLE `credit_transactions`
@@ -380,6 +435,13 @@ ALTER TABLE `download_log`
   ADD PRIMARY KEY (`id`),
   ADD KEY `tool_id` (`tool_id`),
   ADD KEY `version_id` (`version_id`);
+
+--
+-- Indexes for table `ecu_types`
+--
+ALTER TABLE `ecu_types`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `model_id` (`model_id`);
 
 --
 -- Indexes for table `email_change_requests`
@@ -401,7 +463,10 @@ ALTER TABLE `error_log`
 --
 ALTER TABLE `files`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `manufacturer_id` (`manufacturer_id`),
+  ADD KEY `model_id` (`model_id`),
+  ADD KEY `ecu_type_id` (`ecu_type_id`);
 
 --
 -- Indexes for table `file_download_log`
@@ -529,6 +594,18 @@ ALTER TABLE `active_sessions`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `car_manufacturers`
+--
+ALTER TABLE `car_manufacturers`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `car_models`
+--
+ALTER TABLE `car_models`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `credit_transactions`
 --
 ALTER TABLE `credit_transactions`
@@ -538,6 +615,12 @@ ALTER TABLE `credit_transactions`
 -- AUTO_INCREMENT for table `download_log`
 --
 ALTER TABLE `download_log`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ecu_types`
+--
+ALTER TABLE `ecu_types`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
@@ -653,10 +736,22 @@ ALTER TABLE `active_sessions`
   ADD CONSTRAINT `active_sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
+-- Constraints for table `car_models`
+--
+ALTER TABLE `car_models`
+  ADD CONSTRAINT `car_models_ibfk_1` FOREIGN KEY (`manufacturer_id`) REFERENCES `car_manufacturers` (`id`);
+
+--
 -- Constraints for table `credit_transactions`
 --
 ALTER TABLE `credit_transactions`
   ADD CONSTRAINT `credit_transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `ecu_types`
+--
+ALTER TABLE `ecu_types`
+  ADD CONSTRAINT `ecu_types_ibfk_1` FOREIGN KEY (`model_id`) REFERENCES `car_models` (`id`);
 
 --
 -- Constraints for table `email_change_requests`
@@ -675,7 +770,10 @@ ALTER TABLE `error_log`
 -- Constraints for table `files`
 --
 ALTER TABLE `files`
-  ADD CONSTRAINT `files_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `files_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `files_ibfk_2` FOREIGN KEY (`manufacturer_id`) REFERENCES `car_manufacturers` (`id`),
+  ADD CONSTRAINT `files_ibfk_3` FOREIGN KEY (`model_id`) REFERENCES `car_models` (`id`),
+  ADD CONSTRAINT `files_ibfk_4` FOREIGN KEY (`ecu_type_id`) REFERENCES `ecu_types` (`id`);
 
 --
 -- Constraints for table `file_download_log`

@@ -110,6 +110,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("iss", $fileId, $filename, $file_hash);
         $stmt->execute();
 
+        // Store selected tuning options
+        if (!empty($_POST['tuning_options'])) {
+            $stmt = $conn->prepare("
+                INSERT INTO file_tuning_options (file_id, option_id)
+                VALUES (?, ?)
+            ");
+            
+            foreach ($_POST['tuning_options'] as $optionId) {
+                $stmt->bind_param("ii", $fileId, (int)$optionId);
+                $stmt->execute();
+            }
+        }
+
+        // Notify admins about new file upload
+        $stmt = $conn->prepare("
+            INSERT INTO notifications (user_id, message, link, is_read)
+            SELECT id, ?, ?, 0
+            FROM users
+            WHERE role = 'admin'
+        ");
+        $notificationMsg = "New file upload requires review: " . htmlspecialchars($_POST['title']);
+        $notificationLink = "admin_files.php?action=review&id=" . $fileId;
+        $stmt->bind_param("ss", $notificationMsg, $notificationLink);
+        $stmt->execute();
+
         // Deduct credits and log transaction
         $stmt = $conn->prepare("UPDATE users SET credits = credits - ? WHERE id = ?");
         $stmt->bind_param("ii", $totalCredits, $_SESSION['user_id']);
