@@ -44,10 +44,11 @@ include 'header.php';
 
 <div class="flex min-h-screen bg-gray-50 dark:bg-gray-900">
     <?php include 'includes/sidebar.php'; ?>
+    
     <div class="flex-1 transition-all duration-300 lg:ml-64">
         <div class="container mx-auto px-4 py-8 mt-16">
-            <!-- Quick Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+             <!-- Quick Stats Grid -->
+             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <!-- Credit Balance Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div class="flex items-center justify-between">
@@ -152,11 +153,6 @@ include 'header.php';
                     <p class="text-gray-500 dark:text-gray-400 text-center py-4">No files uploaded yet</p>
                     <?php endif; ?>
                 </div>
-                </div>
-        </div>
-    </div>
-    <div class="flex-1 transition-all duration-300 lg:ml-64">
-        <div class="container mx-auto px-4 py-8 mt-16">
             <!-- Credit Balance Card -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
