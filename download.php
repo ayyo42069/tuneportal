@@ -51,6 +51,16 @@ if ($version) {
         header('Content-Disposition: attachment; filename="' . basename($version['file_path']) . '"');
         header('Content-Length: ' . filesize($file_path));
         readfile($file_path);
+        // Add file hash verification before download
+        $stored_hash = $version['file_hash'];
+        $current_hash = hash_file('sha256', $file_path);
+        
+        if ($stored_hash !== $current_hash) {
+            error_log("File integrity check failed for file ID: $fileId");
+            $_SESSION['error'] = "File integrity check failed";
+            header("Location: files.php");
+            exit();
+        }
         exit();
     }
 }

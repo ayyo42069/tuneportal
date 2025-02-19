@@ -32,7 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("i", $_SESSION['user_id']);
         $stmt->execute();
         $user = $stmt->get_result()->fetch_assoc();
+        // Add file type validation
+        $allowed_types = ['application/octet-stream'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_file($finfo, $_FILES['file']['tmp_name']);
+        finfo_close($finfo);
         
+        if (!in_array($mime_type, $allowed_types)) {
+            $_SESSION['error'] = "Invalid file type";
+            header("Location: dashboard.php");
+            exit();
+        }
         if ($user['credits'] < $totalCredits) {
             throw new Exception("Insufficient credits");
         }

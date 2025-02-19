@@ -23,7 +23,24 @@ if ($attempts >= $max_attempts) {
     $remaining_time = ceil($attempts_window / 60);
     $error = "Too many login attempts. Please try again in {$remaining_time} minutes.";
 }
+// Add IP-based rate limiting with exponential backoff
+function getBackoffTime($attempts) {
+    return min(pow(2, $attempts), 30) * 60; // Max 30 minutes
+}
 
+$backoff_time = getBackoffTime($attempts);
+if ($attempts > 0) {
+    $last_attempt = $conn->prepare("SELECT MAX(attempt_time) FROM login_attempts WHERE ip = ?");
+    $last_attempt->bind_param("s", $ip);
+    $last_attempt->execute();
+    $last_attempt->bind_result($last_time);
+    $last_attempt->fetch();
+    
+    if (strtotime($last_time) + $backoff_time > time()) {
+        $wait_time = ceil((strtotime($last_time) + $backoff_time - time()) / 60);
+        $error = "Please wait {$wait_time} minutes before trying again.";
+    }
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verify the CSRF token before proceeding
     $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
