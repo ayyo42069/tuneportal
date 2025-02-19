@@ -1,25 +1,70 @@
 <?php include 'header.php'; ?>
 
+<?php 
+include 'header.php';
+
+// Fetch statistics
+$stats = $conn->query("
+    SELECT 
+        (SELECT COUNT(*) FROM files WHERE status = 'processed') as tuned_files,
+        (SELECT COUNT(DISTINCT user_id) FROM files WHERE status = 'processed') as active_tuners,
+        (SELECT COUNT(*) FROM file_versions) as total_tunes,
+        (SELECT COUNT(DISTINCT car_model) FROM files) as unique_models
+")->fetch_assoc();
+
+// Fetch latest successful tunes
+$latest_tunes = $conn->query("
+    SELECT f.title, f.car_model, u.username, fv.uploaded_at 
+    FROM files f 
+    JOIN users u ON f.user_id = u.id 
+    JOIN file_versions fv ON f.id = fv.file_id 
+    WHERE f.status = 'processed' 
+    ORDER BY fv.uploaded_at DESC 
+    LIMIT 5
+");
+
+// Fetch top tuners
+$top_tuners = $conn->query("
+    SELECT u.username, u.id, COUNT(f.id) as tune_count 
+    FROM users u 
+    JOIN files f ON u.id = f.user_id 
+    WHERE f.status = 'processed' 
+    GROUP BY u.id 
+    ORDER BY tune_count DESC 
+    LIMIT 3
+");
+?>
+
 <main class="flex-grow mt-16">
-    <!-- Hero Section with Particle.js Background -->
+    <!-- Hero Section with Enhanced Stats -->
     <section class="relative h-screen bg-gradient-to-r from-primary to-secondary overflow-hidden">
         <div id="particles-js" class="absolute inset-0 z-0"></div>
         
         <div class="relative z-10 h-full flex items-center">
             <div class="container mx-auto px-4 text-center text-white">
+                <!-- Enhanced Stats Display -->
                 <div class="live-stats absolute top-4 right-4 glassmorphism p-4 rounded-lg">
-                    <div class="flex space-x-6">
+                    <div class="grid grid-cols-2 gap-6">
                         <div class="text-center">
-                            <div class="text-2xl font-bold count-up" data-count="2543">0</div>
+                            <div class="text-2xl font-bold count-up" data-count="<?= $stats['tuned_files'] ?>">0</div>
                             <div class="text-sm">Tuned Vehicles</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-2xl font-bold count-up" data-count="178">0</div>
+                            <div class="text-2xl font-bold count-up" data-count="<?= $stats['active_tuners'] ?>">0</div>
                             <div class="text-sm">Expert Tuners</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold count-up" data-count="<?= $stats['total_tunes'] ?>">0</div>
+                            <div class="text-sm">Total Tunes</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold count-up" data-count="<?= $stats['unique_models'] ?>">0</div>
+                            <div class="text-sm">Car Models</div>
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- Rest of the hero content -->
                 <h1 class="text-6xl md:text-7xl font-bold mb-6 animate-fade-in-up">
                     Unleash Your Car's<br><span class="text-secondary dark:text-primary">True Potential</span>
                 </h1>
@@ -111,6 +156,7 @@
 
 <?php include 'footer.php'; ?>
 
+<!-- Keep your existing scripts and add: -->
 <script>
     // Particle.js configuration
     particlesJS("particles-js", {
