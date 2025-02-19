@@ -1,6 +1,29 @@
 <?php
 include 'config.php';
 
+// Add rate limiting
+$ip = $_SERVER['REMOTE_ADDR'];
+$attempts_window = 15 * 60; // 15 minutes
+$max_attempts = 5;
+
+// Clean up old attempts
+$stmt = $conn->prepare("DELETE FROM login_attempts WHERE attempt_time < NOW() - INTERVAL ? SECOND");
+$stmt->bind_param("i", $attempts_window);
+$stmt->execute();
+
+// Check attempts count
+$stmt = $conn->prepare("SELECT COUNT(*) FROM login_attempts WHERE ip = ? AND attempt_time > NOW() - INTERVAL ? SECOND");
+$stmt->bind_param("si", $ip, $attempts_window);
+$stmt->execute();
+$stmt->bind_result($attempts);
+$stmt->fetch();
+$stmt->close();
+
+if ($attempts >= $max_attempts) {
+    $remaining_time = ceil($attempts_window / 60);
+    $error = "Too many login attempts. Please try again in {$remaining_time} minutes.";
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verify the CSRF token before proceeding
     $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
@@ -91,37 +114,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php include 'header.php'; ?>
 
-<main class="flex-grow mt-16 bg-gray-50 dark:bg-gray-900">
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Login</h2>
-            <?php if (isset($error)): ?>
-                <div class="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
-                    <?= htmlspecialchars($error) ?>
-                </div>
-            <?php endif; ?>
-            <form method="POST" class="space-y-4">
-                <?php echo csrf_input_field(); ?>
+<div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div class="text-center">
+            <h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">Welcome back</h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Sign in to access your tuning dashboard
+            </p>
+        </div>
+
+        <?php if (isset($error)): ?>
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline"><?= htmlspecialchars($error) ?></span>
+            </div>
+        <?php endif; ?>
+
+        <form class="mt-8 space-y-6" method="POST">
+            <?php echo csrf_input_field(); ?>
+
+            <div class="rounded-md shadow-sm space-y-4">
                 <div>
-                    <label for="login" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email or Username</label>
+                    <label for="login" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username or Email</label>
                     <input type="text" id="login" name="login" required 
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                           class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm dark:bg-gray-700">
                 </div>
+
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
                     <input type="password" id="password" name="password" required 
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-500 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                           class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm dark:bg-gray-700">
                 </div>
-                <button type="submit" 
-                        class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors">
-                    Login
-                </button>
-            </form>
-            <p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-                Don't have an account? <a href="register.php" class="text-red-600 dark:text-red-400 hover:underline">Register here</a>
-            </p>
-        </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember_me" name="remember_me"
+                           class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                    <label for="remember_me" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                        Remember me
+                    </label>
+                </div>
+
+                <div class="text-sm">
+                    <a href="forgot_password.php" class="font-medium text-red-600 hover:text-red-500">
+                        Forgot your password?
+                    </a>
+                </div>
+            </div>
+
+            <button type="submit" 
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                Sign in
+            </button>
+        </form>
+
+        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            Don't have an account? 
+            <a href="register.php" class="font-medium text-red-600 hover:text-red-500">Register now</a>
+        </p>
     </div>
-</main>
+</div>
 
 <?php include 'footer.php'; ?>

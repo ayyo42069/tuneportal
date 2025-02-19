@@ -1,4 +1,3 @@
-
 <?php 
 include 'config.php'; // Add database connection
 include 'header.php'; // Remove duplicate header inclusion
