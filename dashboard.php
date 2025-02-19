@@ -11,12 +11,150 @@ $user = $result->fetch_assoc();
 $_SESSION['credits'] = $user['credits'];
 $stmt->close();
 
+// Get quick statistics
+$stmt = $conn->prepare("
+    SELECT 
+        COUNT(*) as total_files,
+        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_files,
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_files
+    FROM files 
+    WHERE user_id = ?
+");
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$stats = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+// Get recent files
+$stmt = $conn->prepare("
+    SELECT f.*, m.name as manufacturer_name, cm.name as model_name 
+    FROM files f
+    JOIN car_manufacturers m ON f.manufacturer_id = m.id
+    JOIN car_models cm ON f.model_id = cm.id
+    WHERE f.user_id = ?
+    ORDER BY f.created_at DESC
+    LIMIT 5
+");
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$recent_files = $stmt->get_result();
+$stmt->close();
 include 'header.php';
 ?>
 
 <div class="flex min-h-screen bg-gray-50 dark:bg-gray-900">
     <?php include 'includes/sidebar.php'; ?>
-    
+    <div class="flex-1 transition-all duration-300 lg:ml-64">
+        <div class="container mx-auto px-4 py-8 mt-16">
+            <!-- Quick Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <!-- Credit Balance Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white"><?= __('credit_balance', 'dashboard') ?></h3>
+                            <p class="text-3xl font-bold text-red-600">
+                                <?= number_format($_SESSION['credits']) ?>
+                            </p>
+                        </div>
+                        <div class="p-3 bg-red-100 rounded-full">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <a href="credits.php" class="mt-4 text-sm text-red-600 hover:text-red-700 inline-flex items-center">
+                        <?= __('transaction_history', 'dashboard') ?> →
+                    </a>
+                </div>
+
+                <!-- Total Files Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Total Files</h3>
+                            <p class="text-3xl font-bold text-blue-600"><?= $stats['total_files'] ?></p>
+                        </div>
+                        <div class="p-3 bg-blue-100 rounded-full">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <a href="files.php" class="mt-4 text-sm text-blue-600 hover:text-blue-700 inline-flex items-center">
+                        View all files →
+                    </a>
+                </div>
+
+                <!-- Pending Files Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Pending Files</h3>
+                            <p class="text-3xl font-bold text-yellow-600"><?= $stats['pending_files'] ?></p>
+                        </div>
+                        <div class="p-3 bg-yellow-100 rounded-full">
+                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approved Files Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Approved Files</h3>
+                            <p class="text-3xl font-bold text-green-600"><?= $stats['approved_files'] ?></p>
+                        </div>
+                        <div class="p-3 bg-green-100 rounded-full">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid gap-8 grid-cols-1 lg:grid-cols-2">
+                <!-- Recent Files Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Recent Files</h3>
+                        <a href="files.php" class="text-sm text-red-600 hover:text-red-700">View all →</a>
+                    </div>
+                    <?php if ($recent_files->num_rows > 0): ?>
+                    <div class="space-y-4">
+                        <?php while ($file = $recent_files->fetch_assoc()): ?>
+                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+                                    <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-800 dark:text-white"><?= htmlspecialchars($file['title']) ?></h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        <?= htmlspecialchars($file['manufacturer_name']) ?> <?= htmlspecialchars($file['model_name']) ?>
+                                    </p>
+                                </div>
+                            </div>
+                            <a href="file_details.php?id=<?= $file['id'] ?>" class="text-sm text-red-600 hover:text-red-700">
+                                Details →
+                            </a>
+                        </div>
+                        <?php endwhile; ?>
+                    </div>
+                    <?php else: ?>
+                    <p class="text-gray-500 dark:text-gray-400 text-center py-4">No files uploaded yet</p>
+                    <?php endif; ?>
+                </div>
+                </div>
+        </div>
+    </div>
     <div class="flex-1 transition-all duration-300 lg:ml-64">
         <div class="container mx-auto px-4 py-8 mt-16">
             <!-- Credit Balance Card -->
