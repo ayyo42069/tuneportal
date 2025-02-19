@@ -349,7 +349,7 @@ include 'header.php';
                                   cm.name as model,
                                   et.name as ecu_type,
                                   fv.file_path,
-                                  GROUP_CONCAT(to.name) as tuning_options
+                                  GROUP_CONCAT(DISTINCT to.name) as tuning_options
                            FROM files f
                            JOIN users u ON f.user_id = u.id
                            JOIN car_manufacturers m ON f.manufacturer_id = m.id
@@ -358,7 +358,8 @@ include 'header.php';
                            JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
                            LEFT JOIN file_tuning_options fto ON f.id = fto.file_id
                            LEFT JOIN tuning_options `to` ON fto.option_id = to.id
-                           GROUP BY f.id
+                           GROUP BY f.id, f.user_id, f.title, f.status, f.current_version, f.created_at,
+                                    u.username, m.name, cm.name, et.name, fv.file_path
                            ORDER BY f.created_at DESC
                        ");
                             $stmt->execute();
