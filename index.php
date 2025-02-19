@@ -199,6 +199,4 @@ $top_tuners = $conn->query("
     });
 </script>
 
-</body>
-</html>
 
