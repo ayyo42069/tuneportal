@@ -384,21 +384,12 @@ include 'header.php';
                                         </a>
                                         
                                         <?php if ($file['status'] === 'pending'): ?>
-                                        <form method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
-                                            <input type="hidden" name="file_id" value="<?= $file['id'] ?>">
-                                            <input type="hidden" name="user_id" value="<?= $file['user_id'] ?>">
-                                            <?php echo csrf_input_field(); ?>
-                                            <div class="relative">
-                                                <input type="file" name="processed_file" 
-                                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                       accept=".bin">
-                                                <button type="submit" 
-                                                        class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-                                                    Process
-                                                </button>
-                                            </div>
-                                        </form>
-                                        <?php endif; ?>
+<button type="button" 
+        onclick="showProcessModal(<?= $file['id'] ?>, <?= $file['user_id'] ?>)"
+        class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+    Process
+</button>
+<?php endif; ?>
                                         
                                         <form method="POST" class="inline-block"
                                               onsubmit="return confirm('Are you sure you want to delete this file?');">
@@ -424,10 +415,82 @@ document.querySelectorAll('form[enctype="multipart/form-data"]').forEach(form =>
     });
 });
 </script>
+<script>
+function showProcessModal(fileId, userId) {
+    document.getElementById('modal_file_id').value = fileId;
+    document.getElementById('modal_user_id').value = userId;
+    document.getElementById('processModal').classList.remove('hidden');
+    document.getElementById('processModal').classList.add('flex');
+}
+
+function closeProcessModal() {
+    document.getElementById('processModal').classList.add('hidden');
+    document.getElementById('processModal').classList.remove('flex');
+    document.getElementById('processForm').reset();
+}
+
+// Close modal when clicking outside
+document.getElementById('processModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeProcessModal();
+    }
+});
+
+// Form validation
+document.getElementById('processForm').addEventListener('submit', function(e) {
+    const fileInput = this.querySelector('input[type="file"]');
+    if (!fileInput.files.length) {
+        e.preventDefault();
+        alert('Please select a file first');
+    }
+});
+</script>
                             <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>
+                <div id="processModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Process File</h3>
+            <button type="button" onclick="closeProcessModal()" class="text-gray-400 hover:text-gray-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="processForm" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <input type="hidden" name="file_id" id="modal_file_id">
+            <input type="hidden" name="user_id" id="modal_user_id">
+            <?php echo csrf_input_field(); ?>
+            
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Select Processed File (.bin)
+                </label>
+                <input type="file" name="processed_file" 
+                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                              file:rounded-full file:border-0 file:text-sm file:font-semibold
+                              file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100
+                              dark:file:bg-gray-700 dark:file:text-gray-300"
+                       accept=".bin" required>
+            </div>
+            
+            <div class="mt-4 flex justify-end space-x-3">
+                <button type="button" onclick="closeProcessModal()"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200
+                               dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                    Process File
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
             </div>
         </div> <!-- Close the bg-white div -->
     </div> <!-- Close the flex-1 div -->
