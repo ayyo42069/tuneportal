@@ -1,4 +1,6 @@
-
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en" <?php echo isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'class="dark"' : ''; ?>>
 <head>
@@ -10,7 +12,21 @@
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+<body x-data="{ 
+    darkMode: <?php echo isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'true' : 'false' ?>,
+    toggleTheme() {
+        this.darkMode = !this.darkMode;
+        fetch('/update_theme.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `theme=${this.darkMode ? 'dark' : 'light'}`
+        });
+        this.darkMode ? document.documentElement.classList.add('dark') 
+                     : document.documentElement.classList.remove('dark');
+    }
+}" class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
 
 <header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 border-b border-gray-200 dark:border-gray-700">
     <div class="container mx-auto px-4">
