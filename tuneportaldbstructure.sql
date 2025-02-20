@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 19, 2025 at 10:57 PM
+-- Generation Time: Feb 20, 2025 at 07:48 PM
 -- Server version: 8.0.41-0ubuntu0.24.04.1
 -- PHP Version: 8.3.16
 
@@ -193,9 +193,23 @@ CREATE TABLE `file_transactions` (
   `file_id` int NOT NULL,
   `user_id` int NOT NULL,
   `action_type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
   `details` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `file_tuning_options`
+--
+
+CREATE TABLE `file_tuning_options` (
+  `id` int NOT NULL,
+  `file_id` int NOT NULL,
+  `option_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -268,9 +282,22 @@ CREATE TABLE `notifications` (
   `user_id` int DEFAULT NULL,
   `message` text COLLATE utf8mb4_general_ci NOT NULL,
   `link` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `type` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `is_read` tinyint(1) DEFAULT '0',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `processed_webhooks`
+--
+
+CREATE TABLE `processed_webhooks` (
+  `id` bigint UNSIGNED NOT NULL,
+  `event_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -426,7 +453,8 @@ ALTER TABLE `car_models`
 --
 ALTER TABLE `credit_transactions`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `idx_user_date` (`user_id`,`created_at`);
 
 --
 -- Indexes for table `download_log`
@@ -466,7 +494,8 @@ ALTER TABLE `files`
   ADD KEY `user_id` (`user_id`),
   ADD KEY `manufacturer_id` (`manufacturer_id`),
   ADD KEY `model_id` (`model_id`),
-  ADD KEY `ecu_type_id` (`ecu_type_id`);
+  ADD KEY `ecu_type_id` (`ecu_type_id`),
+  ADD KEY `idx_user_status` (`user_id`,`status`);
 
 --
 -- Indexes for table `file_download_log`
@@ -492,6 +521,14 @@ ALTER TABLE `file_transactions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `file_id` (`file_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `file_tuning_options`
+--
+ALTER TABLE `file_tuning_options`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `file_id` (`file_id`),
+  ADD KEY `option_id` (`option_id`);
 
 --
 -- Indexes for table `file_update_requests`
@@ -527,6 +564,14 @@ ALTER TABLE `login_history`
 ALTER TABLE `notifications`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `processed_webhooks`
+--
+ALTER TABLE `processed_webhooks`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_event_id` (`event_id`),
+  ADD KEY `idx_created_at` (`created_at`);
 
 --
 -- Indexes for table `tools`
@@ -569,7 +614,9 @@ ALTER TABLE `update_requests`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `username` (`username`);
+  ADD UNIQUE KEY `username` (`username`),
+  ADD KEY `idx_email` (`email`),
+  ADD KEY `idx_username` (`username`);
 
 --
 -- Indexes for table `user_preferences`
@@ -660,6 +707,12 @@ ALTER TABLE `file_transactions`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `file_tuning_options`
+--
+ALTER TABLE `file_tuning_options`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `file_update_requests`
 --
 ALTER TABLE `file_update_requests`
@@ -688,6 +741,12 @@ ALTER TABLE `login_history`
 --
 ALTER TABLE `notifications`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `processed_webhooks`
+--
+ALTER TABLE `processed_webhooks`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tools`
@@ -798,6 +857,13 @@ ALTER TABLE `file_transactions`
   ADD CONSTRAINT `file_transactions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `file_tuning_options`
+--
+ALTER TABLE `file_tuning_options`
+  ADD CONSTRAINT `file_tuning_options_ibfk_1` FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `file_tuning_options_ibfk_2` FOREIGN KEY (`option_id`) REFERENCES `tuning_options` (`id`);
+
+--
 -- Constraints for table `file_update_requests`
 --
 ALTER TABLE `file_update_requests`
@@ -820,5 +886,6 @@ ALTER TABLE `user_preferences`
 -- Constraints for table `user_profiles`
 --
 ALTER TABLE `user_profiles`
+  ADD CONSTRAINT `fk_user_profiles_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `user_profiles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
