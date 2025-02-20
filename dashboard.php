@@ -68,10 +68,13 @@ include 'header.php';
                                 <?= number_format($_SESSION['credits']) ?>
                             </p>
                         </div>
-                        <div class="p-3 bg-red-100 rounded-full">
-                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="showCreditPackages()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                Buy Credits
+                            </button>
                         </div>
                     </div>
                     <a href="credits.php" class="mt-4 text-sm text-red-600 hover:text-red-700 inline-flex items-center">
@@ -79,6 +82,36 @@ include 'header.php';
                     </a>
                 </div>
 
+                <!-- Credit Packages Modal -->
+                <div id="creditPackagesModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg w-full mx-4">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Buy Credits</h3>
+                            <button onclick="hideCreditPackages()" class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="space-y-4">
+                            <?php foreach (CREDIT_PACKAGES as $id => $package): ?>
+                            <div class="border dark:border-gray-700 rounded-lg p-4 hover:border-red-500 cursor-pointer"
+                                 onclick="purchaseCredits(<?= $id ?>)">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white"><?= $package['description'] ?></h4>
+                                        <p class="text-gray-600 dark:text-gray-400">Perfect for regular users</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-2xl font-bold text-red-600">$<?= number_format($package['price'], 2) ?></p>
+                                        <p class="text-sm text-gray-500"><?= $package['currency'] ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
                 <!-- Total Files Card -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div class="flex items-center justify-between">
@@ -331,6 +364,55 @@ include 'header.php';
 </div>
 
 <!-- Add this JavaScript at the bottom of the file, before the footer include -->
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+const stripe = Stripe('<?= STRIPE_PUBLISHABLE_KEY ?>');
+
+function showCreditPackages() {
+    document.getElementById('creditPackagesModal').style.display = 'flex';
+}
+
+function hideCreditPackages() {
+    document.getElementById('creditPackagesModal').style.display = 'none';
+}
+
+async function purchaseCredits(packageId) {
+    try {
+        const response = await fetch('process_payment.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ package_id: packageId })
+        });
+        
+        const session = await response.json();
+        
+        if (session.error) {
+            alert('Error: ' + session.error);
+            return;
+        }
+        
+        const result = await stripe.redirectToCheckout({
+            sessionId: session.id
+        });
+        
+        if (result.error) {
+            alert(result.error.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Close modal when clicking outside
+document.getElementById('creditPackagesModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideCreditPackages();
+    }
+});
+</script>
 <script>
 function loadModels() {
     const manufacturerId = document.getElementById('manufacturer').value;
