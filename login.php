@@ -146,10 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
 
-    
-
         <form class="mt-8 space-y-6" method="POST">
-            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
             <?php echo csrf_input_field(); ?>
 
             <div class="rounded-md shadow-sm space-y-4">
