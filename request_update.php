@@ -23,7 +23,9 @@ try {
     // Update file status to pending
     $stmt = $conn->prepare("UPDATE files SET status = 'pending', updated_at = NOW() WHERE id = ?");
     $stmt->bind_param("i", $file_id);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new Exception("Failed to update file status: " . $stmt->error);
+    }
 
     // Insert into file_transactions
     $stmt = $conn->prepare("
@@ -32,7 +34,9 @@ try {
         VALUES (?, ?, 'update_requested', ?, NOW())
     ");
     $stmt->bind_param("iis", $file_id, $user_id, $message);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new Exception("Failed to create transaction record: " . $stmt->error);
+    }
 
     // Notify admins
     $stmt = $conn->prepare("
@@ -48,7 +52,9 @@ try {
         WHERE role = 'admin'
     ");
     $stmt->bind_param("isi", $file_id, $message, $file_id);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new Exception("Failed to create notifications: " . $stmt->error);
+    }
 
     $conn->commit();
     $_SESSION['success'] = "Update request submitted successfully";
@@ -57,9 +63,12 @@ try {
     $conn->rollback();
     log_error("Update request failed", "ERROR", [
         'file_id' => $file_id,
-        'error' => $e->getMessage()
+        'user_id' => $user_id,
+        'message' => $message,
+        'error' => $e->getMessage(),
+        'mysql_error' => $conn->error
     ]);
-    $_SESSION['error'] = "Failed to submit update request";
+    $_SESSION['error'] = "Failed to submit update request: " . $e->getMessage();
 }
 
 header("Location: file_details.php?id=" . $file_id);
