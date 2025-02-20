@@ -27,11 +27,10 @@ try {
             $stmt->bind_param("ii", $credits, $user_id);
             $stmt->execute();
             
-            // Add transaction record - fixed to match database structure
-            $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)");
+            // Add transaction record with correct enum type
+            $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description, created_at) VALUES (?, ?, 'purchase', ?, NOW())");
             $description = "Purchased " . $credits . " credits";
-            $type = "purchase";
-            $stmt->bind_param("iiss", $user_id, $credits, $type, $description);
+            $stmt->bind_param("iis", $user_id, $credits, $description);
             $stmt->execute();
             
             $conn->commit();
