@@ -16,15 +16,27 @@ $stmt = $conn->prepare("
         et.name AS ecu_name,
         (SELECT COUNT(*) FROM file_download_log WHERE file_id = f.id) as download_count,
         (SELECT COUNT(*) FROM file_versions WHERE file_id = f.id) as version_count,
-        (SELECT COUNT(*) FROM file_transactions 
+        (SELECT COUNT(*) 
+         FROM file_transactions 
          WHERE file_id = f.id 
          AND action_type = 'update_requested'
          AND created_at = (
              SELECT MAX(created_at) 
              FROM file_transactions 
+             WHERE file_id = f.id
+         )
+         AND NOT EXISTS (
+             SELECT 1 
+             FROM file_transactions 
              WHERE file_id = f.id 
-             AND action_type = 'update_requested'
-         )) as has_pending_update
+             AND created_at > (
+                 SELECT MAX(created_at) 
+                 FROM file_transactions 
+                 WHERE file_id = f.id 
+                 AND action_type = 'update_requested'
+             )
+         )
+        ) as has_pending_update
     FROM files f
     LEFT JOIN file_versions fv ON f.id = fv.file_id AND f.current_version = fv.version
     LEFT JOIN users u ON f.user_id = u.id
@@ -111,8 +123,8 @@ include 'header.php';
                                             <?php
                                             $statusClass = '';
                                             $statusText = '';
-                                            
-                                            if ($file['has_pending_update']) {
+                                            // Update the status check in the table
+                                            if ($file['has_pending_update'] && $file['status'] === 'pending') {
                                                 $statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
                                                 $statusText = 'Update Requested';
                                             } elseif ($file['status'] === 'pending') {
