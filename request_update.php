@@ -30,7 +30,7 @@ try {
     // Insert into file_transactions
     $stmt = $conn->prepare("
         INSERT INTO file_transactions 
-        (file_id, user_id, action_type, notes, created_at) 
+        (file_id, user_id, action_type, description, created_at) 
         VALUES (?, ?, 'update_requested', ?, NOW())
     ");
     $stmt->bind_param("iis", $file_id, $user_id, $message);
