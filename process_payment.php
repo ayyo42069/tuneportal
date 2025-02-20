@@ -4,11 +4,16 @@ require 'config/stripe.php';
 require_auth();
 
 try {
-    if (!isset($_POST['package_id']) || !isset(CREDIT_PACKAGES[$_POST['package_id']])) {
+    // Get JSON input
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    // Check if package_id exists and is valid
+    if (!isset($data['package_id']) || !isset(CREDIT_PACKAGES[$data['package_id']])) {
         throw new Exception('Invalid package selected');
     }
 
-    $package = CREDIT_PACKAGES[$_POST['package_id']];
+    $package = CREDIT_PACKAGES[$data['package_id']];
     
     // Create Stripe Checkout Session
     $checkout_session = \Stripe\Checkout\Session::create([
