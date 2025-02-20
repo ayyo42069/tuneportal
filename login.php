@@ -45,16 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Verify the CSRF token before proceeding
     $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
     if (!verify_csrf_token($token)) {
-        // Debug information
-        $debug_info = [
-            'Received Token' => $token,
-            'Session Token' => $_SESSION['csrf_token'] ?? 'not set',
-            'Session ID' => session_id(),
-            'Session Status' => session_status(),
-            'POST Data' => $_POST
-        ];
-        $error = "CSRF Token Error:<br><pre>" . htmlspecialchars(print_r($debug_info, true)) . "</pre>";
-    }  
+        die("Error: Invalid CSRF token.");
+    }
 
     $login = sanitize($_POST['login']);
     $password = sanitize($_POST['password']);
