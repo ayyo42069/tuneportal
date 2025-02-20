@@ -1,5 +1,5 @@
 <?php
-require_once '../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Set your Stripe secret key
 \Stripe\Stripe::setApiKey('sk_test_51Qubl2PP22uFyni1lqPVNCrJJQ70T8ngBg7Opz20gprZIqH0qEtCrAeluuRXPZ7D8kspWWRNjIjAyEvmIHtpT31m00g8VKFwwu');
