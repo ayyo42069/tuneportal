@@ -10,8 +10,7 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-<header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 shadow-md">
-    <div class="container mx-auto px-4">
+<header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 shadow-md"   <div class="container mx-auto px-4">
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center">
                 <?php if(isset($_SESSION['user_id'])): ?>
@@ -72,3 +71,19 @@
         </nav>
     </div>
 </header>
+
+
+<script>
+// Add this script to handle dark mode state
+document.addEventListener('DOMContentLoaded', function() {
+    // Check PHP session dark mode state
+    const darkModeEnabled = <?php echo isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'true' : 'false' ?>;
+    
+    // Apply dark mode class based on session state
+    if (darkModeEnabled) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+});
+</script>
