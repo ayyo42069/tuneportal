@@ -1,2 +1,82 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --primary: #1e40af;
+    --secondary: #7e22ce;
+  }
+
+  body {
+    @apply bg-slate-900 text-gray-100;
+  }
+}
+
+@layer components {
+  .glassmorphism {
+    @apply backdrop-blur-xl bg-white/10 border border-white/10;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom gradients */
+.bg-gradient-hero {
+  @apply bg-gradient-to-br from-slate-900 via-primary to-secondary;
+}
+
+.bg-gradient-cta {
+  @apply bg-gradient-to-br from-red-600 to-orange-600;
+}
+
+/* Custom text gradients */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500;
+}
+
+/* Custom shadows */
+.shadow-glow {
+  @apply shadow-lg shadow-red-600/30;
+}
+
+/* Custom transitions */
+.transition-transform {
+  @apply transition-all duration-300 ease-out;
+}
+
+/* Custom hover effects */
+.hover-lift {
+  @apply hover:scale-105 hover:shadow-glow;
+}
+
+/* Custom backgrounds with opacity */
+.bg-dark-overlay {
+  @apply bg-slate-900/90;
+}
+
+.bg-light-overlay {
+  @apply bg-white/10;
+}
