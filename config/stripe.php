@@ -8,6 +8,7 @@ require_once __DIR__ . '/../config.php';
 // Set your publishable key (for frontend)
 define('STRIPE_PUBLISHABLE_KEY', getenv('STRIPE_PUBLISHABLE_KEY'));
 
+
 // Define credit package options
 define('CREDIT_PACKAGES', [
     [
@@ -27,5 +28,11 @@ define('CREDIT_PACKAGES', [
         'price' => 80.00,
         'currency' => 'USD',
         'description' => '1000 Credits (20% off)'
+    ],
+    [
+        'credits' => 10,
+        'price' => 1.00,
+        'currency' => 'USD',
+        'description' => '10 Credits'
     ]
 ]);
