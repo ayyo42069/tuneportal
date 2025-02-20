@@ -156,43 +156,30 @@ function validate_file($file) {
 
     return [true, ""];
 }
-
+// CSRF Protection Functions
 function generate_csrf_token() {
-    if (empty($_SESSION['csrf_token'])) {
+    if (!isset($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
     return $_SESSION['csrf_token'];
 }
 
 function verify_csrf_token($token) {
-    if (!isset($_SESSION['csrf_token']) || !$token) {
-        log_error("CSRF token missing", "WARNING", [
-            'user_id' => $_SESSION['user_id'] ?? 'guest',
-            'page' => $_SERVER['PHP_SELF'],
-            'ip' => $_SERVER['REMOTE_ADDR'],
-            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
-        ]);
+    if (empty($_SESSION['csrf_token']) || empty($token)) {
+        error_log('CSRF Verification Failed - Empty Token. Session Token: ' . 
+            (isset($_SESSION['csrf_token']) ? 'set' : 'not set') . 
+            ', Provided Token: ' . ($token ? 'set' : 'not set'));
         return false;
     }
-
-    if (!hash_equals($_SESSION['csrf_token'], $token)) {
-        log_error("CSRF token mismatch", "WARNING", [
-            'user_id' => $_SESSION['user_id'] ?? 'guest',
-            'provided_token' => $token,
-            'page' => $_SERVER['PHP_SELF'],
-            'ip' => $_SERVER['REMOTE_ADDR'],
-            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
-        ]);
-        return false;
-    }
-
-    return true;
+    return hash_equals($_SESSION['csrf_token'], $token);
 }
 
 function csrf_input_field() {
-    $token = generate_csrf_token();
-    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+    return '<input type="hidden" name="csrf_token" value="' . generate_csrf_token() . '">';
 }
+
+
+
 // Add after successful authentication
 if (isset($_SESSION['user_id'])) {
     $stmt = $conn->prepare("SELECT dark_mode FROM user_preferences WHERE user_id = ?");
