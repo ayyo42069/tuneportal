@@ -1,5 +1,3 @@
-html
-Copy
 <!DOCTYPE html>
 <html lang="en" <?php echo isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'class="dark"' : ''; ?>>
 <head>
