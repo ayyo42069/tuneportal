@@ -46,9 +46,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
     if (!verify_csrf_token($token)) {
         // Debug information
-        error_log('CSRF Token Mismatch - Received: ' . $token . ', Session Token: ' . ($_SESSION['csrf_token'] ?? 'not set'));
-        $error = "Security token validation failed. Please try again.";
-    }
+        $debug_info = [
+            'Received Token' => $token,
+            'Session Token' => $_SESSION['csrf_token'] ?? 'not set',
+            'Session ID' => session_id(),
+            'Session Status' => session_status(),
+            'POST Data' => $_POST
+        ];
+        $error = "CSRF Token Error:<br><pre>" . htmlspecialchars(print_r($debug_info, true)) . "</pre>";
+    }  
 
     $login = sanitize($_POST['login']);
     $password = sanitize($_POST['password']);
