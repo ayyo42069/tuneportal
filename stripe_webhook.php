@@ -10,10 +10,20 @@ ini_set('error_log', __DIR__ . '/stripe_webhook_errors.log');
 
 // Get the raw POST data
 $payload = file_get_contents('php://input');
-$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
+
+// Check for Stripe signature header
+if (!isset($_SERVER['HTTP_STRIPE_SIGNATURE'])) {
+    error_log("Missing Stripe signature header");
+    http_response_code(400);
+    echo json_encode(['error' => 'Missing signature header']);
+    exit();
+}
+
+$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 $endpoint_secret = 'whsec_pSRrjFsOIDN8Opw9mI4VlGj7FsE85c8d';
 
-error_log("Webhook received - Payload: " . $payload);
+error_log("Webhook received with signature: " . $sig_header);
+error_log("Webhook payload: " . $payload);
 
 try {
     $event = \Stripe\Webhook::constructEvent(
