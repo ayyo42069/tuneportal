@@ -19,7 +19,7 @@ if (!isset($_SERVER['HTTP_STRIPE_SIGNATURE'])) {
     exit();
 }
 
-$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+$sig_header = $_SERVER['HTTPS_STRIPE_SIGNATURE'];
 $endpoint_secret = 'whsec_pSRrjFsOIDN8Opw9mI4VlGj7FsE85c8d';
 
 error_log("Webhook received with signature: " . $sig_header);
