@@ -16,6 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Validate tuning options
+        if (!isset($_POST['tuning_options']) || empty($_POST['tuning_options'])) {
+            throw new Exception("Please select at least one tuning option");
+        }
+
         // Validate file
         if (!isset($_FILES['bin_file']) || $_FILES['bin_file']['error'] !== UPLOAD_ERR_OK) {
             throw new Exception("No file uploaded or upload error occurred");

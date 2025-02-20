@@ -283,7 +283,7 @@ include 'header.php';
                         ?>
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" name="tuning_options[]" value="<?= $opt['id'] ?>"
-                                   class="rounded border-gray-300 text-red-600 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700">
+                                   class="tuning-option rounded border-gray-300 text-red-600 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700">
                             <span class="text-sm text-gray-700 dark:text-gray-300">
                                 <?= htmlspecialchars($opt['name']) ?> 
                                 <span class="text-gray-500 dark:text-gray-400">(<?= $opt['credit_cost'] ?> <?= __('credits_cost', 'dashboard') ?>)</span>
@@ -291,8 +291,8 @@ include 'header.php';
                         </label>
                         <?php endwhile; ?>
                     </div>
+                    <p class="text-sm text-red-500 hidden" id="tuning-error">Please select at least one tuning option</p>
                 </div>
-
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300"><?= __('select_file', 'dashboard') ?></label>
                     <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg hover:border-red-500 transition-colors">
@@ -313,7 +313,8 @@ include 'header.php';
                 </div>
 
                 <div class="flex justify-end mt-6">
-                    <button type="submit" class="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
+                    <button type="submit" id="upload-button"
+                            class="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                         </svg>
@@ -393,6 +394,28 @@ function loadECUs() {
             ecuSelect.disabled = false;
         });
 }
+document.querySelector('form').addEventListener('submit', function(e) {
+    const tuningOptions = document.querySelectorAll('.tuning-option:checked');
+    const tuningError = document.getElementById('tuning-error');
+    
+    if (tuningOptions.length === 0) {
+        e.preventDefault();
+        tuningError.classList.remove('hidden');
+        // Scroll to the error message
+        tuningError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+        tuningError.classList.add('hidden');
+    }
+});
+
+// Optional: Hide error message when user checks an option
+document.querySelectorAll('.tuning-option').forEach(option => {
+    option.addEventListener('change', function() {
+        if (document.querySelectorAll('.tuning-option:checked').length > 0) {
+            document.getElementById('tuning-error').classList.add('hidden');
+        }
+    });
+});
 </script>
 
 <?php include 'footer.php'; ?>
