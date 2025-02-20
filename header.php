@@ -1,35 +1,16 @@
+html
+Copy
 <!DOCTYPE html>
 <html lang="en" <?php echo isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'class="dark"' : ''; ?>>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TunePortal - Automotive Tuning Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./styles.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#ff4d4d',
-                        secondary: '#3d3d3d',
-                    },
-                },
-            },
-        }
-    </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .glassmorphism {
-                @apply bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg;
-            }
-        }
-    </style>
 </head>
-<body class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-<header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 shadow-md">
+<body class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300"><header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 shadow-md">
 <div class="container mx-auto px-4">
     <div class="flex justify-between items-center h-16">
         <div class="flex items-center">
