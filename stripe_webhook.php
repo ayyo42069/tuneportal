@@ -27,21 +27,27 @@ try {
             $stmt->bind_param("ii", $credits, $user_id);
             $stmt->execute();
             
-            // Add transaction record
-            $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, description, payment_id) VALUES (?, ?, ?, ?)");
+            // Add transaction record - fixed to match database structure
+            $stmt = $conn->prepare("INSERT INTO credit_transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)");
             $description = "Purchased " . $credits . " credits";
-            $stmt->bind_param("iiss", $user_id, $credits, $description, $session->payment_intent);
+            $type = "purchase";
+            $stmt->bind_param("iiss", $user_id, $credits, $type, $description);
             $stmt->execute();
             
             $conn->commit();
+            
+            // Log success
+            error_log("Credits added successfully: User ID: $user_id, Credits: $credits");
         } catch (Exception $e) {
             $conn->rollback();
+            error_log("Error in webhook: " . $e->getMessage());
             throw $e;
         }
     }
 
     http_response_code(200);
 } catch(Exception $e) {
+    error_log("Webhook error: " . $e->getMessage());
     http_response_code(400);
     exit();
 }
