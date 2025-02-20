@@ -23,12 +23,14 @@ $stmt = $conn->prepare("
          AND created_at = (
              SELECT MAX(created_at) 
              FROM file_transactions 
-             WHERE file_id = f.id
+             WHERE file_id = f.id 
+             AND action_type = 'update_requested'
          )
          AND NOT EXISTS (
              SELECT 1 
              FROM file_transactions 
              WHERE file_id = f.id 
+             AND action_type = 'update_completed'
              AND created_at > (
                  SELECT MAX(created_at) 
                  FROM file_transactions 
