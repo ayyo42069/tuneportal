@@ -2,6 +2,13 @@
 require 'config.php';
 require 'config/stripe.php';
 
+// Check if this is a Stripe webhook request
+if (!isset($_SERVER['HTTP_STRIPE_SIGNATURE'])) {
+    error_log('No Stripe signature found - possible direct access');
+    http_response_code(400);
+    exit('Invalid request');
+}
+
 $payload = @file_get_contents('php://input');
 $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 $endpoint_secret = 'whsec_pSRrjFsOIDN8Opw9mI4VlGj7FsE85c8d';
