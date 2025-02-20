@@ -60,168 +60,247 @@ try {
 }
 ?>
 
-<main class="flex-grow mt-16">
-    <!-- Hero Section with Enhanced Stats -->
-    <section class="relative h-screen bg-gradient-to-r from-primary to-secondary overflow-hidden">
-        <div id="particles-js" class="absolute inset-0 z-0"></div>
+<main class="flex-grow">
+    <!-- Hero Section -->
+    <section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-red-900 to-gray-900 overflow-hidden">
+        <div id="particles-js" class="absolute inset-0 z-0 opacity-50"></div>
         
-        <div class="relative z-10 h-full flex items-center">
-            <div class="container mx-auto px-4 text-center text-white">
-                <!-- Enhanced Stats Display -->
-                <div class="live-stats absolute top-4 right-4 glassmorphism p-4 rounded-lg">
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold count-up" data-count="<?= $stats['tuned_files'] ?>">0</div>
-                            <div class="text-sm">Tuned Vehicles</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold count-up" data-count="<?= $stats['active_tuners'] ?>">0</div>
-                            <div class="text-sm">Expert Tuners</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold count-up" data-count="<?= $stats['total_tunes'] ?>">0</div>
-                            <div class="text-sm">Total Tunes</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold count-up" data-count="<?= $stats['unique_models'] ?>">0</div>
-                            <div class="text-sm">Car Models</div>
-                        </div>
+        <div class="relative z-10 h-full flex items-center py-32">
+            <div class="container mx-auto px-4">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 max-w-5xl mx-auto">
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-white text-center transform hover:scale-105 transition-all duration-300">
+                        <div class="text-3xl font-bold count-up mb-2" data-count="<?= $stats['tuned_files'] ?>">0</div>
+                        <div class="text-sm text-gray-300">Tuned Vehicles</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-white text-center transform hover:scale-105 transition-all duration-300">
+                        <div class="text-3xl font-bold count-up mb-2" data-count="<?= $stats['active_tuners'] ?>">0</div>
+                        <div class="text-sm text-gray-300">Expert Tuners</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-white text-center transform hover:scale-105 transition-all duration-300">
+                        <div class="text-3xl font-bold count-up mb-2" data-count="<?= $stats['total_tunes'] ?>">0</div>
+                        <div class="text-sm text-gray-300">Total Tunes</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-white text-center transform hover:scale-105 transition-all duration-300">
+                        <div class="text-3xl font-bold count-up mb-2" data-count="<?= $stats['unique_models'] ?>">0</div>
+                        <div class="text-sm text-gray-300">Car Models</div>
                     </div>
                 </div>
 
-                <!-- Rest of the hero content -->
-                <h1 class="text-6xl md:text-7xl font-bold mb-6 animate-fade-in-up">
-                    Unleash Your Car's<br><span class="text-secondary dark:text-primary">True Potential</span>
-                </h1>
-                <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90 animate-fade-in-up animation-delay-300">
-                    Experience the pinnacle of automotive performance with our cutting-edge ECU tuning solutions
-                </p>
-                <?php if(!isset($_SESSION['user_id'])): ?>
-                    <a href="register.php" 
-                       class="inline-block bg-white text-primary px-8 py-3 rounded-full text-lg font-semibold 
-                              hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 animate-fade-in-up animation-delay-600">
-                        Start Tuning Now
-                    </a>
-                <?php endif; ?>
+                <!-- Hero Content -->
+                <div class="text-center max-w-4xl mx-auto">
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6 text-white animate-fade-in-up">
+                        Unleash Your Car's<br>
+                        <span class="bg-gradient-to-r from-red-500 to-red-300 text-transparent bg-clip-text">True Potential</span>
+                    </h1>
+                    <p class="text-xl mb-12 text-gray-300 animate-fade-in-up animation-delay-300 max-w-2xl mx-auto">
+                        Experience professional-grade ECU tuning with our cutting-edge platform. 
+                        Optimize performance, improve efficiency, and unlock hidden power.
+                    </p>
+                    <?php if(!isset($_SESSION['user_id'])): ?>
+                        <div class="space-x-4 animate-fade-in-up animation-delay-600">
+                            <a href="register.php" 
+                               class="inline-block bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold 
+                                      transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
+                                Start Tuning Now
+                            </a>
+                            <a href="#features" 
+                               class="inline-block bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-semibold 
+                                      backdrop-blur-md transition-all duration-300">
+                                Learn More
+                            </a>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
-        
-        
     </section>
 
-    <!-- Features Grid with Hover Effects -->
-    <section class="py-20 bg-gray-50 dark:bg-gray-900">
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-gray-50 dark:bg-gray-900">
         <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">Why Choose TunePortal?</h2>
+            <h2 class="text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">
+                Why Choose TunePortal?
+            </h2>
             
-            <div class="grid md:grid-cols-3 gap-12">
-                <!-- Feature 1 -->
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
-                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Feature Cards -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-red-500/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-white">Advanced ECU Tuning</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Precision-engineered performance upgrades for maximum power and efficiency</p>
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Advanced ECU Tuning</h3>
+                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Professional-grade tuning tools and real-time optimization for maximum performance gains.
+                    </p>
                 </div>
 
-                <!-- Feature 2 -->
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
-                    <div class="w-16 h-16 bg-secondary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-red-500/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-white">Real-time Diagnostics</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Instant performance feedback and diagnostics for optimal tuning results</p>
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Safe & Secure</h3>
+                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Built-in safety measures and comprehensive diagnostics to protect your vehicle.
+                    </p>
                 </div>
 
-                <!-- Feature 3 -->
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
-                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h3m-3 4h3m-6 4h3M9 7h3m-3 4h3m-6 4h3M6 17v-4m9 4V7m3 10v-4"/>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-red-500/10 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-white">Custom Mapping</h3>
-                    <p class="text-gray-600 dark:text-gray-300">Tailor-made performance maps for your specific vehicle and driving style</p>
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Expert Community</h3>
+                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                        Connect with professional tuners and enthusiasts for support and guidance.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section with Animated Background -->
-    <section class="relative py-20 bg-primary text-white overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <svg class="w-full h-full" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
-                <path fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" d="M0,600 C600,200 900,100 1200,600" />
-                <path fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" d="M0,450 C300,50 900,50 1200,450" />
-            </svg>
-        </div>
-        <div class="container mx-auto px-4 relative z-10">
-            <h2 class="text-4xl font-bold mb-6 text-center">Start Your Tuning Journey Today</h2>
-            <p class="text-xl mb-8 max-w-2xl mx-auto text-center opacity-90">
-                Join the ranks of satisfied tuners and unleash your vehicle's true potential
-            </p>
-            <div class="flex justify-center space-x-4">
-                <a href="register.php" 
-                   class="bg-white text-primary px-8 py-3 rounded-lg font-semibold 
-                          hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
-                    Create Free Account
-                </a>
-                <a href="#features" 
-                   class="border border-white hover:bg-white hover:text-primary px-8 py-3 rounded-lg font-semibold transition-colors">
-                    Learn More
-                </a>
+    <!-- Latest Tunes Section -->
+    <?php if ($latest_tunes && $latest_tunes->num_rows > 0): ?>
+    <section class="py-24 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">Latest Tunes</h2>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <?php while ($tune = $latest_tunes->fetch_assoc()): ?>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 shadow-lg">
+                    <h3 class="font-bold text-xl mb-2 text-gray-800 dark:text-white"><?= htmlspecialchars($tune['title']) ?></h3>
+                    <p class="text-gray-600 dark:text-gray-300"><?= htmlspecialchars($tune['car_model']) ?></p>
+                    <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                        <span>By <?= htmlspecialchars($tune['username']) ?></span>
+                        <span class="ml-4"><?= date('M j, Y', strtotime($tune['uploaded_at'])) ?></span>
+                    </div>
+                </div>
+                <?php endwhile; ?>
             </div>
+        </div>
+    </section>
+    <?php endif; ?>
+
+    <!-- CTA Section -->
+    <section class="relative py-24 bg-gradient-to-br from-red-600 to-red-800 text-white">
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-8">Ready to Transform Your Vehicle?</h2>
+                <p class="text-xl mb-12 text-red-100">
+                    Join thousands of satisfied users who have already unlocked their vehicle's true potential.
+                </p>
+                <div class="space-x-4">
+                    <a href="register.php" 
+                       class="inline-block bg-white text-red-600 px-8 py-4 rounded-lg text-lg font-semibold 
+                              hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
+                        Get Started Now
+                    </a>
+                    <a href="#features" 
+                       class="inline-block border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold 
+                              hover:bg-white/10 transition-all duration-300">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 z-0 opacity-10">
+            <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <pattern id="pattern" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <circle cx="5" cy="5" r="2" fill="currentColor"/>
+                </pattern>
+                <rect width="100%" height="100%" fill="url(#pattern)"/>
+            </svg>
         </div>
     </section>
 </main>
 
 <?php include 'footer.php'; ?>
 
-<!-- Keep your existing scripts and add: -->
 <script>
-    // Particle.js configuration
-    particlesJS("particles-js", {
-        particles: {
-            number: { value: 80, density: { enable: true, value_area: 800 } },
-            color: { value: "#ffffff" },
-            shape: { type: "circle" },
-            opacity: { value: 0.5, random: false },
-            size: { value: 3, random: true },
-            line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
-            move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+// Enhanced Particle.js configuration
+particlesJS("particles-js", {
+    particles: {
+        number: { value: 100, density: { enable: true, value_area: 800 } },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.5, random: true },
+        size: { value: 3, random: true },
+        line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ffffff",
+            opacity: 0.2,
+            width: 1
         },
-        interactivity: {
-            detect_on: "canvas",
-            events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
-            modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+        move: {
+            enable: true,
+            speed: 3,
+            direction: "none",
+            random: true,
+            straight: false,
+            out_mode: "out",
+            bounce: false
+        }
+    },
+    interactivity: {
+        detect_on: "canvas",
+        events: {
+            onhover: { enable: true, mode: "repulse" },
+            onclick: { enable: true, mode: "push" },
+            resize: true
         },
-        retina_detect: true
+        modes: {
+            repulse: { distance: 100, duration: 0.4 },
+            push: { particles_nb: 4 }
+        }
+    },
+    retina_detect: true
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
     });
+});
 
-    // Animate count-up
-    const countUpElements = document.querySelectorAll('.count-up');
-    countUpElements.forEach(element => {
-        const target = parseInt(element.getAttribute('data-count'), 10);
-        let count = 0;
-        const duration = 2000; // 2 seconds
-        const increment = target / (duration / 16); // 60 FPS
+// Enhanced count-up animation
+const countUpElements = document.querySelectorAll('.count-up');
+countUpElements.forEach(element => {
+    const target = parseInt(element.getAttribute('data-count'), 10);
+    let count = 0;
+    const duration = 2500;
+    const increment = target / (duration / 16);
 
-        const updateCount = () => {
-            count += increment;
-            if (count < target) {
-                element.textContent = Math.round(count);
-                requestAnimationFrame(updateCount);
-            } else {
-                element.textContent = target;
+    const updateCount = () => {
+        count += increment;
+        if (count < target) {
+            element.textContent = Math.round(count).toLocaleString();
+            requestAnimationFrame(updateCount);
+        } else {
+            element.textContent = target.toLocaleString();
+        }
+    };
+
+    // Start animation when element is in view
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                updateCount();
+                observer.unobserve(entry.target);
             }
-        };
-
-        updateCount();
+        });
     });
+
+    observer.observe(element);
+});
 </script>
-
-
