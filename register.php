@@ -99,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <form class="mt-8 space-y-6" method="POST">
             <?php echo csrf_input_field(); ?>
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
             
             <div class="rounded-md shadow-sm space-y-4">
                 <div>
@@ -188,7 +189,8 @@ async function checkUsername(username) {
     if (username.length < 3) return;
     
     try {
-        const response = await fetch('check_username.php?username=' + encodeURIComponent(username));
+        const response = await fetch('check_username.php?username=' + encodeURIComponent(username) + 
+            '&csrf_token=' + encodeURIComponent(document.querySelector('input[name="csrf_token"]').value));
         const data = await response.json();
         const availabilitySpan = document.getElementById('username-availability');
         
