@@ -1,37 +1,93 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
 
+/* Custom base styles */
 @layer base {
-  :root {
-    --primary: #1e40af;
-    --secondary: #7e22ce;
-  }
-
   body {
-    @apply bg-slate-900 text-gray-100;
+    @apply font-sans text-gray-100 bg-slate-900;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold text-white;
+  }
+
+  h1 {
+    @apply text-5xl lg:text-7xl;
+  }
+
+  h2 {
+    @apply text-4xl;
+  }
+
+  h3 {
+    @apply text-3xl;
+  }
+
+  a {
+    @apply text-red-500 hover:text-red-600 transition-colors;
   }
 }
 
+/* Custom components */
 @layer components {
-  .glassmorphism {
-    @apply backdrop-blur-xl bg-white/10 border border-white/10;
+  .btn-primary {
+    @apply px-8 py-4 bg-red-600 text-white rounded-lg font-semibold 
+               hover:bg-red-700 transition-all duration-300 transform hover:scale-105 
+               shadow-lg shadow-red-600/30;
+  }
+
+  .btn-secondary {
+    @apply px-8 py-4 border border-white/30 text-white rounded-lg font-semibold 
+               hover:bg-white/10 transition-all duration-300;
+  }
+
+  .card {
+    @apply backdrop-blur-xl bg-white/10 rounded-2xl p-8 border border-white/10 shadow-2xl;
+  }
+
+  .feature-card {
+    @apply p-8 bg-slate-800 rounded-2xl hover:bg-slate-700/50 transition-all 
+               duration-300 transform hover:-translate-y-2;
+  }
+
+  .stat-card {
+    @apply text-center p-4 bg-white/5 rounded-xl;
   }
 }
 
+/* Custom utilities */
 @layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text;
+  }
+
   .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out forwards;
+    @apply opacity-0 transform translate-y-10;
+    animation: fadeInUp 0.8s ease-out forwards;
   }
 
   .animation-delay-300 {
-    animation-delay: 300ms;
+    animation-delay: 0.3s;
   }
 
   .animation-delay-600 {
-    animation-delay: 600ms;
+    animation-delay: 0.6s;
+  }
+
+  .shadow-soft {
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .backdrop-blur-xl {
+    backdrop-filter: blur(20px);
   }
 }
 
+/* Custom animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -43,40 +99,38 @@
   }
 }
 
-/* Custom gradients */
+@keyframes gradientBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Custom gradients and backgrounds */
 .bg-gradient-hero {
-  @apply bg-gradient-to-br from-slate-900 via-primary to-secondary;
+  background: linear-gradient(135deg, #1e293b, #0f172a, #1e293b);
+  background-size: 200% 200%;
+  animation: gradientBackground 10s ease infinite;
 }
 
 .bg-gradient-cta {
-  @apply bg-gradient-to-br from-red-600 to-orange-600;
+  background: linear-gradient(135deg, #dc2626, #ea580c);
+  background-size: 200% 200%;
+  animation: gradientBackground 10s ease infinite;
 }
 
-/* Custom text gradients */
-.text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500;
+/* Custom particle background */
+.particle-background {
+  @apply absolute inset-0 opacity-30;
 }
 
-/* Custom shadows */
-.shadow-glow {
-  @apply shadow-lg shadow-red-600/30;
-}
-
-/* Custom transitions */
-.transition-transform {
-  @apply transition-all duration-300 ease-out;
-}
-
-/* Custom hover effects */
-.hover-lift {
-  @apply hover:scale-105 hover:shadow-glow;
-}
-
-/* Custom backgrounds with opacity */
-.bg-dark-overlay {
-  @apply bg-slate-900/90;
-}
-
-.bg-light-overlay {
-  @apply bg-white/10;
+/* Custom noise texture */
+.noise-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  @apply absolute inset-0 opacity-10;
 }
