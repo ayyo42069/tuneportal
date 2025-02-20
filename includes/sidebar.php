@@ -1,16 +1,36 @@
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
+
+// Get user profile information from user_profiles table
+$profile = [];
+if (isset($_SESSION['user_id'])) {
+    $stmt = $conn->prepare("SELECT up.profile_picture, u.username, u.role 
+                           FROM users u 
+                           LEFT JOIN user_profiles up ON u.id = up.user_id 
+                           WHERE u.id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $profile = $stmt->get_result()->fetch_assoc();
+}
+
+// Set default profile picture if none exists
+$profile_picture = isset($profile['profile_picture']) && !empty($profile['profile_picture']) 
+    ? htmlspecialchars($profile['profile_picture']) 
+    : 'default.png';
 ?>
-<aside id="sidebar" class="w-64 h-screen fixed top-0 left-0 lg:translate-x-0 -translate-x-full transition-transform duration-300 bg-white dark:bg-gray-800 text-gray-800 dark:text-white z-40 mt-16 flex flex-col shadow-lg">
-    <nav class="flex-grow overflow-y-auto">
+<nav class="flex-grow overflow-y-auto">
         <div class="p-4 space-y-4">
             <!-- Profile Section -->
             <div class="relative">
                 <button id="profileDropdown" class="flex items-center space-x-3 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <img src="uploads/profiles/<?= htmlspecialchars($profile['profile_picture']) ?>" 
+                    <img src="uploads/profiles/<?= $profile_picture ?>" 
                          alt="Profile" 
-                         class="w-10 h-10 rounded-full object-cover">
-                    <span class="font-medium"><?= __('my_profile', 'sidebar') ?></span>
+                         class="w-10 h-10 rounded-full object-cover"
+                         onerror="this.src='uploads/profiles/default.png'">
+                    <div class="flex flex-col text-left">
+                        <span class="font-medium"><?= htmlspecialchars($profile['username'] ?? $_SESSION['username']) ?></span>
+                        <span class="text-xs text-gray-500"><?= __('my_profile', 'sidebar') ?></span>
+                    </div>
                 </button>
                 <!-- Dropdown Menu -->
                 <div id="profileMenu" class="hidden absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
@@ -34,7 +54,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <div class="space-y-2">
                 <a href="dashboard.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'dashboard.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
                     <span><?= __('dashboard', 'sidebar') ?></span>
                 </a>
