@@ -250,9 +250,9 @@ include 'header.php';
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
                             <?= ucwords(str_replace('_', ' ', $transaction['action_type'])) ?>
                         </p>
-                        <?php if($transaction['notes']): ?>
+                        <?php if(isset($transaction['description']) && $transaction['description']): ?>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                <?= htmlspecialchars($transaction['notes']) ?>
+                                <?= htmlspecialchars($transaction['description']) ?>
                             </p>
                         <?php endif; ?>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -268,6 +268,7 @@ include 'header.php';
     <?php else: ?>
         <p class="text-gray-500 dark:text-gray-400 text-center">No activity recorded yet</p>
     <?php endif; ?>
+
 </div>
                     </div>
                     <div class="space-y-3">
