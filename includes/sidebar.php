@@ -18,7 +18,8 @@ $profile_picture = isset($profile['profile_picture']) && !empty($profile['profil
     ? htmlspecialchars($profile['profile_picture']) 
     : 'default.png';
 ?>
-<nav class="flex-grow overflow-y-auto">
+<aside id="sidebar" class="w-64 h-screen fixed top-0 left-0 lg:translate-x-0 -translate-x-full transition-transform duration-300 bg-white dark:bg-gray-800 text-gray-800 dark:text-white z-40 mt-16 flex flex-col shadow-lg">
+    <nav class="flex-grow overflow-y-auto">
         <div class="p-4 space-y-4">
             <!-- Profile Section -->
             <div class="relative">
@@ -27,10 +28,7 @@ $profile_picture = isset($profile['profile_picture']) && !empty($profile['profil
                          alt="Profile" 
                          class="w-10 h-10 rounded-full object-cover"
                          onerror="this.src='uploads/profiles/default.png'">
-                    <div class="flex flex-col text-left">
-                        <span class="font-medium"><?= htmlspecialchars($profile['username'] ?? $_SESSION['username']) ?></span>
-                        <span class="text-xs text-gray-500"><?= __('my_profile', 'sidebar') ?></span>
-                    </div>
+                    <span class="font-medium"><?= __('my_profile', 'sidebar') ?></span>
                 </button>
                 <!-- Dropdown Menu -->
                 <div id="profileMenu" class="hidden absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
