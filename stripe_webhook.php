@@ -13,7 +13,13 @@ if (!isset($_SERVER['HTTP_STRIPE_SIGNATURE'])) {
 }
 
 $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
-$endpoint_secret = 'whsec_pSRrjFsOIDN8Opw9mI4VlGj7FsE85c8d';
+// Replace hardcoded secret with environment variable
+$endpoint_secret = getenv('STRIPE_WEBHOOK_SECRET');
+if (!$endpoint_secret) {
+    log_error('Stripe webhook secret not configured', 'ERROR');
+    http_response_code(500);
+    exit();
+}
 
 try {
     $event = \Stripe\Webhook::constructEvent(
@@ -28,8 +34,20 @@ try {
             'session_id' => $session->id,
             'payment_status' => $session->payment_status
         ]);
+        // Add before processing the webhook
+        $event_id = $event->id;
+        $stmt = $conn->prepare("SELECT id FROM processed_webhooks WHERE event_id = ?");
+        $stmt->bind_param("s", $event_id);
+        $stmt->execute();
+        if ($stmt->get_result()->num_rows > 0) {
+            http_response_code(200); // Already processed
+            exit();
+        }
         
-        // Add credits to user account
+        // After successful processing
+        $stmt = $conn->prepare("INSERT INTO processed_webhooks (event_id) VALUES (?)");
+        $stmt->bind_param("s", $event_id);
+        $stmt->execute();
         $user_id = $session->metadata->user_id;
         $credits = $session->metadata->credits;
         
