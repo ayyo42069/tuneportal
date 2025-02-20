@@ -141,10 +141,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
                 ]);
             }
             break;
-    }
+        case '':
     
+    
+    case 'update_profile':
+        try {
+            $timezone = sanitize($_POST['timezone']);
+            $company = sanitize($_POST['company']);
+            $phone = sanitize($_POST['phone']);
+            
+            // Handle profile picture upload
+            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
+                $file = $_FILES['profile_picture'];
+                $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+                $filename = $file['name'];
+                $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                
+                if (!in_array($ext, $allowed)) {
+                    throw new Exception("Invalid file type. Allowed types: " . implode(', ', $allowed));
+                }
+                
+                // Validate file size (max 5MB)
+                if ($file['size'] > 5 * 1024 * 1024) {
+                    throw new Exception("File size must not exceed 5MB");
+                }
+                
+                $new_filename = 'profile_' . $user_id . '_' . time() . '.' . $ext;
+                $upload_path = __DIR__ . '/uploads/profiles/';
+                
+                // Create directory if it doesn't exist
+                if (!file_exists($upload_path)) {
+                    mkdir($upload_path, 0777, true);
+                }
+                
+                // Get current profile picture
+                $stmt = $conn->prepare("SELECT profile_picture FROM user_profiles WHERE user_id = ?");
+                $stmt->bind_param("i", $user_id);
+                $stmt->execute();
+                $current_profile = $stmt->get_result()->fetch_assoc();
+                
+                // Delete old profile picture if it exists and isn't the default
+                if ($current_profile && $current_profile['profile_picture'] !== 'default.png') {
+                    $old_file = $upload_path . $current_profile['profile_picture'];
+                    if (file_exists($old_file)) {
+                        unlink($old_file);
+                    }
+                }
+                
+                if (!move_uploaded_file($file['tmp_name'], $upload_path . $new_filename)) {
+                    throw new Exception("Failed to upload file");
+                }
+                
+                // Insert or update user profile
+                $stmt = $conn->prepare("
+                    INSERT INTO user_profiles (user_id, timezone, company, phone, profile_picture)
+                    VALUES (?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                    timezone = VALUES(timezone),
+                    company = VALUES(company),
+                    phone = VALUES(phone),
+                    profile_picture = VALUES(profile_picture)
+                ");
+                $stmt->bind_param("issss", $user_id, $timezone, $company, $phone, $new_filename);
+                
+                if (!$stmt->execute()) {
+                    throw new Exception("Failed to update profile");
+                }
+                
+                log_error("Profile picture updated", "INFO", [
+                    'user_id' => $user_id,
+                    'file_name' => $new_filename,
+                    'file_size' => $file['size']
+                ]);
+                
+                $_SESSION['success'] = "Profile updated successfully";
+            } else {
+                // Update profile without changing picture
+                $stmt = $conn->prepare("
+                    INSERT INTO user_profiles (user_id, timezone, company, phone)
+                    VALUES (?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                    timezone = VALUES(timezone),
+                    company = VALUES(company),
+                    phone = VALUES(phone)
+                ");
+                $stmt->bind_param("isss", $user_id, $timezone, $company, $phone);
+                
+                if (!$stmt->execute()) {
+                    throw new Exception("Failed to update profile");
+                }
+                
+                $_SESSION['success'] = "Profile updated successfully";
+            }
+            
+        } catch (Exception $e) {
+            log_error("Profile update failed", "ERROR", [
+                'user_id' => $user_id,
+                'error' => $e->getMessage()
+            ]);
+            $_SESSION['error'] = $e->getMessage();
+        }
+    }
     header("Location: settings.php");
     exit();
+    
 }
 // After fetching preferences
 $stmt = $conn->prepare("SELECT * FROM user_preferences WHERE user_id = ?");
