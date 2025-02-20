@@ -1,6 +1,7 @@
 <?php
 include 'config.php';
 require_auth();
+require 'config/stripe.php';
 
 // Get current credits using a prepared statement
 $stmt = $conn->prepare("SELECT credits FROM users WHERE id = ?");
