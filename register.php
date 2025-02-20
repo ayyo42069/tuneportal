@@ -28,7 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_result($attempts);
     $stmt->fetch();
     $stmt->close();
-
+    if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
+        throw new Exception("Password must be at least 8 characters and contain uppercase, lowercase, number and special character");
+    }
+    
+    // Add email validation
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        throw new Exception("Invalid email format");
+    }
     if ($attempts > 3) {
         $error = "Too many registration attempts. Try again later.";
     } else {

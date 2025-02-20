@@ -2,16 +2,31 @@
 function log_error($message, $severity = "INFO", $context = []) {
     global $conn;
     
-    // Validate severity
-    $valid_severities = ['INFO', 'WARNING', 'ERROR', 'CRITICAL'];
-    $severity = in_array(strtoupper($severity), $valid_severities) ? strtoupper($severity) : 'INFO';
+    // Add stack trace for better debugging
+    if ($severity === "ERROR" || $severity === "CRITICAL") {
+        $context['stack_trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    }
     
-    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+    // Add request information
+    $context['request'] = [
+        'url' => $_SERVER['REQUEST_URI'] ?? 'unknown',
+        'method' => $_SERVER['REQUEST_METHOD'] ?? 'unknown',
+        'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+    ];
+    
     $context_json = json_encode($context);
     
-    $stmt = $conn->prepare("INSERT INTO error_log (message, severity, user_id, context) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssis", $message, $severity, $user_id, $context_json);
-    return $stmt->execute();
+    // Use transaction to ensure log entry is saved
+    $conn->begin_transaction();
+    try {
+        $stmt = $conn->prepare("INSERT INTO error_log (message, severity, user_id, context) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssis", $message, $severity, $_SESSION['user_id'] ?? null, $context_json);
+        $stmt->execute();
+        $conn->commit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        error_log("Failed to log error: " . $e->getMessage());
+    }
 }
 
 // Add a function to check database connection

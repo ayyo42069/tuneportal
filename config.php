@@ -83,6 +83,7 @@ if (session_status() === PHP_SESSION_NONE) {
         'samesite' => 'Lax'
     ]);
     session_start();
+    session_regenerate_id(true);
 }
 
 // Create a new MySQLi connection using environment variables
@@ -209,4 +210,27 @@ register_shutdown_function(function() {
         log_error("Fatal Error", "CRITICAL", $error);
     }
 });
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php");
+    exit();
+}
+$_SESSION['LAST_ACTIVITY'] = time();
+
+function check_rate_limit($action, $limit = 60, $window = 3600) {
+    global $conn;
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $user_id = $_SESSION['user_id'] ?? 0;
+    
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM rate_limits WHERE 
+        (ip = ? OR user_id = ?) AND 
+        action = ? AND 
+        created_at > NOW() - INTERVAL ? SECOND");
+    $stmt->bind_param("sisi", $ip, $user_id, $action, $window);
+    $stmt->execute();
+    $count = $stmt->get_result()->fetch_row()[0];
+    
+    return $count < $limit;
+}
 ?>
