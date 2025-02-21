@@ -4,11 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TunePortal - Automotive Tuning Platform</title>
-    <link href="/src/css/tailwind.css" rel="stylesheet">
+    <link href="/tailwind.css" rel="stylesheet">
     <link href="/src/css/custom.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+    // Add this script in the head section for immediate dark mode detection
+    document.documentElement.classList.toggle(
+        "dark",
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    );
+</script>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
 <header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 shadow-lg">
@@ -71,18 +79,17 @@
 </header>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const theme = localStorage.getItem('theme');
-        if (theme) {
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-    });
-
     function toggleDarkMode() {
-        const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        // Check current preference
+        if (localStorage.theme === 'dark') {
+            // Switch to light mode
+            localStorage.theme = 'light'
+            document.documentElement.classList.remove('dark')
+        } else {
+            // Switch to dark mode
+            localStorage.theme = 'dark'
+            document.documentElement.classList.add('dark')
+        }
 
         // Send AJAX request to update backend
         fetch('update_theme.php', {
@@ -90,7 +97,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ theme: isDark ? 'dark' : 'light' })
+            body: JSON.stringify({ theme: localStorage.theme })
         });
     }
 </script>

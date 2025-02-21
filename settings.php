@@ -27,7 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
             if ($stmt->execute()) {
                 $_SESSION['dark_mode'] = $dark_mode; // Update session variable
                 $_SESSION['language'] = $language;
-                $_SESSION['success'] = __('preferences_updated', 'settings');;
+                
+                // Update theme in localStorage via JavaScript
+                echo "<script>
+                    localStorage.theme = '" . ($dark_mode ? 'dark' : 'light') . "';
+                    document.documentElement.classList.toggle('dark', " . ($dark_mode ? 'true' : 'false') . ");
+                </script>";
+                
+                $_SESSION['success'] = __('preferences_updated', 'settings');
             }
             break;
 
@@ -624,32 +631,23 @@ input:checked + .slider:before {
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dark mode from PHP session
-    if (<?= isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'true' : 'false' ?>) {
+    // Initialize dark mode based on localStorage or system preference
+    const theme = localStorage.getItem('theme');
+    if (theme) {
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.documentElement.classList.add('dark');
     }
 
-    // Listen for form submission
-    const preferencesForm = document.querySelector('form[action="settings.php"]');
-    preferencesForm.addEventListener('submit', function() {
-        const darkModeEnabled = this.querySelector('input[name="dark_mode"]').checked;
-        document.documentElement.classList.toggle('dark', darkModeEnabled);
-    });
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dark mode from PHP session
-    if (<?= isset($_SESSION['dark_mode']) && $_SESSION['dark_mode'] ? 'true' : 'false' ?>) {
-        document.documentElement.classList.add('dark');
+    // Listen for dark mode toggle
+    const darkModeToggle = document.querySelector('input[name="dark_mode"]');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', function() {
+            const isDark = this.checked;
+            document.documentElement.classList.toggle('dark', isDark);
+            localStorage.theme = isDark ? 'dark' : 'light';
+        });
     }
-
-    // Listen for form submission
-    const preferencesForm = document.querySelector('form[action="settings.php"]');
-    preferencesForm.addEventListener('submit', function() {
-        const darkModeEnabled = this.querySelector('input[name="dark_mode"]').checked;
-        document.documentElement.classList.toggle('dark', darkModeEnabled);
-    });
 });
 </script>
 <?php include 'footer.php'; ?>
