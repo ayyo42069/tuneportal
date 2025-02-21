@@ -1,10 +1,9 @@
-<?php 
-include 'config.php'; // Add database connection
-include 'header.php'; // Remove duplicate header inclusion
+<?php
+include 'config.php'; // Database connection
+include 'header.php'; // Header inclusion
 
-// Add error handling for database queries
+// Fetch statistics
 try {
-    // Fetch statistics
     $stats = $conn->query("
         SELECT 
             (SELECT COUNT(*) FROM files WHERE status = 'processed') as tuned_files,
@@ -12,10 +11,6 @@ try {
             (SELECT COUNT(*) FROM file_versions) as total_tunes,
             (SELECT COUNT(DISTINCT car_model) FROM files) as unique_models
     ");
-
-    if (!$stats) {
-        throw new Exception("Error fetching statistics");
-    }
     $stats = $stats->fetch_assoc();
 
     // Fetch latest successful tunes
@@ -29,10 +24,6 @@ try {
         LIMIT 5
     ");
 
-    if (!$latest_tunes) {
-        throw new Exception("Error fetching latest tunes");
-    }
-
     // Fetch top tuners
     $top_tuners = $conn->query("
         SELECT u.username, u.id, COUNT(f.id) as tune_count 
@@ -43,13 +34,7 @@ try {
         ORDER BY tune_count DESC 
         LIMIT 3
     ");
-
-    if (!$top_tuners) {
-        throw new Exception("Error fetching top tuners");
-    }
-
 } catch (Exception $e) {
-    // Set default values if database queries fail
     $stats = [
         'tuned_files' => 0,
         'active_tuners' => 0,
@@ -133,7 +118,7 @@ try {
             </div>
             
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Feature Cards with enhanced styling -->
+                <!-- Feature Cards -->
                 <div class="group p-8 bg-slate-800 rounded-2xl hover:bg-slate-700/50 transition-all duration-300 transform hover:-translate-y-2">
                     <div class="w-16 h-16 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
                         <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +128,44 @@ try {
                     <h3 class="text-xl font-semibold mb-4 text-white">Advanced ECU Tuning</h3>
                     <p class="text-gray-400">State-of-the-art performance optimization with real-time monitoring and adjustments.</p>
                 </div>
-                <!-- ... Similar styling for other feature cards ... -->
+                <div class="group p-8 bg-slate-800 rounded-2xl hover:bg-slate-700/50 transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-white">Real-Time Analytics</h3>
+                    <p class="text-gray-400">Monitor your vehicle's performance in real-time with our advanced analytics dashboard.</p>
+                </div>
+                <div class="group p-8 bg-slate-800 rounded-2xl hover:bg-slate-700/50 transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-white">24/7 Support</h3>
+                    <p class="text-gray-400">Our expert team is available around the clock to assist you with any issues.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Latest Tunes Section -->
+    <section id="latest-tunes" class="py-24 bg-slate-800">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-white mb-4">Latest Successful Tunes</h2>
+                <div class="w-24 h-1 bg-red-600 mx-auto rounded-full"></div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <?php while ($tune = $latest_tunes->fetch_assoc()): ?>
+                    <div class="bg-slate-700 rounded-2xl p-6 hover:bg-slate-600/50 transition-all duration-300">
+                        <h3 class="text-xl font-semibold text-white mb-2"><?= $tune['title'] ?></h3>
+                        <p class="text-gray-400 mb-4"><?= $tune['car_model'] ?></p>
+                        <p class="text-gray-400">Tuned by <span class="text-red-500"><?= $tune['username'] ?></span></p>
+                        <p class="text-gray-400 text-sm"><?= date('M d, Y', strtotime($tune['uploaded_at'])) ?></p>
+                    </div>
+                <?php endwhile; ?>
             </div>
         </div>
     </section>
@@ -155,7 +177,7 @@ try {
             <div class="max-w-3xl mx-auto text-center">
                 <h2 class="text-4xl md:text-5xl font-bold text-white mb-8">Ready to Transform Your Vehicle?</h2>
                 <p class="text-xl text-white/80 mb-12">
-                    Join thousands of satisfied customers who have unlocked their vehicle's true potential
+                    Join thousands of satisfied customers who have unlocked their vehicle's true potential.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="register.php" 
@@ -176,9 +198,8 @@ try {
 
 <?php include 'footer.php'; ?>
 
-<!-- Keep your existing Particle.js and count-up scripts -->
+<!-- Particle.js and Count-Up Scripts -->
 <script>
-    // Particle.js configuration
     particlesJS("particles-js", {
         particles: {
             number: { value: 80, density: { enable: true, value_area: 800 } },
@@ -218,5 +239,3 @@ try {
         updateCount();
     });
 </script>
-
-
