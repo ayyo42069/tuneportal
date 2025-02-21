@@ -11,9 +11,10 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-<header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 shadow-md">
+<header class="bg-white dark:bg-gray-800 text-gray-800 dark:text-white fixed w-full top-0 z-50 transition-all duration-300 shadow-lg">
     <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center h-16">
+        <div class="flex justify-between items-center h-20">
+            <!-- Logo and Toggle Button -->
             <div class="flex items-center">
                 <?php if(isset($_SESSION['user_id'])): ?>
                 <button x-data x-on:click="$dispatch('toggle-sidebar')" class="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors mr-2">
@@ -56,7 +57,7 @@
          x-on:toggle-menu.window="open = !open"
          x-show="open" 
          x-transition 
-         class="md:hidden bg-white dark:bg-gray-800">
+         class="md:hidden bg-white dark:bg-gray-800 shadow-lg">
         <div class="container mx-auto px-4 py-4 space-y-2">
             <?php if(!isset($_SESSION['user_id'])): ?>
                 <a href="register.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Register</a>
