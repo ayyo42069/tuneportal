@@ -69,3 +69,28 @@
         </div>
     </div>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const theme = localStorage.getItem('theme');
+        if (theme) {
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+    });
+
+    function toggleDarkMode() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+        // Send AJAX request to update backend
+        fetch('update_theme.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ theme: isDark ? 'dark' : 'light' })
+        });
+    }
+</script>
