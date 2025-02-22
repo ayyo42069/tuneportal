@@ -112,7 +112,7 @@
         </div>
     </div>
 </header>
-<div class="h-20"></div>
+<div class="h-5"></div>
 <script>
     function toggleDarkMode() {
         // Check current preference
