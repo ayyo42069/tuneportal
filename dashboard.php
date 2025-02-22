@@ -49,43 +49,42 @@ $stmt->close();
 include 'header.php';
 ?>
 
-<div class="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+<div class="flex min-h-screen bg-gradient-hero">
+    <!-- Add particle background -->
+    <div id="particles-js" class="fixed inset-0 pointer-events-none"></div>
     <?php include 'includes/sidebar.php'; ?>
     
-    <div class="flex-1 transition-all duration-300 lg:ml-64">
+    <div class="flex-1 transition-all duration-300 lg:ml-64 relative">
         <div class="container mx-auto px-4 py-8 mt-16">
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+            <!-- Welcome Section -->
+            <h2 class="text-3xl font-bold text-gradient mb-8 animate-fade-in-up">
                 <?= __('welcome_back', 'dashboard') ?>, <?= htmlspecialchars($_SESSION['username']) ?>!
             </h2>
-
-            <!-- Quick Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+             <!-- Quick Stats Grid -->
+             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <!-- Credit Balance Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                <div class="glass-card animate-fade-in-up animation-delay-300">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-white"><?= __('credit_balance', 'dashboard') ?></h3>
-                            <p class="text-3xl font-bold text-red-600">
+                            <p class="text-3xl font-bold text-gradient">
                                 <?= number_format($_SESSION['credits']) ?>
                             </p>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <button onclick="showCreditPackages()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                </svg>
-                                Buy Credits
-                            </button>
-                        </div>
+                        <button onclick="showCreditPackages()" class="glass-button-primary p-2 rounded-xl">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                        </button>
                     </div>
-                    <a href="credits.php" class="mt-4 text-sm text-red-600 hover:text-red-700 inline-flex items-center">
+                    <a href="credits.php" class="mt-4 text-sm text-red-500 hover:text-red-600 inline-flex items-center">
                         <?= __('transaction_history', 'dashboard') ?> →
                     </a>
                 </div>
 
                 <!-- Credit Packages Modal -->
-                <div id="creditPackagesModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg w-full mx-4">
+                <div id="creditPackagesModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+                <div class="glass-card max-w-lg w-full mx-4 animate-fade-in-up">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white">Buy Credits</h3>
                             <button onclick="hideCreditPackages()" class="text-gray-500 hover:text-gray-700">
@@ -114,47 +113,43 @@ include 'header.php';
                     </div>
                 </div>
                 <!-- Total Files Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                <div class="glass-card animate-fade-in-up animation-delay-400">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Total Files</h3>
-                            <p class="text-3xl font-bold text-blue-600"><?= $stats['total_files'] ?></p>
+                            <p class="text-3xl font-bold text-gradient"><?= $stats['total_files'] ?></p>
                         </div>
-                        <div class="p-3 bg-blue-100 rounded-full">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="glass-icon p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </div>
                     </div>
-                    <a href="files.php" class="mt-4 text-sm text-blue-600 hover:text-blue-700 inline-flex items-center">
-                        View all files →
-                    </a>
                 </div>
 
                 <!-- Pending Files Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                <div class="glass-card animate-fade-in-up animation-delay-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Pending Files</h3>
-                            <p class="text-3xl font-bold text-yellow-600"><?= $stats['pending_files'] ?></p>
+                            <p class="text-3xl font-bold text-gradient"><?= $stats['pending_files'] ?></p>
                         </div>
-                        <div class="p-3 bg-yellow-100 rounded-full">
-                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="glass-icon p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
                     </div>
                 </div>
-
                 <!-- Approved Files Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                <div class="glass-card animate-fade-in-up animation-delay-600">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Approved Files</h3>
-                            <p class="text-3xl font-bold text-green-600"><?= $stats['approved_files'] ?></p>
+                            <p class="text-3xl font-bold text-gradient"><?= $stats['approved_files'] ?></p>
                         </div>
-                        <div class="p-3 bg-green-100 rounded-full">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="glass-icon p-3 rounded-xl">
+                            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
@@ -163,50 +158,49 @@ include 'header.php';
             </div>
 
             <!-- Main Content Grid -->
-            <div class="grid gap-8 grid-cols-1 lg:grid-cols-2">
+             <!-- Main Content Grid -->
+             <div class="grid gap-8 grid-cols-1 lg:grid-cols-2">
                 <!-- Recent Files Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                <div class="glass-card">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Recent Files</h3>
-                        <a href="files.php" class="text-sm text-red-600 hover:text-red-700">View all →</a>
+                        <h3 class="text-lg font-semibold text-gradient">Recent Files</h3>
+                        <a href="files.php" class="text-sm text-red-500 hover:text-red-600">View all →</a>
                     </div>
                     <?php if ($recent_files->num_rows > 0): ?>
                     <div class="space-y-4">
                         <?php while ($file = $recent_files->fetch_assoc()): ?>
-                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div class="flex items-center space-x-3">
-                                <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
-                                    <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
+                        <div class="glass-feature p-4 rounded-xl transition-all duration-300 hover:scale-[1.02]">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="glass-icon-sm">
+                                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-white"><?= htmlspecialchars($file['title']) ?></h4>
+                                        <p class="text-xs text-gray-400">
+                                            <?= htmlspecialchars($file['manufacturer_name']) ?> <?= htmlspecialchars($file['model_name']) ?>
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="text-sm font-medium text-gray-800 dark:text-white"><?= htmlspecialchars($file['title']) ?></h4>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        <?= htmlspecialchars($file['manufacturer_name']) ?> <?= htmlspecialchars($file['model_name']) ?>
-                                    </p>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                        <?= $file['status'] === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' ?>">
-                                        <?= ucfirst($file['status']) ?>
-                                    </span>
-                                </div>
+                                <span class="glass-button px-2 py-1 text-xs rounded-full">
+                                    <?= ucfirst($file['status']) ?>
+                                </span>
                             </div>
-                            <a href="file_details.php?id=<?= $file['id'] ?>" class="text-sm text-red-600 hover:text-red-700">
-                                Details →
-                            </a>
                         </div>
                         <?php endwhile; ?>
                     </div>
                     <?php else: ?>
-                    <p class="text-gray-500 dark:text-gray-400 text-center py-4">No files uploaded yet</p>
+                    <p class="text-center text-gray-400 py-4">No files uploaded yet</p>
                     <?php endif; ?>
                 </div>
 
                 <!-- Notifications Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white"><?= __('notifications', 'dashboard') ?></h3>
-                        <span class="bg-red-100 text-red-600 text-sm py-1 px-3 rounded-full"><?= __('new', 'dashboard') ?></span>
+                <div class="glass-card">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gradient"><?= __('notifications', 'dashboard') ?></h3>
+                        <span class="glass-button-primary px-3 py-1 text-xs rounded-full"><?= __('new', 'dashboard') ?></span>
                     </div>
                     <?php
                     $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? OR user_id IS NULL ORDER BY created_at DESC LIMIT 5");
