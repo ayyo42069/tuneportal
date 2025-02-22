@@ -48,9 +48,6 @@ $stats = $stats->fetch_assoc();
    
     <!-- Hero Section -->
     <section class="relative min-h-screen pt-16 flex items-center justify-center">
-        <!-- Particles Background -->
-        <div id="particles-js" class="absolute inset-0 opacity-30 pointer-events-none"></div>
-        
         <!-- Video Background -->
         <div class="absolute inset-0">
             <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/70 z-10"></div>
@@ -127,7 +124,7 @@ $stats = $stats->fetch_assoc();
 
                 <!-- Right Column - Stats -->
                 <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
-                            bg-black/20 border border-white/10 order-1 lg:order-2">
+                            bg-black/20 border border-white/10 order-2 lg:order-1">
                     <div class="stats-grid-card rounded-2xl p-6 h-full">
                         <div class="grid grid-cols-2 gap-4">
                             <?php
@@ -185,9 +182,58 @@ $stats = $stats->fetch_assoc();
         </div>
     </section>
 
+    <!-- Features Section with 3D Cards -->
+    <section id="features" class="relative overflow-hidden section-spacing backdrop-blur-sm bg-gradient-to-b from-slate-900/90 to-black/90 dark:from-gray-900/90 dark:to-black/90">
+        <div class="absolute inset-0 bg-[url('/src/images/grid-pattern.svg')] opacity-5"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center mb-20">
+                <h2 class="text-5xl font-bold text-white mb-6">Why Choose TunePortal?</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-red-500 to-orange-500 mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-12">
+                <?php 
+                $features = [
+                    [
+                        'title' => 'Advanced ECU Tuning',
+                        'description' => 'State-of-the-art performance optimization with real-time monitoring and adjustments.',
+                        'icon' => 'M13 10V3L4 14h7v7l9-11h-7z'
+                    ],
+                    [
+                        'title' => 'Real-Time Analytics',
+                        'description' => 'Monitor your vehicle\'s performance in real-time with our advanced analytics dashboard.',
+                        'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
+                    ],
+                    [
+                        'title' => '24/7 Expert Support',
+                        'description' => 'Our certified tuning experts are available around the clock to assist you with any issues.',
+                        'icon' => 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z'
+                    ]
+                ];
+
+                foreach ($features as $feature): ?>
+                    <div class="group perspective">
+                        <div class="relative transform transition-all duration-500 group-hover:rotate-y-12">
+                            <div class="absolute inset-0 bg-gradient-to-r from-red-500/30 to-orange-500/30 rounded-2xl transform -rotate-y-12 group-hover:rotate-y-0 transition-all duration-500 opacity-0 group-hover:opacity-100 backdrop-blur-lg"></div>
+                            <div class="glass-feature relative rounded-2xl p-8 transform group-hover:rotate-y-12 transition-all duration-500">
+                                <div class="w-16 h-16 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
+                                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $feature['icon'] ?>"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-4 text-white"><?= $feature['title'] ?></h3>
+                                <p class="text-gray-400"><?= $feature['description'] ?></p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
     <!-- Latest Tunes Section with Animated Cards -->
     <section id="latest-tunes" class="relative overflow-hidden section-spacing bg-black dark:bg-gray-900">
-    <div class="absolute inset-0 bg-[url('/src/images/texture.jpg')] opacity-5"></div>
+        <div class="absolute inset-0 bg-[url('/src/images/texture.jpg')] opacity-5"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
                 <h2 class="text-5xl font-bold text-white mb-6">Latest Successful Tunes</h2>
@@ -206,18 +252,18 @@ $stats = $stats->fetch_assoc();
                             <span class="text-gray-400 text-sm"><?= date('M d, Y', strtotime($tune['uploaded_at'])) ?></span>
                         </div>
                         <h3 class="text-xl font-semibold text-white mb-3 group-hover:text-red-500 transition-colors">
-        <?= htmlspecialchars($tune['title'] ?? '') ?>
-    </h3>
-    <p class="text-gray-400 mb-4"><?= htmlspecialchars($tune['car_model'] ?? '') ?></p>
-       <div class="flex items-center">
+                            <?= htmlspecialchars($tune['title'] ?? '') ?>
+                        </h3>
+                        <p class="text-gray-400 mb-4"><?= htmlspecialchars($tune['car_model'] ?? '') ?></p>
+                        <div class="flex items-center">
                             <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                 </svg>
                             </div>
                             <span class="ml-3 text-gray-400">Tuned by <span class="text-red-500 font-medium">
-        <?= htmlspecialchars($tune['username'] ?? '') ?></span>
-    </span>
+                                <?= htmlspecialchars($tune['username'] ?? '') ?>
+                            </span></span>
                         </div>
                     </div>
                 <?php endwhile; ?>
@@ -225,9 +271,9 @@ $stats = $stats->fetch_assoc();
         </div>
     </section>
 
-    <!-- Enhanced CTA Section (continuing) -->
+    <!-- Enhanced CTA Section -->
     <section class="relative overflow-hidden section-spacing bg-gradient-to-br from-red-600 to-orange-600 dark:from-red-700 dark:to-orange-700">
-                <div class="container mx-auto px-4 relative z-10">
+        <div class="container mx-auto px-4 relative z-10">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-5xl md:text-6xl font-bold text-white mb-8">Ready to Transform Your Vehicle?</h2>
                 <p class="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
@@ -258,25 +304,8 @@ $stats = $stats->fetch_assoc();
     </section>
 </main>
 
-<<script>
-    // Particle.js configuration
-    particlesJS("particles-js", {
-        particles: {
-            number: { value: 80, density: { enable: true, value_area: 800 } },
-            color: { value: "#ffffff" },
-            shape: { type: "circle", stroke: { width: 0, color: "#000000" }, polygon: { nb_sides: 5 } },
-            opacity: { value: 0.5, random: false, anim: { enable: false, speed: 1, opacity_min: 0.1, sync: false } },
-            size: { value: 3, random: true, anim: { enable: false, speed: 40, size_min: 0.1, sync: false } },
-            line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
-            move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false, attract: { enable: false, rotateX: 600, rotateY: 1200 } }
-        },
-        interactivity: {
-            detect_on: "canvas",
-            events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
-            modes: { grab: { distance: 400, line_linked: { opacity: 1 } }, bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 }, repulse: { distance: 200, duration: 0.4 }, push: { particles_nb: 4 }, remove: { particles_nb: 2 } }
-        },
-        retina_detect: true
-    });
+<script>
+
 
     // Enhanced count-up animation with easing
     const countUpElements = document.querySelectorAll('.count-up');
