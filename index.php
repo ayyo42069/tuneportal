@@ -44,28 +44,19 @@ $stats = $stats->fetch_assoc();
 }
 ?>
 <?php include 'header.php'; ?>
+<?php include 'header.php'; ?>
 <main class="flex-grow">
-    <div id="particles-js" class="fixed inset-0 pointer-events-none"></div>
+    <div id="particles-js" class="fixed inset-0 pointer-events-none mt-16 z-0"></div>
+    
     <!-- Hero Section -->
-    <section class="relative min-h-screen overflow-hidden dark:bg-gray-900">
+    <section class="relative min-h-screen overflow-hidden dark:bg-gray-900 pt-16">
         <!-- Video Background -->
         <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40 z-10"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/70 z-10"></div>
             <video class="w-full h-full object-cover" autoplay muted loop playsinline>
                 <source src="/assets/videos/car-tuning.mp4" type="video/mp4">
             </video>
         </div>
-
-        <!-- Hero Content -->
-<!-- Hero Section -->
-<section class="relative min-h-screen overflow-hidden dark:bg-gray-900 pt-20">
-    <!-- Video Background -->
-    <div class="absolute inset-0 z-0">
-        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/70 z-10"></div>
-        <video class="w-full h-full object-cover" autoplay muted loop playsinline>
-            <source src="/assets/videos/car-tuning.mp4" type="video/mp4">
-        </video>
-    </div>
 
     <!-- Hero Content -->
     <div class="relative z-20 container mx-auto px-4 min-h-[calc(100vh-5rem)] flex items-center">
