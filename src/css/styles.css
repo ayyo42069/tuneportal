@@ -203,3 +203,7 @@
 .animate-gradient {
   animation: gradient 15s ease infinite;
 }
+
+.bg-300% {
+  background-size: 300% 300%;
+}
