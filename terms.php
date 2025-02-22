@@ -1,6 +1,6 @@
 <?php include 'header.php'; ?>
 
-<div class="min-h-screen bg-gradient-hero py-12 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gradient-hero py-12 px-4 sm:px-6 lg:px-8 mt-16">
     <div class="max-w-4xl mx-auto">
         <div class="glass-card animate-fade-in-up">
             <h1 class="text-3xl font-bold text-gradient mb-8">Terms and Conditions</h1>
