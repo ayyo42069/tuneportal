@@ -25,7 +25,7 @@ $profile_picture = isset($profile['profile_picture']) && !empty($profile['profil
     <nav class="flex-grow overflow-y-auto relative">
         <div class="p-4 space-y-4">
             <!-- Profile Section -->
-            <div class="relative">
+            <div class="relative z-50">
                 <button id="profileDropdown" class="glass-button flex items-center space-x-3 w-full p-3 rounded-xl hover:bg-white/20 dark:hover:bg-gray-700/20 transition-all duration-300">
                     <div class="glass-icon-sm">
                         <img src="uploads/profiles/<?= $profile_picture ?>" 
@@ -36,8 +36,7 @@ $profile_picture = isset($profile['profile_picture']) && !empty($profile['profil
                     <span class="font-medium text-gray-700 dark:text-gray-300"><?= __('my_profile', 'sidebar') ?></span>
                 </button>
                 <!-- Enhanced Dropdown Menu -->
-                <div id="profileMenu" class="hidden absolute left-0 mt-2 w-56 glass-dropdown rounded-xl">
-                    <div class="py-2">
+                <div id="profileMenu" class="hidden absolute left-0 mt-2 w-56 glass-dropdown rounded-xl z-50"> <div class="py-2">
                         <div class="px-4 py-2">
                             <p class="font-bold text-gradient"><?= htmlspecialchars($_SESSION['username']) ?></p>
                             <p class="text-xs text-gray-500 dark:text-gray-400"><?= ucfirst($_SESSION['role']) ?></p>
