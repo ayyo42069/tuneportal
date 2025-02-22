@@ -1,11 +1,11 @@
 <?php include 'header.php'; ?>
 
 <div class="min-h-screen bg-gradient-hero py-12 px-4 sm:px-6 lg:px-8 mt-16">
-    <div class="max-w-4xl mx-auto">
-        <div class="glass-card animate-fade-in-up">
-            <h1 class="text-3xl font-bold text-gradient mb-8">Terms and Conditions</h1>
+    <div class="max-w-4xl mx-auto h-[calc(100vh-12rem)]">
+    <div class="glass-card animate-fade-in-up h-full flex flex-col">
+    <h1 class="text-3xl font-bold text-gradient mb-8 sticky top-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl py-4 z-10">Terms and Conditions</h1>
             
-            <div class="space-y-6 text-gray-700 dark:text-gray-300">
+    <div class="space-y-6 text-gray-700 dark:text-gray-300 overflow-y-auto custom-scrollbar flex-1 pr-4">
                 <section class="space-y-4">
                     <h2 class="text-xl font-semibold text-gradient">1. Acceptance of Terms</h2>
                     <p>By accessing and using TunePortal, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our services.</p>
@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <div class="mt-8 flex justify-end">
+            <div class="mt-8 flex justify-end sticky bottom-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl py-4">
                 <a href="register.php" class="glass-button-primary px-6 py-2 rounded-xl">
                     Return to Registration
                 </a>
