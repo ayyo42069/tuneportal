@@ -4,19 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TunePortal - Automotive Tuning Platform</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="TunePortal - Your premier platform for automotive tuning solutions, custom maps, and professional tuning services">
+    <meta name="keywords" content="automotive tuning, car tuning, ECU mapping, performance tuning, engine tuning">
+    <meta name="author" content="TunePortal">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="TunePortal - Automotive Tuning Platform">
+    <meta property="og:description" content="Professional automotive tuning solutions and services">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tuneportal.germanywestcentral.cloudapp.azure.com">
+    <meta property="og:image" content="https://tuneportal.germanywestcentral.cloudapp.azure.com/logo.png">
+    
+    <!-- Existing CSS -->
     <link href="/src/css/tailwind.css" rel="stylesheet">
     <link href="/src/css/custom.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    
+    <!-- Performance Optimization -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1RS47DBT8C"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-1RS47DBT8C');
+    </script>
+    
+    <!-- Existing Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Performance Enhancements -->
     <script>
-    // Add this script in the head section for immediate dark mode detection
-    document.documentElement.classList.toggle(
-        "dark",
-        localStorage.theme === "dark" ||
-        (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
-    );
-</script>
+        // Defer non-critical images
+        document.addEventListener("DOMContentLoaded", function() {
+            var lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
+            if ("IntersectionObserver" in window) {
+                let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            let lazyImage = entry.target;
+                            lazyImage.src = lazyImage.dataset.src;
+                            lazyImage.classList.remove("lazy");
+                            lazyImageObserver.unobserve(lazyImage);
+                        }
+                    });
+                });
+                lazyImages.forEach(function(lazyImage) {
+                    lazyImageObserver.observe(lazyImage);
+                });
+            }
+        });
+
+        // Add page load performance monitoring
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const timing = window.performance.timing;
+                const pageLoadTime = timing.loadEventEnd - timing.navigationStart;
+                console.log('Page load time:', pageLoadTime + 'ms');
+                // Send to Analytics if needed
+                if (typeof gtag === 'function') {
+                    gtag('event', 'performance', {
+                        'page_load_time': pageLoadTime
+                    });
+                }
+            }, 0);
+        });
+    </script>
+    
+    <!-- Dark mode script (your existing one) -->
+    <script>
+        document.documentElement.classList.toggle(
+            "dark",
+            localStorage.theme === "dark" ||
+            (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        );
+    </script>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
     <header class="fixed w-full top-0 z-50 transition-all duration-300">
