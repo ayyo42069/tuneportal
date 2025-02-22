@@ -5,13 +5,13 @@ include 'header.php'; // Header inclusion
 // Fetch statistics
 try {
     $stats = $conn->query("
-        SELECT 
-            (SELECT COUNT(*) FROM files WHERE status = 'processed') as tuned_files,
-            (SELECT COUNT(DISTINCT user_id) FROM files WHERE status = 'processed') as active_tuners,
-            (SELECT COUNT(*) FROM file_versions) as total_tunes,
-            (SELECT COUNT(DISTINCT car_model) FROM files) as unique_models
-    ");
-    $stats = $stats->fetch_assoc();
+    SELECT 
+        COALESCE((SELECT COUNT(*) FROM files WHERE status = 'processed'), 0) as tuned_files,
+        COALESCE((SELECT COUNT(DISTINCT user_id) FROM files WHERE status = 'processed'), 0) as active_tuners,
+        COALESCE((SELECT COUNT(*) FROM file_versions), 0) as total_tunes,
+        COALESCE((SELECT COUNT(DISTINCT car_model) FROM files), 0) as unique_models
+");
+$stats = $stats->fetch_assoc();
 
     // Fetch latest successful tunes
     $latest_tunes = $conn->query("
@@ -46,8 +46,9 @@ try {
 ?>
 
 <main class="flex-grow">
-    <!-- Hero Section with Video Background -->
-    <section class="relative min-h-screen overflow-hidden">
+    <div id="particles-js" class="fixed inset-0 pointer-events-none"></div>
+    <!-- Hero Section -->
+    <section class="relative min-h-screen overflow-hidden dark:bg-gray-900">
         <!-- Video Background -->
         <div class="absolute inset-0 z-0">
             <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40 z-10"></div>
@@ -137,8 +138,8 @@ try {
     </section>
 
     <!-- Features Section with 3D Cards -->
-    <section id="features" class="py-32 bg-gradient-to-b from-slate-900 to-black relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('/src/images/grid-pattern.svg')] opacity-5"></div>
+    <section id="features" class="py-32 mt-20 bg-gradient-to-b from-slate-900 to-black dark:from-gray-900 dark:to-black relative overflow-hidden">
+    <div class="absolute inset-0 bg-[url('/src/images/grid-pattern.svg')] opacity-5"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
                 <h2 class="text-5xl font-bold text-white mb-6">Why Choose TunePortal?</h2>
@@ -186,8 +187,9 @@ try {
     </section>
 
     <!-- Latest Tunes Section with Animated Cards -->
-    <section id="latest-tunes" class="py-32 bg-black relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('/src/images/texture.jpg')] opacity-5"></div>
+    <section id="latest-tunes" class="py-32 mt-20 bg-black dark:bg-gray-900 relative overflow-hidden">
+
+    <div class="absolute inset-0 bg-[url('/src/images/texture.jpg')] opacity-5"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
                 <h2 class="text-5xl font-bold text-white mb-6">Latest Successful Tunes</h2>
@@ -206,18 +208,18 @@ try {
                             <span class="text-gray-400 text-sm"><?= date('M d, Y', strtotime($tune['uploaded_at'])) ?></span>
                         </div>
                         <h3 class="text-xl font-semibold text-white mb-3 group-hover:text-red-500 transition-colors">
-                            <?= htmlspecialchars($tune['title']) ?>
-                        </h3>
-                        <p class="text-gray-400 mb-4"><?= htmlspecialchars($tune['car_model']) ?></p>
-                        <div class="flex items-center">
+        <?= htmlspecialchars($tune['title'] ?? '') ?>
+    </h3>
+    <p class="text-gray-400 mb-4"><?= htmlspecialchars($tune['car_model'] ?? '') ?></p>
+       <div class="flex items-center">
                             <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
                                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                 </svg>
                             </div>
                             <span class="ml-3 text-gray-400">Tuned by <span class="text-red-500 font-medium">
-                                <?= htmlspecialchars($tune['username']) ?></span>
-                            </span>
+        <?= htmlspecialchars($tune['username'] ?? '') ?></span>
+    </span>
                         </div>
                     </div>
                 <?php endwhile; ?>
@@ -226,6 +228,7 @@ try {
     </section>
 
     <!-- Enhanced CTA Section (continuing) -->
+    <section class="relative py-32 mt-20 bg-gradient-to-br from-red-600 to-orange-600 dark:from-red-700 dark:to-orange-700 overflow-hidden">
         <div class="container mx-auto px-4 relative z-10">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-5xl md:text-6xl font-bold text-white mb-8">Ready to Transform Your Vehicle?</h2>
