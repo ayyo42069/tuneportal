@@ -227,7 +227,8 @@ $stats = $stats->fetch_assoc();
     </section>
 
     <!-- Enhanced CTA Section (continuing) -->
-    <section class="relative overflow-hidden section-spacing bg-gradient-to-br from-red-600 to-orange-600 dark:from-red-700 dark:to-orange-700">        <div class="container mx-auto px-4 relative z-10">
+    <section class="relative overflow-hidden section-spacing bg-gradient-to-br from-red-600 to-orange-600 dark:from-red-700 dark:to-orange-700">
+                <div class="container mx-auto px-4 relative z-10">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-5xl md:text-6xl font-bold text-white mb-8">Ready to Transform Your Vehicle?</h2>
                 <p class="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
