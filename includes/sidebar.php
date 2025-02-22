@@ -18,8 +18,7 @@ $profile_picture = isset($profile['profile_picture']) && !empty($profile['profil
     ? htmlspecialchars($profile['profile_picture']) 
     : 'default.png';
 ?>
-<aside id="sidebar" class="w-64 h-screen fixed top-0 left-0 lg:translate-x-0 -translate-x-full transition-transform duration-300 z-40 mt-16 flex flex-col">
-    <!-- Glassmorphism background -->
+<aside id="sidebar" class="w-64 h-[calc(100vh-5rem)] fixed top-20 left-0 lg:translate-x-0 -translate-x-full transition-transform duration-300 z-30 flex flex-col">   <!-- Glassmorphism background -->
     <div class="absolute inset-0 backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 border-r border-white/10 dark:border-gray-700/20 shadow-lg"></div>
 
     <nav class="flex-grow overflow-y-auto relative">
