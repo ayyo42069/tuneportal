@@ -58,53 +58,91 @@ $stats = $stats->fetch_assoc();
         </div>
 
         <!-- Hero Content -->
-        <div class="relative z-20 container mx-auto px-4 min-h-screen flex items-center py-20 lg:py-0">
-    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-        <!-- Left Column -->
-        <div class="glass-hero p-4 sm:p-6 lg:p-8 rounded-2xl lg:rounded-3xl text-white space-y-6 lg:space-y-8 order-2 lg:order-1">
-            <div class="inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-red-600/20 backdrop-blur-sm rounded-full mb-2 sm:mb-4">
-                <span class="text-red-400 font-semibold text-sm sm:text-base">Professional ECU Tuning Solutions</span>
-            </div>
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl xl:text-7xl font-bold leading-tight animate-fade-in-up">
-                Unleash Your
-                <span class="relative inline-block">
-                    <span class="bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">Vehicle's</span>
-                    <svg class="absolute -bottom-2 sm:-bottom-3 lg:-bottom-4 left-0 w-full" viewBox="0 0 100 12" preserveAspectRatio="none">
-                        <path d="M0,0 Q50,12 100,0" stroke="rgb(239,68,68)" stroke-width="4" fill="none"/>
-                    </svg>
-                </span>
-                <br class="hidden sm:block">Potential
-            </h1>
-            <p class="text-base sm:text-lg lg:text-xl text-gray-300 max-w-xl animate-fade-in-up animation-delay-300">
-                Experience precision engineering and cutting-edge technology to maximize your vehicle's performance.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 animate-fade-in-up animation-delay-600">
-                <?php if(!isset($_SESSION['user_id'])): ?>
-                    <a href="register.php" 
-                       class="group px-6 sm:px-8 py-3 sm:py-4 bg-red-600 rounded-lg font-semibold inline-flex items-center justify-center
-                              transition-all duration-300 transform hover:scale-105 hover:bg-red-700 shadow-lg shadow-red-600/30 text-sm sm:text-base">
-                        Start Tuning Now
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                        </svg>
-                    </a>
-                <?php endif; ?>
-                <a href="#features" 
-                   class="group px-6 sm:px-8 py-3 sm:py-4 border border-white/30 rounded-lg font-semibold inline-flex items-center justify-center
-                          hover:bg-white/10 transition-all duration-300 text-sm sm:text-base">
-                    Explore Features
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-                    </svg>
-                </a>
-            </div>
-        </div>
+<!-- Hero Section -->
+<section class="relative min-h-screen overflow-hidden dark:bg-gray-900 pt-20">
+    <!-- Video Background -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/70 z-10"></div>
+        <video class="w-full h-full object-cover" autoplay muted loop playsinline>
+            <source src="/assets/videos/car-tuning.mp4" type="video/mp4">
+        </video>
+    </div>
 
-        <!-- Right Column - Animated Stats Card -->
-        <div class="glass-card stats-card rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 
-             border border-white/10 transform hover:scale-105 transition-all duration-500 order-1 lg:order-2">
-            <div class="grid grid-cols-2 gap-3 sm:gap-6 lg:gap-8">
-            <?php
+    <!-- Hero Content -->
+    <div class="relative z-20 container mx-auto px-4 min-h-[calc(100vh-5rem)] flex items-center">
+        <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full">
+            <!-- Left Column - Content -->
+            <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
+                        bg-black/20 border border-white/10 order-2 lg:order-1">
+                <div class="inline-flex items-center space-x-2 px-4 py-2 bg-red-600/20 backdrop-blur-sm rounded-full">
+                    <span class="animate-pulse w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span class="text-red-400 font-semibold">Professional ECU Tuning Solutions</span>
+                </div>
+
+                <div class="space-y-4">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+                        Unleash Your
+                        <span class="relative inline-block">
+                            <span class="bg-gradient-to-r from-red-500 via-orange-500 to-red-500 text-transparent bg-clip-text 
+                                       animate-gradient bg-300% group-hover:bg-red-500">Vehicle's</span>
+                            <svg class="absolute -bottom-2 sm:-bottom-3 lg:-bottom-4 left-0 w-full opacity-50" viewBox="0 0 100 12" preserveAspectRatio="none">
+                                <path d="M0,0 Q50,12 100,0" stroke="url(#gradient)" stroke-width="4" fill="none"/>
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color: #EF4444"/>
+                                        <stop offset="50%" style="stop-color: #F97316"/>
+                                        <stop offset="100%" style="stop-color: #EF4444"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </span>
+                        <br class="hidden sm:block">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-200">Potential</span>
+                    </h1>
+
+                    <p class="text-lg sm:text-xl text-gray-300 max-w-xl">
+                        Experience precision engineering and cutting-edge technology to maximize your vehicle's performance.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                    <?php if(!isset($_SESSION['user_id'])): ?>
+                        <a href="register.php" 
+                           class="group relative px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 rounded-xl 
+                                  font-semibold inline-flex items-center justify-center overflow-hidden">
+                            <span class="relative z-10 flex items-center text-white">
+                                Start Tuning Now
+                                <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" 
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                </svg>
+                            </span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-0 
+                                      group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </a>
+                    <?php endif; ?>
+                    <a href="#features" 
+                       class="group px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl 
+                              font-semibold inline-flex items-center justify-center hover:bg-white/20 transition-all">
+                        <span class="text-white flex items-center">
+                            Explore Features
+                            <svg class="w-5 h-5 ml-2 transform group-hover:translate-y-1 transition-transform" 
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column - Stats -->
+            <div class="order-1 lg:order-2">
+                <div class="glass-card rounded-3xl p-8 backdrop-blur-xl bg-white/5 border border-white/10 
+                            transform hover:scale-[1.02] transition-all duration-500">
+                    <div class="grid grid-cols-2 gap-6 lg:gap-8">
+                    <?php
                         $statsData = [
                             ['count' => $stats['tuned_files'], 'label' => 'Tuned Vehicles', 'icon' => 'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'],
                             ['count' => $stats['active_tuners'], 'label' => 'Expert Tuners', 'icon' => 'M12 4.354a4 4 0 1 1 0 5.292V14M12 21v-7'],
@@ -113,29 +151,39 @@ $stats = $stats->fetch_assoc();
                         ];
 
                         foreach ($statsData as $stat): ?>
-                    <div class="relative group">
-                        <div class="absolute inset-0 bg-red-600/20 rounded-xl transform group-hover:scale-105 transition-transform duration-300"></div>
-                        <div class="relative p-3 sm:p-4 lg:p-6 text-center">
-                            <svg class="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $stat['icon'] ?>"/>
-                            </svg>
-                            <div class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white count-up" data-count="<?= $stat['count'] ?>">0</div>
-                            <div class="text-gray-300 mt-1 sm:mt-2 font-medium text-sm sm:text-base"><?= $stat['label'] ?></div>
-                        </div>
+                            <div class="group relative overflow-hidden rounded-2xl">
+                                <div class="absolute inset-0 bg-gradient-to-br from-red-500/20 to-orange-500/10 
+                                            opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                <div class="relative p-6 text-center">
+                                    <div class="mb-4 mx-auto w-12 h-12 flex items-center justify-center 
+                                                bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-xl">
+                                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="<?= $stat['icon'] ?>"/>
+                                        </svg>
+                                    </div>
+                                    <div class="text-3xl lg:text-4xl font-bold text-white mb-2 
+                                                bg-gradient-to-r from-white to-gray-300 text-transparent bg-clip-text 
+                                                count-up" data-count="<?= $stat['count'] ?>">0</div>
+                                    <div class="text-sm text-gray-400 font-medium"><?= $stat['label'] ?></div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div class="p-2 rounded-full bg-white/10 backdrop-blur-sm">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
             </svg>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Features Section with 3D Cards -->
     <section id="features" class="relative overflow-hidden section-spacing backdrop-blur-sm bg-gradient-to-b from-slate-900/90 to-black/90 dark:from-gray-900/90 dark:to-black/90">
