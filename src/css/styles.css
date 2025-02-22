@@ -3,7 +3,7 @@
 /* Custom base styles */
 @layer base {
   body {
-    @apply font-sans text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-900 transition-colors duration-300;
+    @apply font-sans text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-900 transition-all duration-300;
   }
 
   h1,
@@ -12,64 +12,108 @@
   h4,
   h5,
   h6 {
-    @apply font-bold text-gray-900 dark:text-white;
+    @apply font-bold text-gray-900 dark:text-white tracking-tight;
   }
 
   h1 {
-    @apply text-5xl lg:text-7xl;
+    @apply text-5xl lg:text-7xl leading-tight;
   }
 
   h2 {
-    @apply text-4xl;
+    @apply text-4xl lg:text-5xl leading-tight;
   }
 
   h3 {
-    @apply text-3xl;
+    @apply text-3xl lg:text-4xl;
   }
 
   a {
-    @apply text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600 transition-colors;
+    @apply text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 
+           transition-all duration-300 relative;
+  }
+
+  /* Enhanced link hover effect */
+  a.nav-link {
+    @apply relative overflow-hidden;
+  }
+
+  a.nav-link::after {
+    @apply content-[''] absolute bottom-0 left-0 w-0 h-0.5 bg-red-500 
+           transition-all duration-300 ease-in-out;
+  }
+
+  a.nav-link:hover::after {
+    @apply w-full;
   }
 }
 
 /* Custom components */
 @layer components {
   .btn-primary {
-    @apply px-8 py-4 bg-red-600 text-white rounded-lg font-semibold 
-               hover:bg-red-700 transition-all duration-300 transform hover:scale-105 
-               shadow-lg shadow-red-600/30;
+    @apply px-8 py-4 bg-red-600 text-white rounded-xl font-semibold 
+           hover:bg-red-700 active:bg-red-800
+           transition-all duration-300 transform hover:scale-[1.02] 
+           shadow-lg shadow-red-600/30 dark:shadow-red-900/30
+           focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
+           dark:focus:ring-offset-gray-900;
   }
 
   .btn-secondary {
-    @apply px-8 py-4 border border-gray-300 text-gray-800 dark:border-gray-600 dark:text-white 
-               rounded-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300;
+    @apply px-8 py-4 border-2 border-gray-300 text-gray-800 dark:border-gray-600 dark:text-white 
+           rounded-xl font-semibold hover:bg-gray-100 dark:hover:bg-gray-700/50
+           transition-all duration-300 backdrop-blur-sm
+           focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
+           dark:focus:ring-offset-gray-900;
   }
 
   .card {
-    @apply backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 rounded-2xl p-8 border border-gray-200 
-               dark:border-gray-700 shadow-lg transition-colors duration-300;
+    @apply backdrop-blur-xl bg-white/90 dark:bg-gray-800/90 rounded-2xl p-8 
+           border border-gray-200/50 dark:border-gray-700/50
+           shadow-xl shadow-gray-200/50 dark:shadow-black/20
+           transition-all duration-500 hover:shadow-2xl;
   }
 
   .feature-card {
-    @apply p-8 bg-white dark:bg-gray-800 rounded-2xl hover:bg-gray-100 dark:hover:bg-gray-700/50 
-               transition-all duration-300 transform hover:-translate-y-2 shadow-md;
+    @apply p-8 bg-white dark:bg-gray-800 rounded-2xl 
+           hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100
+           dark:hover:from-gray-800 dark:hover:to-gray-700
+           transition-all duration-500 transform hover:-translate-y-1
+           shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-700;
   }
 
   .stat-card {
-    @apply text-center p-4 bg-white/50 dark:bg-gray-700/50 rounded-xl border border-gray-200 
-               dark:border-gray-600 shadow-sm transition-colors duration-300;
+    @apply text-center p-6 bg-white/80 dark:bg-gray-800/80 rounded-2xl
+           border border-gray-200/50 dark:border-gray-700/50
+           shadow-lg backdrop-blur-lg
+           transition-all duration-300 hover:transform hover:scale-[1.02];
+  }
+
+  /* New glass-morphism card */
+  .glass-card {
+    @apply relative backdrop-blur-xl bg-white/10 dark:bg-gray-800/10
+           rounded-2xl p-8 border border-white/20 dark:border-gray-700/20
+           shadow-xl transition-all duration-500
+           hover:bg-white/20 dark:hover:bg-gray-800/20;
+  }
+
+  /* Enhanced dark mode toggle */
+  .dark-mode-toggle {
+    @apply p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+           transition-colors duration-300 focus:outline-none
+           focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600;
   }
 }
 
 /* Custom utilities */
 @layer utilities {
   .text-gradient {
-    @apply bg-gradient-to-r from-red-600 to-orange-600 text-transparent bg-clip-text;
+    @apply bg-gradient-to-r from-red-600 via-orange-500 to-red-500 
+           dark:from-red-500 dark:via-orange-400 dark:to-red-400
+           text-transparent bg-clip-text bg-300% animate-gradient;
   }
 
   .animate-fade-in-up {
-    @apply opacity-0 transform translate-y-10;
-    animation: fadeInUp 0.8s ease-out forwards;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .animation-delay-300 {
@@ -81,27 +125,70 @@
   }
 
   .shadow-soft {
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    @apply shadow-[0_4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)];
   }
 
   .backdrop-blur-xl {
-    backdrop-filter: blur(20px);
+    @apply backdrop-blur-[20px];
   }
 }
 
-/* Custom animations */
+/* Enhanced animations */
 @keyframes fadeInUp {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(20px) scale(0.98);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes gradientBackground {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Enhanced gradients and backgrounds */
+.bg-gradient-hero {
+  @apply bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50
+         dark:from-gray-900 dark:via-gray-800 dark:to-gray-900
+         bg-300% animate-gradient;
+}
+
+.bg-gradient-cta {
+  @apply bg-gradient-to-br from-red-600 via-orange-500 to-red-500
+         dark:from-red-700 dark:via-orange-600 dark:to-red-600
+         bg-300% animate-gradient;
+}
+
+/* Particle effects */
+.particle-background {
+  @apply absolute inset-0 opacity-30 pointer-events-none;
+}
+
+/* New animations */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes gradient {
   0% {
     background-position: 0% 50%;
   }
@@ -113,32 +200,6 @@
   }
 }
 
-/* Custom gradients and backgrounds */
-.bg-gradient-hero {
-  background: linear-gradient(135deg, #f3f4f6, #e5e7eb, #f3f4f6);
-  background-size: 200% 200%;
-  animation: gradientBackground 10s ease infinite;
-}
-
-.dark .bg-gradient-hero {
-  background: linear-gradient(135deg, #1e293b, #0f172a, #1e293b);
-  background-size: 200% 200%;
-  animation: gradientBackground 10s ease infinite;
-}
-
-.bg-gradient-cta {
-  background: linear-gradient(135deg, #dc2626, #ea580c);
-  background-size: 200% 200%;
-  animation: gradientBackground 10s ease infinite;
-}
-
-/* Custom particle background */
-.particle-background {
-  @apply absolute inset-0 opacity-30;
-}
-
-/* Custom noise texture */
-.noise-texture {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  @apply absolute inset-0 opacity-10;
+.animate-gradient {
+  animation: gradient 15s ease infinite;
 }
