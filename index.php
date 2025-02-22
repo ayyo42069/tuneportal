@@ -127,7 +127,9 @@ $stats = $stats->fetch_assoc();
 
               
                           <!-- Right Column - Stats -->
-                          <div class="order-1 lg:order-2">
+                          
+                <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
+                            bg-black/20 border border-white/10 order-2 lg:order-1">
                     <div class="stats-grid-card rounded-2xl p-6 h-full">
                         <div class="grid grid-cols-2 gap-4">
                             <?php
