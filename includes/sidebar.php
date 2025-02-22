@@ -18,30 +18,35 @@ $profile_picture = isset($profile['profile_picture']) && !empty($profile['profil
     ? htmlspecialchars($profile['profile_picture']) 
     : 'default.png';
 ?>
-<aside id="sidebar" class="w-64 h-screen fixed top-0 left-0 lg:translate-x-0 -translate-x-full transition-transform duration-300 bg-white dark:bg-gray-800 text-gray-800 dark:text-white z-40 mt-16 flex flex-col shadow-lg">
-    <nav class="flex-grow overflow-y-auto">
+<aside id="sidebar" class="w-64 h-screen fixed top-0 left-0 lg:translate-x-0 -translate-x-full transition-transform duration-300 z-40 mt-16 flex flex-col">
+    <!-- Glassmorphism background -->
+    <div class="absolute inset-0 backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 border-r border-white/10 dark:border-gray-700/20 shadow-lg"></div>
+
+    <nav class="flex-grow overflow-y-auto relative">
         <div class="p-4 space-y-4">
             <!-- Profile Section -->
             <div class="relative">
-                <button id="profileDropdown" class="flex items-center space-x-3 w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <img src="uploads/profiles/<?= $profile_picture ?>" 
-                         alt="Profile" 
-                         class="w-10 h-10 rounded-full object-cover"
-                         onerror="this.src='uploads/profiles/default.png'">
-                    <span class="font-medium"><?= __('my_profile', 'sidebar') ?></span>
+                <button id="profileDropdown" class="glass-button flex items-center space-x-3 w-full p-3 rounded-xl hover:bg-white/20 dark:hover:bg-gray-700/20 transition-all duration-300">
+                    <div class="glass-icon-sm">
+                        <img src="uploads/profiles/<?= $profile_picture ?>" 
+                             alt="Profile" 
+                             class="w-10 h-10 rounded-full object-cover"
+                             onerror="this.src='uploads/profiles/default.png'">
+                    </div>
+                    <span class="font-medium text-gray-700 dark:text-gray-300"><?= __('my_profile', 'sidebar') ?></span>
                 </button>
-                <!-- Dropdown Menu -->
-                <div id="profileMenu" class="hidden absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
-                    <div class="py-1">
-                        <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
-                            <p class="font-bold"><?= htmlspecialchars($_SESSION['username']) ?></p>
+                <!-- Enhanced Dropdown Menu -->
+                <div id="profileMenu" class="hidden absolute left-0 mt-2 w-56 glass-dropdown rounded-xl">
+                    <div class="py-2">
+                        <div class="px-4 py-2">
+                            <p class="font-bold text-gradient"><?= htmlspecialchars($_SESSION['username']) ?></p>
                             <p class="text-xs text-gray-500 dark:text-gray-400"><?= ucfirst($_SESSION['role']) ?></p>
                         </div>
-                        <hr class="border-gray-200 dark:border-gray-600">
-                        <a href="settings.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <hr class="border-white/10 dark:border-gray-700/50">
+                        <a href="settings.php" class="glass-menu-item">
                             <?= __('settings', 'sidebar') ?>
                         </a>
-                        <a href="logout.php" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <a href="logout.php" class="glass-menu-item">
                             <?= __('logout', 'sidebar') ?>
                         </a>
                     </div>
@@ -50,38 +55,31 @@ $profile_picture = isset($profile['profile_picture']) && !empty($profile['profil
 
             <!-- Common User Links -->
             <div class="space-y-2">
-                <a href="dashboard.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'dashboard.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                    <span><?= __('dashboard', 'sidebar') ?></span>
-                </a>
-                <a href="files.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'files.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span><?= __('my_files', 'sidebar') ?></span>
-                </a>
-                <a href="credits.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'credits.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span><?= __('credits', 'sidebar') ?></span>
-                </a>
-                <a href="tools.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'tools.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span><?= __('tools', 'sidebar') ?></span>
-                </a>
+                <?php
+                $menu_items = [
+                    ['url' => 'dashboard.php', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 011-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'label' => 'dashboard'],
+                    ['url' => 'files.php', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'label' => 'my_files'],
+                    ['url' => 'credits.php', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'label' => 'credits'],
+                    ['url' => 'tools.php', 'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', 'label' => 'tools']
+                ];
+
+                foreach ($menu_items as $item): ?>
+                    <a href="<?= $item['url'] ?>" class="glass-nav-item <?= $current_page == $item['url'] ? 'active-nav-item' : '' ?>">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $item['icon'] ?>"/>
+                        </svg>
+                        <span><?= __($item['label'], 'sidebar') ?></span>
+                    </a>
+                <?php endforeach; ?>
             </div>
 
             <!-- Admin Section with improved styling -->
             <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p class="px-4 text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider"><?= __('admin_tools', 'sidebar') ?></p>
-                    <div class="mt-3 space-y-2">
+                <div class="pt-4 mt-4 border-t border-white/10 dark:border-gray-700/20">
+                    <p class="px-4 text-sm font-semibold text-gradient uppercase tracking-wider">
+                        <?= __('admin_tools', 'sidebar') ?>
+                    </p>
+                       <div class="mt-3 space-y-2">
                         <a href="admin_credits.php" class="flex items-center px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 <?php echo $current_page == 'admin_credits.php' ? 'bg-gray-100 dark:bg-gray-700 text-red-600 dark:text-red-400' : ''; ?>">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
