@@ -125,33 +125,31 @@ $stats = $stats->fetch_assoc();
                     </div>
                 </div>
 
-                <!-- Right Column - Stats -->
-                <div class="order-1 lg:order-2">
-                    <div class="glass-card rounded-3xl p-8 backdrop-blur-xl bg-white/5 border border-white/10 
-                                transform hover:scale-[1.02] transition-all duration-500">
-                        <div class="grid grid-cols-2 gap-6">
-                        <?php
-                        $statsData = [
-                            ['count' => $stats['tuned_files'], 'label' => 'Tuned Vehicles', 'icon' => 'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'],
-                            ['count' => $stats['active_tuners'], 'label' => 'Expert Tuners', 'icon' => 'M12 4.354a4 4 0 1 1 0 5.292V14M12 21v-7'],
-                            ['count' => $stats['total_tunes'], 'label' => 'Total Tunes', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z'],
-                            ['count' => $stats['unique_models'], 'label' => 'Car Models', 'icon' => 'M9 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM19 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4z']
-                        ];
+              
+                          <!-- Right Column - Stats -->
+                          <div class="order-1 lg:order-2">
+                    <div class="stats-grid-card rounded-2xl p-6 h-full">
+                        <div class="grid grid-cols-2 gap-4">
+                            <?php
+                            $statsData = [
+                                ['count' => $stats['tuned_files'], 'label' => 'Tuned Vehicles', 'icon' => 'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'],
+                                ['count' => $stats['active_tuners'], 'label' => 'Expert Tuners', 'icon' => 'M12 4.354a4 4 0 1 1 0 5.292V14M12 21v-7'],
+                                ['count' => $stats['total_tunes'], 'label' => 'Total Tunes', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z'],
+                                ['count' => $stats['unique_models'], 'label' => 'Car Models', 'icon' => 'M9 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM19 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4z']
+                            ];
 
-                        foreach ($statsData as $stat): ?>
-                                <div class="group relative overflow-hidden rounded-2xl">
-                                    <div class="absolute inset-0 bg-gradient-to-br from-red-500/20 to-orange-500/10 
-                                                opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                                    <div class="relative p-6 text-center">
-                                        <div class="mb-4 mx-auto w-12 h-12 flex items-center justify-center 
-                                                    bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-xl">
-                                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            foreach ($statsData as $stat): ?>
+                                <div class="group stat-item p-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="stat-icon">
+                                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $stat['icon'] ?>"/>
                                             </svg>
                                         </div>
-                                        <div class="text-3xl lg:text-4xl font-bold text-white mb-2 count-up" 
-                                             data-count="<?= $stat['count'] ?>">0</div>
-                                        <div class="text-sm text-gray-400 font-medium"><?= $stat['label'] ?></div>
+                                        <div>
+                                            <div class="stat-number count-up" data-count="<?= $stat['count'] ?>">0</div>
+                                            <div class="text-sm text-gray-400"><?= $stat['label'] ?></div>
+                                        </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>

@@ -503,3 +503,35 @@
          hover:bg-gray-400/50 dark:hover:bg-gray-500/50 
          transition-colors duration-300;
 }
+
+/* Add these new styles for stats card */
+.stats-grid-card {
+  @apply backdrop-blur-xl bg-black/20 
+         border border-white/10 
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+         transition-all duration-500;
+}
+
+.stat-item {
+  @apply relative overflow-hidden rounded-xl
+         backdrop-blur-md bg-white/5
+         border border-white/10
+         transition-all duration-300
+         hover:bg-white/10;
+}
+
+.stat-icon {
+  @apply relative z-10 w-10 h-10
+         flex items-center justify-center
+         bg-gradient-to-br from-red-500/20 to-orange-500/20
+         rounded-lg transition-all duration-300
+         group-hover:scale-110;
+}
+
+.stat-number {
+  @apply text-2xl lg:text-3xl font-bold
+         bg-gradient-to-r from-white to-gray-300
+         text-transparent bg-clip-text
+         transition-all duration-300
+         group-hover:scale-105;
+}
