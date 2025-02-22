@@ -82,78 +82,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php include 'header.php'; ?>
 
-<div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <div class="text-center">
-            <h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">Create your account</h2>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Join our community of tuning enthusiasts
-            </p>
-        </div>
-
-        <?php if (isset($error)): ?>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline"><?= htmlspecialchars($error) ?></span>
+<!-- Replace the main container div -->
+<div class="min-h-screen flex items-center justify-center bg-gradient-hero py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full">
+        <div class="glass-card animate-fade-in-up">
+            <div class="text-center">
+                <h2 class="text-3xl font-extrabold text-gradient mb-2">Create your account</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Join our community of tuning enthusiasts
+                </p>
             </div>
-        <?php endif; ?>
 
-        <form class="mt-8 space-y-6" method="POST">
-            <?php echo csrf_input_field(); ?>
-            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
-            
-            <div class="rounded-md shadow-sm space-y-4">
-                <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
-                    <input type="text" id="username" name="username" required 
-                           class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm dark:bg-gray-700"
-                           onkeyup="checkUsername(this.value)">
-                    <span id="username-availability" class="text-sm"></span>
+            <?php if (isset($error)): ?>
+                <div class="mt-4 glass-feature p-4 text-red-500 rounded-xl" role="alert">
+                    <span class="block sm:inline"><?= htmlspecialchars($error) ?></span>
                 </div>
+            <?php endif; ?>
 
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                    <input type="email" id="email" name="email" required 
-                           class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm dark:bg-gray-700">
-                </div>
+            <form class="mt-8 space-y-6" method="POST">
+                <?php echo csrf_input_field(); ?>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+                        <input type="text" id="username" name="username" required 
+                               class="glass-input"
+                               onkeyup="checkUsername(this.value)">
+                        <span id="username-availability" class="text-sm"></span>
+                    </div>
 
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                    <input type="password" id="password" name="password" required 
-                           class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm dark:bg-gray-700"
-                           onkeyup="checkPasswordStrength(this.value)">
-                    <div id="password-strength" class="mt-2">
-                        <div class="h-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                            <div id="strength-bar" class="h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                        <input type="email" id="email" name="email" required 
+                               class="glass-input">
+                    </div>
+
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+                        <input type="password" id="password" name="password" required 
+                               class="glass-input"
+                               onkeyup="checkPasswordStrength(this.value)">
+                        <div id="password-strength" class="mt-2">
+                            <div class="h-2 rounded-full bg-gray-200/20 dark:bg-gray-700/20">
+                                <div id="strength-bar" class="h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <p id="strength-text" class="text-sm mt-1 text-gray-600 dark:text-gray-400"></p>
                         </div>
-                        <p id="strength-text" class="text-sm mt-1 text-gray-600 dark:text-gray-400"></p>
+                    </div>
+
+                    <div>
+                        <label for="password_confirm" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+                        <input type="password" id="password_confirm" name="password_confirm" required 
+                               class="glass-input">
                     </div>
                 </div>
 
-                <div>
-                    <label for="password_confirm" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
-                    <input type="password" id="password_confirm" name="password_confirm" required 
-                           class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm dark:bg-gray-700">
+                <div class="flex items-center">
+                    <input type="checkbox" id="terms" name="terms" required
+                           class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                    <label for="terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        I agree to the <a href="terms.php" class="text-red-500 hover:text-red-600">Terms and Conditions</a>
+                    </label>
                 </div>
-            </div>
 
-            <div class="flex items-center">
-                <input type="checkbox" id="terms" name="terms" required
-                       class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-                <label for="terms" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                    I agree to the <a href="terms.php" class="text-red-600 hover:text-red-500">Terms and Conditions</a>
-                </label>
-            </div>
+                <button type="submit" class="glass-button-primary w-full py-2 px-4 rounded-xl">
+                    Create Account
+                </button>
+            </form>
 
-            <button type="submit" 
-                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                Create Account
-            </button>
-        </form>
-
-        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account? 
-            <a href="login.php" class="font-medium text-red-600 hover:text-red-500">Sign in</a>
-        </p>
+            <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+                Already have an account? 
+                <a href="login.php" class="font-medium text-red-500 hover:text-red-600">Sign in</a>
+            </p>
+        </div>
     </div>
 </div>
 
