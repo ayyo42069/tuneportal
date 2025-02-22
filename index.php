@@ -44,7 +44,7 @@ $stats = $stats->fetch_assoc();
 }
 ?>
 <?php include 'header.php'; ?>
-<main class="flex-grow">
+<main class="flex-grow pt-0">
    
     <!-- Hero Section -->
     <section class="relative min-h-screen pt-16 flex items-center justify-center">

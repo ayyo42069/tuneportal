@@ -19,7 +19,7 @@
 </script>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-<header class="fixed w-full top-0 z-50 transition-all duration-300">
+    <header class="fixed w-full top-0 z-50 transition-all duration-300">
     <!-- Glassmorphism background -->
     <div class="absolute inset-0 backdrop-blur-lg bg-white/70 dark:bg-gray-900/70 border-b border-white/10 dark:border-gray-800/50"></div>
     
@@ -112,7 +112,7 @@
         </div>
     </div>
 </header>
-
+<div class="h-20"></div>
 <script>
     function toggleDarkMode() {
         // Check current preference
