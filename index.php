@@ -1,6 +1,5 @@
 <?php
 include 'config.php'; // Database connection
-include 'header.php'; // Header inclusion
 
 // Fetch statistics
 try {
@@ -44,7 +43,7 @@ $stats = $stats->fetch_assoc();
     error_log("Database error: " . $e->getMessage());
 }
 ?>
-
+<?php include 'header.php'; ?>
 <main class="flex-grow">
     <div id="particles-js" class="fixed inset-0 pointer-events-none"></div>
     <!-- Hero Section -->
