@@ -128,24 +128,40 @@ $stats = $stats->fetch_assoc();
               
                           <!-- Right Column - Stats -->
                           
-                <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
+                          <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
                             bg-black/20 border border-white/10 order-2 lg:order-1">
                     <div class="stats-grid-card rounded-2xl p-6 h-full">
                         <div class="grid grid-cols-2 gap-4">
                             <?php
                             $statsData = [
-                                ['count' => $stats['tuned_files'], 'label' => 'Tuned Vehicles', 'icon' => 'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'],
-                                ['count' => $stats['active_tuners'], 'label' => 'Expert Tuners', 'icon' => 'M12 4.354a4 4 0 1 1 0 5.292V14M12 21v-7'],
-                                ['count' => $stats['total_tunes'], 'label' => 'Total Tunes', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z'],
-                                ['count' => $stats['unique_models'], 'label' => 'Car Models', 'icon' => 'M9 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM19 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4z']
+                                [
+                                    'count' => $stats['tuned_files'], 
+                                    'label' => 'Tuned Vehicles', 
+                                    'icon' => 'M8.5 3.5l4.5 11h2l4.5-11M4 20h3.6l1.2-3h6.4l1.2 3H20M6 16l2-3m8 3l2-3M3 20h18M6.2 20h11.6M11 3.5h2M9.5 3.5C9.5 2.7 10.1 2 11 2h2c.9 0 1.5.7 1.5 1.5'
+                                ],
+                                [
+                                    'count' => $stats['active_tuners'], 
+                                    'label' => 'Expert Tuners', 
+                                    'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
+                                ],
+                                [
+                                    'count' => $stats['total_tunes'], 
+                                    'label' => 'Total Tunes', 
+                                    'icon' => 'M13 10V3L4 14h7v7l9-11h-7m2-4l2 2m-2-2l-2 2m8 8l-2-2m2 2l2-2M3 21l2-2m-2 2l-2-2'
+                                ],
+                                [
+                                    'count' => $stats['unique_models'], 
+                                    'label' => 'Car Models', 
+                                    'icon' => 'M17 16v2a2 2 0 01-2 2H9a2 2 0 01-2-2v-2m2-4h6m-6 0a2 2 0 00-2 2v2m0-4a2 2 0 012-2h6a2 2 0 012 2v2m0-4V8a2 2 0 00-2-2H9a2 2 0 00-2 2v2m12 0a2 2 0 00-2-2H9a2 2 0 00-2 2'
+                                ]
                             ];
 
                             foreach ($statsData as $stat): ?>
                                 <div class="group stat-item p-4">
                                     <div class="flex items-center space-x-4">
                                         <div class="stat-icon">
-                                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $stat['icon'] ?>"/>
+                                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="<?= $stat['icon'] ?>"/>
                                             </svg>
                                         </div>
                                         <div>
