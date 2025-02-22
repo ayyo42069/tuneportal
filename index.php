@@ -138,8 +138,8 @@ $stats = $stats->fetch_assoc();
     </section>
 
     <!-- Features Section with 3D Cards -->
-    <section id="features" class="py-32 mt-20 bg-gradient-to-b from-slate-900/90 to-black/90 dark:from-gray-900/90 dark:to-black/90 relative overflow-hidden backdrop-blur-sm">
-    <div class="absolute inset-0 bg-[url('/src/images/grid-pattern.svg')] opacity-5"></div>
+    <section id="features" class="relative overflow-hidden section-spacing backdrop-blur-sm bg-gradient-to-b from-slate-900/90 to-black/90 dark:from-gray-900/90 dark:to-black/90">
+        <div class="absolute inset-0 bg-[url('/src/images/grid-pattern.svg')] opacity-5"></div>
     <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
                 <h2 class="text-5xl font-bold text-white mb-6">Why Choose TunePortal?</h2>
@@ -187,8 +187,7 @@ $stats = $stats->fetch_assoc();
     </section>
 
     <!-- Latest Tunes Section with Animated Cards -->
-    <section id="latest-tunes" class="py-32 mt-20 bg-black dark:bg-gray-900 relative overflow-hidden">
-
+    <section id="latest-tunes" class="relative overflow-hidden section-spacing bg-black dark:bg-gray-900">
     <div class="absolute inset-0 bg-[url('/src/images/texture.jpg')] opacity-5"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
@@ -228,8 +227,7 @@ $stats = $stats->fetch_assoc();
     </section>
 
     <!-- Enhanced CTA Section (continuing) -->
-    <section class="relative py-32 mt-20 bg-gradient-to-br from-red-600 to-orange-600 dark:from-red-700 dark:to-orange-700 overflow-hidden">
-        <div class="container mx-auto px-4 relative z-10">
+    <section class="relative overflow-hidden section-spacing bg-gradient-to-br from-red-600 to-orange-600 dark:from-red-700 dark:to-orange-700">        <div class="container mx-auto px-4 relative z-10">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-5xl md:text-6xl font-bold text-white mb-8">Ready to Transform Your Vehicle?</h2>
                 <p class="text-xl text-white/80 mb-12 max-w-2xl mx-auto">

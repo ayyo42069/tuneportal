@@ -279,3 +279,29 @@
   );
   animation: glassShine 8s infinite;
 }
+
+/* Section spacing and transitions */
+.section-spacing {
+  @apply py-24 lg:py-32;
+  position: relative;
+}
+
+.section-spacing::before {
+  content: "";
+  @apply absolute left-0 right-0 h-24 -top-24 bg-gradient-to-b;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1));
+  pointer-events: none;
+}
+
+.section-spacing::after {
+  content: "";
+  @apply absolute left-0 right-0 h-24 -bottom-24 bg-gradient-to-t;
+  background: linear-gradient(to top, transparent, rgba(0, 0, 0, 0.1));
+  pointer-events: none;
+}
+
+/* Dark mode adjustments */
+.dark .section-spacing::before,
+.dark .section-spacing::after {
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.2));
+}
