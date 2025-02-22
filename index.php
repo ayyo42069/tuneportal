@@ -104,7 +104,15 @@ $stats = $stats->fetch_assoc();
         <div class="glass-card stats-card rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 
              border border-white/10 transform hover:scale-105 transition-all duration-500 order-1 lg:order-2">
             <div class="grid grid-cols-2 gap-3 sm:gap-6 lg:gap-8">
-                <?php foreach ($statsData as $stat): ?>
+            <?php
+                        $statsData = [
+                            ['count' => $stats['tuned_files'], 'label' => 'Tuned Vehicles', 'icon' => 'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'],
+                            ['count' => $stats['active_tuners'], 'label' => 'Expert Tuners', 'icon' => 'M12 4.354a4 4 0 1 1 0 5.292V14M12 21v-7'],
+                            ['count' => $stats['total_tunes'], 'label' => 'Total Tunes', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z'],
+                            ['count' => $stats['unique_models'], 'label' => 'Car Models', 'icon' => 'M9 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM19 17a2 2 0 1 1 0-4 2 2 0 0 1 0 4z']
+                        ];
+
+                        foreach ($statsData as $stat): ?>
                     <div class="relative group">
                         <div class="absolute inset-0 bg-red-600/20 rounded-xl transform group-hover:scale-105 transition-transform duration-300"></div>
                         <div class="relative p-3 sm:p-4 lg:p-6 text-center">
