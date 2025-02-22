@@ -363,3 +363,35 @@
 .nav-link:hover::after {
   @apply w-full;
 }
+/* Footer specific styles */
+.glass-social-button {
+  @apply w-10 h-10 flex items-center justify-center
+         backdrop-blur-sm bg-white/10 dark:bg-gray-800/10
+         border border-white/20 dark:border-gray-700/20
+         rounded-xl text-gray-600 dark:text-gray-400
+         hover:bg-red-500/10 hover:text-red-500
+         dark:hover:bg-red-500/10 dark:hover:text-red-500
+         transition-all duration-300 transform hover:scale-110;
+}
+
+.glass-icon-sm {
+  @apply w-8 h-8 flex items-center justify-center
+         backdrop-blur-sm bg-white/10 dark:bg-gray-800/10
+         border border-white/20 dark:border-gray-700/20
+         rounded-lg text-red-500
+         group-hover:bg-red-500/10
+         transition-all duration-300;
+}
+
+.glass-dot {
+  @apply w-2 h-2 mr-2 rounded-full
+         bg-red-500/50 
+         group-hover:bg-red-500
+         transition-all duration-300;
+}
+
+.footer-link {
+  @apply text-gray-600 dark:text-gray-300
+         hover:text-red-500 dark:hover:text-red-500
+         transition-all duration-300;
+}
