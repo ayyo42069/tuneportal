@@ -138,7 +138,7 @@ try {
 
     <!-- Features Section with 3D Cards -->
     <section id="features" class="py-32 bg-gradient-to-b from-slate-900 to-black relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('/assets/images/grid-pattern.svg')] opacity-5"></div>
+        <div class="absolute inset-0 bg-[url('/src/images/grid-pattern.svg')] opacity-5"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
                 <h2 class="text-5xl font-bold text-white mb-6">Why Choose TunePortal?</h2>
@@ -187,7 +187,7 @@ try {
 
     <!-- Latest Tunes Section with Animated Cards -->
     <section id="latest-tunes" class="py-32 bg-black relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('/assets/images/circuit-pattern.png')] opacity-5"></div>
+        <div class="absolute inset-0 bg-[url('/src/images/texture.jpg')] opacity-5"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
                 <h2 class="text-5xl font-bold text-white mb-6">Latest Successful Tunes</h2>
