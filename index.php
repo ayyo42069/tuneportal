@@ -59,7 +59,8 @@ $stats = $stats->fetch_assoc();
         </div>
 
         <!-- Hero Content Container -->
-        <div class="relative z-20 container mx-auto px-4 h-[calc(100vh-4rem)] flex items-center">
+              <!-- Hero Content Container -->
+              <div class="relative z-20 container mx-auto px-4 min-h-[calc(100vh-4rem)] flex items-center justify-center my-auto">
             <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full">
                 <!-- Left Column - Content -->
                 <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
