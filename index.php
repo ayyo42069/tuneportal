@@ -59,12 +59,12 @@ $stats = $stats->fetch_assoc();
 
         <!-- Hero Content -->
         <div class="relative z-20 container mx-auto px-4 h-screen flex items-center">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <!-- Left Column -->
-                <div class="text-white space-y-8">
-                    <div class="inline-block px-4 py-2 bg-red-600/20 rounded-full mb-4">
-                        <span class="text-red-400 font-semibold">Professional ECU Tuning Solutions</span>
-                    </div>
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Left Column -->
+        <div class="glass-hero p-8 rounded-3xl text-white space-y-8">
+            <div class="inline-block px-4 py-2 bg-red-600/20 backdrop-blur-sm rounded-full mb-4">
+                <span class="text-red-400 font-semibold">Professional ECU Tuning Solutions</span>
+            </div>
                     <h1 class="text-5xl lg:text-7xl font-bold leading-tight animate-fade-in-up">
                         Unleash Your
                         <span class="relative">
@@ -101,8 +101,8 @@ $stats = $stats->fetch_assoc();
                 </div>
 
                 <!-- Right Column - Animated Stats Card -->
-                <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-8 border border-white/10 shadow-2xl
-                            transform hover:scale-105 transition-all duration-500">
+                <div class="glass-card stats-card rounded-3xl p-8 border border-white/10
+                transform hover:scale-105 transition-all duration-500">
                     <div class="grid grid-cols-2 gap-8">
                         <?php
                         $statsData = [
@@ -138,16 +138,16 @@ $stats = $stats->fetch_assoc();
     </section>
 
     <!-- Features Section with 3D Cards -->
-    <section id="features" class="py-32 mt-20 bg-gradient-to-b from-slate-900 to-black dark:from-gray-900 dark:to-black relative overflow-hidden">
+    <section id="features" class="py-32 mt-20 bg-gradient-to-b from-slate-900/90 to-black/90 dark:from-gray-900/90 dark:to-black/90 relative overflow-hidden backdrop-blur-sm">
     <div class="absolute inset-0 bg-[url('/src/images/grid-pattern.svg')] opacity-5"></div>
-        <div class="container mx-auto px-4 relative z-10">
+    <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
                 <h2 class="text-5xl font-bold text-white mb-6">Why Choose TunePortal?</h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-red-500 to-orange-500 mx-auto rounded-full"></div>
             </div>
             
             <div class="grid md:grid-cols-3 gap-12">
-                <?php
+                <?php 
                 $features = [
                     [
                         'title' => 'Advanced ECU Tuning',
@@ -169,8 +169,8 @@ $stats = $stats->fetch_assoc();
                 foreach ($features as $feature): ?>
                     <div class="group perspective">
                         <div class="relative transform transition-all duration-500 group-hover:rotate-y-12">
-                            <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl transform -rotate-y-12 group-hover:rotate-y-0 transition-all duration-500 opacity-0 group-hover:opacity-100"></div>
-                            <div class="relative bg-slate-800 rounded-2xl p-8 transform group-hover:rotate-y-12 transition-all duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-r from-red-500/30 to-orange-500/30 rounded-2xl transform -rotate-y-12 group-hover:rotate-y-0 transition-all duration-500 opacity-0 group-hover:opacity-100 backdrop-blur-lg"></div>
+                            <div class="glass-feature relative rounded-2xl p-8 transform group-hover:rotate-y-12 transition-all duration-500">
                                 <div class="w-16 h-16 bg-red-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-red-600/20 transition-colors">
                                     <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?= $feature['icon'] ?>"/>
@@ -262,23 +262,69 @@ $stats = $stats->fetch_assoc();
 
 <!-- Particle.js and Count-Up Scripts -->
 <script>
-    particlesJS("particles-js", {
-        particles: {
-            number: { value: 80, density: { enable: true, value_area: 800 } },
-            color: { value: "#ffffff" },
-            shape: { type: "circle" },
-            opacity: { value: 0.5, random: false },
-            size: { value: 3, random: true },
-            line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
-            move: { enable: true, speed: 6, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+particlesJS("particles-js", {
+    particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: { 
+            value: 0.3,
+            random: true,
+            animation: {
+                enable: true,
+                speed: 1,
+                opacity_min: 0.1,
+                sync: false
+            }
         },
-        interactivity: {
-            detect_on: "canvas",
-            events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
-            modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+        size: { 
+            value: 3,
+            random: true,
+            animation: {
+                enable: true,
+                speed: 2,
+                size_min: 0.1,
+                sync: false
+            }
         },
-        retina_detect: true
-    });
+        line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ffffff",
+            opacity: 0.2,
+            width: 1
+        },
+        move: {
+            enable: true,
+            speed: 1,
+            direction: "none",
+            random: true,
+            straight: false,
+            out_mode: "out",
+            bounce: false,
+            attract: { enable: true, rotateX: 600, rotateY: 1200 }
+        }
+    },
+    interactivity: {
+        detect_on: "canvas",
+        events: {
+            onhover: { enable: true, mode: "bubble" },
+            onclick: { enable: true, mode: "push" },
+            resize: true
+        },
+        modes: {
+            bubble: {
+                distance: 200,
+                size: 4,
+                duration: 2,
+                opacity: 0.4,
+                speed: 3
+            },
+            push: { particles_nb: 4 }
+        }
+    },
+    retina_detect: true
+});
 
     // Enhanced count-up animation with easing
     const countUpElements = document.querySelectorAll('.count-up');

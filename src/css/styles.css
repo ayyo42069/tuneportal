@@ -208,3 +208,74 @@
 .animate-gradient {
   animation: gradient 15s ease infinite;
 }
+/* Add these new glass effect classes */
+.glass-hero {
+  @apply backdrop-blur-xl bg-black/20 
+         border border-white/10 
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+         transition-all duration-500;
+}
+
+.glass-card {
+  @apply backdrop-blur-2xl bg-white/5
+         border border-white/10
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+         transition-all duration-500;
+}
+
+.glass-feature {
+  @apply backdrop-blur-xl bg-slate-800/50
+         border border-white/5
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+         transition-all duration-500;
+}
+
+.stats-card {
+  backdrop-filter: blur(20px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.01)
+  );
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+}
+
+/* Update the particle background */
+.particle-background {
+  @apply absolute inset-0 opacity-40 pointer-events-none;
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
+}
+
+/* Enhanced animations for glass effects */
+@keyframes glassShine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.glass-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: glassShine 8s infinite;
+}
