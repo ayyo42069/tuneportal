@@ -49,7 +49,7 @@ $stats = $stats->fetch_assoc();
     <!-- Hero Section -->
     <section class="relative min-h-screen pt-16 flex items-center justify-center">
         <!-- Particles Background -->
-        <div id="particles-js" class="absolute inset-0 pointer-events-none"></div>
+       
         
         <!-- Video Background -->
         <div class="absolute inset-0">
@@ -311,69 +311,7 @@ $stats = $stats->fetch_assoc();
 
 <!-- Particle.js and Count-Up Scripts -->
 <script>
-particlesJS("particles-js", {
-    particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: "#ffffff" },
-        shape: { type: "circle" },
-        opacity: { 
-            value: 0.3,
-            random: true,
-            animation: {
-                enable: true,
-                speed: 1,
-                opacity_min: 0.1,
-                sync: false
-            }
-        },
-        size: { 
-            value: 3,
-            random: true,
-            animation: {
-                enable: true,
-                speed: 2,
-                size_min: 0.1,
-                sync: false
-            }
-        },
-        line_linked: {
-            enable: true,
-            distance: 150,
-            color: "#ffffff",
-            opacity: 0.2,
-            width: 1
-        },
-        move: {
-            enable: true,
-            speed: 1,
-            direction: "none",
-            random: true,
-            straight: false,
-            out_mode: "out",
-            bounce: false,
-            attract: { enable: true, rotateX: 600, rotateY: 1200 }
-        }
-    },
-    interactivity: {
-        detect_on: "canvas",
-        events: {
-            onhover: { enable: true, mode: "bubble" },
-            onclick: { enable: true, mode: "push" },
-            resize: true
-        },
-        modes: {
-            bubble: {
-                distance: 200,
-                size: 4,
-                duration: 2,
-                opacity: 0.4,
-                speed: 3
-            },
-            push: { particles_nb: 4 }
-        }
-    },
-    retina_detect: true
-});
+
 
     // Enhanced count-up animation with easing
     const countUpElements = document.querySelectorAll('.count-up');
