@@ -47,140 +47,245 @@ $stats = $stats->fetch_assoc();
 <main class="flex-grow pt-0">
    
     <!-- Hero Section -->
-    <section class="relative min-h-screen pt-16 flex items-center justify-center">
-        <!-- Video Background -->
-        <div class="absolute inset-0">
-            <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/70 z-10"></div>
-            <video class="w-full h-full object-cover" autoplay muted loop playsinline>
-                <source src="/src/videos/car-tuning.mp4" type="video/mp4">
-            </video>
-        </div>
+    <!-- Hero Section with Automotive SVG Elements -->
+<section class="relative min-h-screen pt-16 flex items-center justify-center">
+    <!-- Video Background with Enhanced Overlay -->
+    <div class="absolute inset-0">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/85 to-black/80 z-10"></div>
+        <video class="w-full h-full object-cover" autoplay muted loop playsinline>
+            <source src="/src/videos/car-tuning.mp4" type="video/mp4">
+        </video>
+    </div>
 
-        <!-- Hero Content Container -->
-        <div class="relative z-20 container mx-auto px-4">
-            <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full">
-                <!-- Left Column - Content -->
-                <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
-                            bg-black/20 border border-white/10 order-2 lg:order-1">
-                    <div class="inline-flex items-center space-x-2 px-4 py-2 bg-red-600/20 backdrop-blur-sm rounded-full">
-                        <span class="animate-pulse w-2 h-2 bg-red-500 rounded-full"></span>
-                        <span class="text-red-400 font-semibold">Professional ECU Tuning Solutions</span>
-                    </div>
+    <!-- Custom SVG Background Elements -->
+    <div class="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+        <!-- ECU Circuit Board Pattern -->
+        <svg class="absolute right-0 top-20 w-96 h-96 text-red-500/10" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M10,10 h180 v180 h-180 z" fill-opacity="0.1" stroke="currentColor" stroke-width="0.5"/>
+            <path fill="none" stroke="currentColor" stroke-width="0.5" d="M40,40 h120 v120 h-120 z"/>
+            <path fill="none" stroke="currentColor" stroke-width="0.5" d="M70,70 h60 v60 h-60 z"/>
+            <!-- Circuit traces -->
+            <path fill="none" stroke="currentColor" stroke-width="0.5" d="M10,50 h30 M190,50 h-30 M10,150 h30 M190,150 h-30"/>
+            <path fill="none" stroke="currentColor" stroke-width="0.5" d="M50,10 v30 M50,190 v-30 M150,10 v30 M150,190 v-30"/>
+            <!-- IC chip representations -->
+            <rect x="85" y="30" width="30" height="10" fill="currentColor" fill-opacity="0.3"/>
+            <rect x="85" y="160" width="30" height="10" fill="currentColor" fill-opacity="0.3"/>
+            <rect x="30" y="85" width="10" height="30" fill="currentColor" fill-opacity="0.3"/>
+            <rect x="160" y="85" width="10" height="30" fill="currentColor" fill-opacity="0.3"/>
+            <!-- Center processor -->
+            <rect x="85" y="85" width="30" height="30" fill="currentColor" fill-opacity="0.4"/>
+            <!-- Connection pins -->
+            <path fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2,2" 
+                  d="M85,100 h-25 M115,100 h25 M100,85 v-25 M100,115 v25"/>
+        </svg>
+        
+        <!-- Turbo SVG Element -->
+        <svg class="absolute left-0 bottom-20 w-80 h-80 text-orange-500/10" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Turbo housing -->
+            <circle cx="100" cy="100" r="50" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="0.5"/>
+            <!-- Turbine blades -->
+            <path fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="0.5" 
+                  d="M100,100 L135,70 A50,50 0 0,1 130,130 Z"/>
+            <path fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="0.5" 
+                  d="M100,100 L130,130 A50,50 0 0,1 70,135 Z"/>
+            <path fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="0.5" 
+                  d="M100,100 L70,135 A50,50 0 0,1 65,70 Z"/>
+            <path fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="0.5" 
+                  d="M100,100 L65,70 A50,50 0 0,1 135,65 Z"/>
+            <!-- Center hub -->
+            <circle cx="100" cy="100" r="15" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="0.5"/>
+            <!-- Intake and exhaust ports -->
+            <path fill="none" stroke="currentColor" stroke-width="1" d="M160,70 h30"/>
+            <path fill="none" stroke="currentColor" stroke-width="1" d="M10,130 h30"/>
+            <path fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3,3" d="M160,70 C190,70 190,130 160,130"/>
+        </svg>
+    </div>
 
-                    <div class="space-y-6">
-                        <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-                            Unleash Your
-                            <span class="relative inline-block">
-                                <span class="bg-gradient-to-r from-red-500 via-orange-500 to-red-500 text-transparent bg-clip-text">Vehicle's</span>
-                                <svg class="absolute -bottom-2 sm:-bottom-3 lg:-bottom-4 left-0 w-full" viewBox="0 0 100 12" preserveAspectRatio="none">
-                                    <path d="M0,0 Q50,12 100,0" stroke="url(#gradient)" stroke-width="4" fill="none"/>
-                                    <defs>
-                                        <linearGradient id="gradient">
-                                            <stop offset="0%" stop-color="#EF4444"/>
-                                            <stop offset="50%" stop-color="#F97316"/>
-                                            <stop offset="100%" stop-color="#EF4444"/>
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                            </span>
-                            <br class="hidden sm:block">
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-200">Potential</span>
-                        </h1>
+    <!-- Hero Content Container -->
+    <div class="relative z-20 container mx-auto px-4">
+        <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full">
+            <!-- Left Column - Content -->
+            <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
+                        bg-black/20 border border-white/10 order-2 lg:order-1">
+                <div class="inline-flex items-center space-x-2 px-4 py-2 bg-red-600/20 backdrop-blur-sm rounded-full">
+                    <span class="animate-pulse w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span class="text-red-400 font-semibold">Professional ECU Remapping & Tuning</span>
+                </div>
 
-                        <p class="text-lg sm:text-xl text-gray-300 max-w-xl">
-                            Experience precision engineering and cutting-edge technology to maximize your vehicle's performance.
-                        </p>
+                <div class="space-y-6">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+                        Maximize
+                        <span class="relative inline-block">
+                            <span class="bg-gradient-to-r from-red-500 via-orange-500 to-red-500 text-transparent bg-clip-text">Power &</span>
+                            <svg class="absolute -bottom-2 sm:-bottom-3 lg:-bottom-4 left-0 w-full" viewBox="0 0 100 12" preserveAspectRatio="none">
+                                <path d="M0,0 Q50,12 100,0" stroke="url(#gradient)" stroke-width="4" fill="none"/>
+                                <defs>
+                                    <linearGradient id="gradient">
+                                        <stop offset="0%" stop-color="#EF4444"/>
+                                        <stop offset="50%" stop-color="#F97316"/>
+                                        <stop offset="100%" stop-color="#EF4444"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </span>
+                        <br class="hidden sm:block">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-200">Performance</span>
+                    </h1>
 
-                        <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 pt-4">
-                            <?php if(!isset($_SESSION['user_id'])): ?>
-                                <a href="register.php" 
-                                   class="group relative px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 rounded-xl 
-                                          font-semibold inline-flex items-center justify-center overflow-hidden">
-                                    <span class="relative z-10 flex items-center text-white">
-                                        Start Tuning Now
-                                        <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" 
-                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                        </svg>
-                                    </span>
-                                    <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-0 
-                                              group-hover:opacity-100 transition-opacity duration-300"></div>
-                                </a>
-                            <?php endif; ?>
-                            <a href="#features" 
-                               class="group px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl 
-                                      font-semibold inline-flex items-center justify-center hover:bg-white/20 transition-all">
-                                <span class="text-white flex items-center">
-                                    Explore Features
-                                    <svg class="w-5 h-5 ml-2 transform group-hover:translate-y-1 transition-transform" 
+                    <p class="text-lg sm:text-xl text-gray-300 max-w-xl">
+                        Custom ECU programming, turbo optimization, and precision mapping by certified automotive engineers.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 pt-4">
+                        <?php if(!isset($_SESSION['user_id'])): ?>
+                            <a href="register.php" 
+                               class="group relative px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 rounded-xl 
+                                      font-semibold inline-flex items-center justify-center overflow-hidden">
+                                <span class="relative z-10 flex items-center text-white">
+                                    Unlock Your Engine
+                                    <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" 
                                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                     </svg>
                                 </span>
+                                <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-0 
+                                          group-hover:opacity-100 transition-opacity duration-300"></div>
                             </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column - Stats -->
-                <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white space-y-8 backdrop-blur-lg 
-                            bg-black/20 border border-white/10 order-2 lg:order-1">
-                    <div class="stats-grid-card rounded-2xl p-6 h-full">
-                        <div class="grid grid-cols-2 gap-4">
-                            <?php
-                            $statsData = [
-                                [
-                                    'count' => $stats['tuned_files'], 
-                                    'label' => 'Tuned Vehicles', 
-                                    'icon' => 'M8.5 3.5l4.5 11h2l4.5-11M4 20h3.6l1.2-3h6.4l1.2 3H20M6 16l2-3m8 3l2-3M3 20h18M6.2 20h11.6M11 3.5h2M9.5 3.5C9.5 2.7 10.1 2 11 2h2c.9 0 1.5.7 1.5 1.5'
-                                ],
-                                [
-                                    'count' => $stats['active_tuners'], 
-                                    'label' => 'Expert Tuners', 
-                                    'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
-                                ],
-                                [
-                                    'count' => $stats['total_tunes'], 
-                                    'label' => 'Total Tunes', 
-                                    'icon' => 'M13 10V3L4 14h7v7l9-11h-7m2-4l2 2m-2-2l-2 2m8 8l-2-2m2 2l2-2M3 21l2-2m-2 2l-2-2'
-                                ],
-                                [
-                                    'count' => $stats['unique_models'], 
-                                    'label' => 'Car Models', 
-                                    'icon' => 'M17 16v2a2 2 0 01-2 2H9a2 2 0 01-2-2v-2m2-4h6m-6 0a2 2 0 00-2 2v2m0-4a2 2 0 012-2h6a2 2 0 012 2v2m0-4V8a2 2 0 00-2-2H9a2 2 0 00-2 2v2m12 0a2 2 0 00-2-2H9a2 2 0 00-2 2'
-                                ]
-                            ];
-
-                            foreach ($statsData as $stat): ?>
-                                <div class="group stat-item p-4">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="stat-icon">
-                                            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="<?= $stat['icon'] ?>"/>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <div class="stat-number count-up" data-count="<?= $stat['count'] ?>">0</div>
-                                            <div class="text-sm text-gray-400"><?= $stat['label'] ?></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
+                        <?php endif; ?>
+                        <a href="#features" 
+                           class="group px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl 
+                                  font-semibold inline-flex items-center justify-center hover:bg-white/20 transition-all">
+                            <span class="text-white flex items-center">
+                                View Performance Gains
+                                <svg class="w-5 h-5 ml-2 transform group-hover:translate-y-1 transition-transform" 
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                </svg>
+                            </span>
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <div class="p-2 rounded-full bg-white/10 backdrop-blur-sm">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            <!-- Right Column - Performance Graph SVG -->
+            <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white backdrop-blur-lg 
+                        bg-black/20 border border-white/10 order-1 lg:order-2">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">Performance Gains</h3>
+                    <div class="flex space-x-2">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                            <span class="text-sm text-gray-300">Tuned</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-gray-500 mr-2"></div>
+                            <span class="text-sm text-gray-300">Stock</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Custom SVG Performance Graph -->
+                <svg class="w-full h-64" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Graph background -->
+                    <rect x="0" y="0" width="400" height="200" fill="rgba(0,0,0,0.2)" rx="8" ry="8"/>
+                    
+                    <!-- Grid lines -->
+                    <g stroke="rgba(255,255,255,0.1)" stroke-width="1">
+                        <line x1="50" y1="20" x2="50" y2="180"/>
+                        <line x1="50" y1="180" x2="380" y2="180"/>
+                        
+                        <!-- Horizontal grid lines -->
+                        <line x1="50" y1="140" x2="380" y2="140" stroke-dasharray="2,2"/>
+                        <line x1="50" y1="100" x2="380" y2="100" stroke-dasharray="2,2"/>
+                        <line x1="50" y1="60" x2="380" y2="60" stroke-dasharray="2,2"/>
+                        <line x1="50" y1="20" x2="380" y2="20" stroke-dasharray="2,2"/>
+                        
+                        <!-- Vertical grid lines -->
+                        <line x1="132" y1="20" x2="132" y2="180" stroke-dasharray="2,2"/>
+                        <line x1="214" y1="20" x2="214" y2="180" stroke-dasharray="2,2"/>
+                        <line x1="296" y1="20" x2="296" y2="180" stroke-dasharray="2,2"/>
+                        <line x1="380" y1="20" x2="380" y2="180" stroke-dasharray="2,2"/>
+                    </g>
+                    
+                    <!-- Y-axis labels (Power) -->
+                    <text x="40" y="180" text-anchor="end" fill="white" font-size="10">0</text>
+                    <text x="40" y="140" text-anchor="end" fill="white" font-size="10">100</text>
+                    <text x="40" y="100" text-anchor="end" fill="white" font-size="10">200</text>
+                    <text x="40" y="60" text-anchor="end" fill="white" font-size="10">300</text>
+                    <text x="40" y="20" text-anchor="end" fill="white" font-size="10">400</text>
+                    
+                    <!-- X-axis labels (RPM) -->
+                    <text x="50" y="195" text-anchor="middle" fill="white" font-size="10">1000</text>
+                    <text x="132" y="195" text-anchor="middle" fill="white" font-size="10">2000</text>
+                    <text x="214" y="195" text-anchor="middle" fill="white" font-size="10">4000</text>
+                    <text x="296" y="195" text-anchor="middle" fill="white" font-size="10">6000</text>
+                    <text x="380" y="195" text-anchor="middle" fill="white" font-size="10">8000</text>
+                    
+                    <!-- Axis titles -->
+                    <text x="215" y="15" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Horsepower & Torque Curves</text>
+                    <text x="20" y="100" text-anchor="middle" fill="white" font-size="10" transform="rotate(-90, 20, 100)">Power (HP/TQ)</text>
+                    <text x="215" y="198" text-anchor="middle" fill="white" font-size="10">Engine RPM</text>
+                    
+                    <!-- Stock Power Curve -->
+                    <path d="M50,160 C80,130 120,110 180,100 S280,95 320,110 Q350,120 380,140" 
+                          fill="none" stroke="#6B7280" stroke-width="3"/>
+                    
+                    <!-- Tuned Power Curve -->
+                    <path d="M50,160 C90,120 130,90 190,65 S290,55 330,70 Q360,80 380,100" 
+                          fill="none" stroke="#EF4444" stroke-width="3"/>
+                          
+                    <!-- Stock Torque Curve (dashed) -->
+                    <path d="M50,140 C90,100 140,90 190,95 S280,115 330,150 Q360,165 380,180" 
+                          fill="none" stroke="#6B7280" stroke-width="3" stroke-dasharray="5,3"/>
+                    
+                    <!-- Tuned Torque Curve (dashed) -->
+                    <path d="M50,120 C90,80 140,60 190,70 S280,90 330,130 Q360,155 380,170" 
+                          fill="none" stroke="#EF4444" stroke-width="3" stroke-dasharray="5,3"/>
+                    
+                    <!-- Power gain highlights -->
+                    <g fill="rgba(239,68,68,0.2)">
+                        <path d="M190,65 L190,100 L100,100 L100,65 Z"/>
+                        <path d="M330,70 L330,110 L280,110 L280,70 Z"/>
+                    </g>
+                    
+                    <!-- Power gain labels -->
+                    <text x="145" y="85" text-anchor="middle" fill="white" font-size="10">+35%</text>
+                    <text x="305" y="95" text-anchor="middle" fill="white" font-size="10">+28%</text>
+                    
+                    <!-- Turbo boost indicator -->
+                    <circle cx="190" cy="65" r="5" fill="rgba(239,68,68,0.8)">
+                        <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <text x="190" y="55" text-anchor="middle" fill="white" font-size="8">Max Boost</text>
                 </svg>
+                
+                <div class="mt-6 flex justify-between">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-red-500">+35%</div>
+                        <div class="text-sm text-gray-400">Horsepower</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-red-500">+28%</div>
+                        <div class="text-sm text-gray-400">Torque</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-red-500">-15%</div>
+                        <div class="text-sm text-gray-400">Fuel Consumption</div>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div class="p-2 rounded-full bg-white/10 backdrop-blur-sm">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </div>
+</section>
 
     <!-- Features Section with 3D Cards -->
     <section id="features" class="relative overflow-hidden section-spacing backdrop-blur-sm bg-gradient-to-b from-slate-900/90 to-black/90 dark:from-gray-900/90 dark:to-black/90">
