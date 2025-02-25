@@ -31,6 +31,7 @@
     <!-- Performance Optimization -->
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preload" as="video" href="/src/videos/car-tuning.mp4" type="video/mp4">
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1RS47DBT8C"></script>
@@ -90,6 +91,46 @@
             localStorage.theme === "dark" ||
             (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
         );
+    </script>
+    
+<!-- ... existing head content ... -->
+    <!-- Preload Critical Resources -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    
+    <!-- Add these new preload tags -->
+    <link rel="preload" as="video" href="/src/videos/car-tuning.mp4" type="video/mp4">
+    
+    <!-- Add this script before closing head tag -->
+    <script>
+        // Video lazy loading and optimization
+        document.addEventListener('DOMContentLoaded', function() {
+            const lazyVideos = [].slice.call(document.querySelectorAll("video.lazy-video"));
+            
+            if ("IntersectionObserver" in window) {
+                const lazyVideoObserver = new IntersectionObserver(function(entries, observer) {
+                    entries.forEach(function(video) {
+                        if (video.isIntersecting) {
+                            for (const source in video.target.children) {
+                                const videoSource = video.target.children[source];
+                                if (typeof videoSource.tagName === "string" && videoSource.tagName === "SOURCE") {
+                                    videoSource.src = videoSource.dataset.src;
+                                }
+                            }
+
+                            video.target.load();
+                            video.target.classList.remove("lazy-video");
+                            lazyVideoObserver.unobserve(video.target);
+                        }
+                    });
+                });
+
+                lazyVideos.forEach(function(lazyVideo) {
+                    lazyVideoObserver.observe(lazyVideo);
+                });
+            }
+        });
     </script>
 </head>
 <body class="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">

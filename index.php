@@ -52,11 +52,46 @@ $stats = $stats->fetch_assoc();
     <!-- Video Background with Enhanced Overlay -->
     <div class="absolute inset-0">
         <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/85 to-black/80 z-10"></div>
-        <video class="w-full h-full object-cover" autoplay muted loop playsinline>
-            <source src="/src/videos/car-tuning.mp4" type="video/mp4">
+        <video class="w-full h-full object-cover lazy-video" 
+               autoplay muted loop playsinline 
+               poster="/src/images/video-poster.jpg"
+               preload="metadata">
+            <source data-src="/src/videos/car-tuning.mp4" type="video/mp4">
+            <!-- Fallback message -->
+            <p class="text-white">Your browser doesn't support HTML5 video.</p>
         </video>
+        <!-- Loading spinner -->
+        <div class="video-loading absolute inset-0 flex items-center justify-center bg-black/90 z-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+        </div>
     </div>
 
+    <!-- Add this script right after the video section -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.querySelector('video');
+            const loadingSpinner = document.querySelector('.video-loading');
+
+            // Hide loading spinner when video can play
+            video.addEventListener('canplay', function() {
+                loadingSpinner.style.display = 'none';
+            });
+
+            // Error handling
+            video.addEventListener('error', function() {
+                loadingSpinner.innerHTML = '<p class="text-white">Error loading video</p>';
+            });
+
+            // Performance optimization
+            video.addEventListener('loadedmetadata', function() {
+                // Reduce quality if on mobile or slow connection
+                if (navigator.connection && (navigator.connection.saveData || navigator.connection.effectiveType.includes('2g'))) {
+                    video.setAttribute('playsinline', '');
+                    video.setAttribute('preload', 'none');
+                }
+            });
+        });
+    </script>
     <!-- Custom SVG Background Elements -->
     <div class="absolute inset-0 z-10 pointer-events-none overflow-hidden">
         <!-- ECU Circuit Board Pattern -->
