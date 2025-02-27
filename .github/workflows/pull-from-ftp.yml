@@ -29,12 +29,13 @@ jobs:
             --exclude-glob .env* \
             --exclude-glob .gitignore \
             --exclude-glob .ftp \
-            --exclude-glob .htaccess \      
-            --exclude vendor/ \
-            --exclude logs/ \
-            --exclude uploads/ \
-            --exclude phpmyadmin \
             --exclude-glob .git/ \
+            --exclude-glob .htaccess \      
+            --exclude-glob vendor/ \
+            --exclude-glob logs/ \
+            --exclude-glob uploads/ \
+            --exclude-glob phpmyadmin \
+            
             $REMOTE_PATH $LOCAL_PATH
           quit
           EOF
