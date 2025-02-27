@@ -31,7 +31,7 @@ jobs:
             --exclude-glob .htaccess \
             --exclude-glob .git/ \
             --exclude-glob *.bak \
-            --exclude-glob *.ftp \
+            --exclude-glob *.ftpqouta \
             --exclude-glob *.zip \
             --exclude-glob *.exe \
             --exclude-glob vendor/ \
