@@ -28,7 +28,12 @@ jobs:
           mirror --verbose \
             --exclude-glob .env* \
             --exclude-glob .gitignore \
-            --exclude-glob .htaccess \
+            --exclude-glob .ftp \
+            --exclude-glob .htaccess \      
+            --exclude vendor/ \
+            --exclude logs/ \
+            --exclude uploads/ \
+            --exclude phpmyadmin \
             --exclude-glob .git/ \
             $REMOTE_PATH $LOCAL_PATH
           quit
