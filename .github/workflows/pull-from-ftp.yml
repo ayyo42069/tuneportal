@@ -1,0 +1,54 @@
+name: Pull Files from FTP
+
+# Trigger manually or on a schedule
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 0 * * *'  # Uncomment to run daily at midnight
+
+jobs:
+  pull-ftp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Mirror FTP directory
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE_PATH: "/"      
+          LOCAL_PATH: "./ftp-download"
+        run: |
+          mkdir -p $LOCAL_PATH
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" ftp://$FTP_SERVER <<EOF
+          mirror --verbose $REMOTE_PATH $LOCAL_PATH
+          quit
+          EOF
+
+      - name: Copy downloaded files to repository
+        run: |
+          # If you want to update the root of the repository with the downloaded files,
+          # you might need to adjust paths to avoid overwriting your workflow files.
+          cp -r ftp-download/* .
+
+      - name: Commit changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          # Only commit if there are changes
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Update from FTP on $(date)"
+          else
+            echo "No changes detected."
+          fi
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.G_TOKEN }}
