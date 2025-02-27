@@ -25,6 +25,7 @@ jobs:
           REMOTE_PATH: "/"  # Change this if needed
         run: |
           lftp -u "$FTP_USERNAME","$FTP_PASSWORD" ftp://$FTP_SERVER <<EOF
-          mirror --reverse --verbose --exclude .git/ ./ $REMOTE_PATH
+          mirror --reverse --verbose --exclude .git/ --exclude vendor/ ./ $REMOTE_PATH
           quit
           EOF
+
