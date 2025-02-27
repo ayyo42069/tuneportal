@@ -1,21 +1,27 @@
-name: Pull Files from FTP
+name: Push Files to FTP
 
 on:
   workflow_dispatch:
   # schedule:
-  #   - cron: '0 0 * * *'  # Uncomment to run daily at midnight
+  #   - cron: '0 0 * * *'
 
 jobs:
   pull-ftp:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Mirror FTP directory (Exclude sensitive files)
+      - name: Mirror FTP directory to workspace (Secure)
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -30,26 +36,39 @@ jobs:
             --exclude-glob .gitignore \
             --exclude-glob .htaccess \
             --exclude-glob .git/ \
+            --exclude-glob *.bak \
+            --exclude-glob .ftpquota* \
+            --exclude-glob *.zip \
+            --exclude-glob *.exe \
+            --exclude-glob *.log \
+            --exclude vendor/ \
+            --exclude logs/ \
+            --exclude uploads/ \
+            --exclude phpmyadmin/ \
+            --exclude .well-known/ \
             $REMOTE_PATH $LOCAL_PATH
           quit
           EOF
 
-      - name: Copy downloaded files to repository
+      - name: Copy downloaded files to repository root
         run: |
-          # Copy while preserving existing sensitive files
-          cp -r ftp-download/* .
+          if [ -d "ftp-download" ]; then
+            cp -rn ftp-download/* . || echo "No files to copy or copy failed."
+          else
+            echo "ftp-download directory not found."
+          fi
 
-      - name: Commit changes
+      - name: Secure Commit changes
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           
-          # Explicitly avoid adding sensitive files that might have been modified locally
+          # Add all changes then explicitly reset sensitive files
           git add .
-          git reset -- .env* .gitignore .htaccess
+          git reset -- .env* .gitignore .htaccess *.bak *.log
           
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Update from FTP on $(date)"
+            git commit -m "Secure update from FTP on $(date)"
           else
             echo "No changes detected."
           fi
