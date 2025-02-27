@@ -1,4 +1,4 @@
-name: Pull Files from FTP
+name: Push Files to FTP
 
 # You can trigger this workflow manually or on a schedule:
 on:
