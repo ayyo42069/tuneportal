@@ -31,10 +31,12 @@ jobs:
             --exclude-glob .htaccess \
             --exclude-glob .git/ \
             --exclude-glob *.bak \
-            --exclude-glob *.ftpqouta \
+            --exclude-glob .ftpqouta* \
             --exclude-glob *.zip \
             --exclude-glob *.exe \
             --exclude-glob vendor/ \
+            --exclude-glob logs/ \
+            --exclude-glob .well-know/ \
             $REMOTE_PATH $LOCAL_PATH
           quit
           EOF
