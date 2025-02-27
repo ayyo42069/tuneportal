@@ -1,0 +1,537 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+/* Custom base styles */
+@layer base {
+  body {
+    @apply font-sans text-gray-800 bg-gray-50 dark:text-gray-100 dark:bg-gray-900 transition-all duration-300;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold text-gray-900 dark:text-white tracking-tight;
+  }
+
+  h1 {
+    @apply text-5xl lg:text-7xl leading-tight;
+  }
+
+  h2 {
+    @apply text-4xl lg:text-5xl leading-tight;
+  }
+
+  h3 {
+    @apply text-3xl lg:text-4xl;
+  }
+
+  a {
+    @apply text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 
+           transition-all duration-300 relative;
+  }
+
+  /* Enhanced link hover effect */
+  a.nav-link {
+    @apply relative overflow-hidden;
+  }
+
+  a.nav-link::after {
+    @apply content-[''] absolute bottom-0 left-0 w-0 h-0.5 bg-red-500 
+           transition-all duration-300 ease-in-out;
+  }
+
+  a.nav-link:hover::after {
+    @apply w-full;
+  }
+}
+
+/* Custom components */
+@layer components {
+  .btn-primary {
+    @apply px-8 py-4 bg-red-600 text-white rounded-xl font-semibold 
+           hover:bg-red-700 active:bg-red-800
+           transition-all duration-300 transform hover:scale-[1.02] 
+           shadow-lg shadow-red-600/30 dark:shadow-red-900/30
+           focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
+           dark:focus:ring-offset-gray-900;
+  }
+
+  .btn-secondary {
+    @apply px-8 py-4 border-2 border-gray-300 text-gray-800 dark:border-gray-600 dark:text-white 
+           rounded-xl font-semibold hover:bg-gray-100 dark:hover:bg-gray-700/50
+           transition-all duration-300 backdrop-blur-sm
+           focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2
+           dark:focus:ring-offset-gray-900;
+  }
+
+  .card {
+    @apply backdrop-blur-xl bg-white/90 dark:bg-gray-800/90 rounded-2xl p-8 
+           border border-gray-200/50 dark:border-gray-700/50
+           shadow-xl shadow-gray-200/50 dark:shadow-black/20
+           transition-all duration-500 hover:shadow-2xl;
+  }
+
+  .feature-card {
+    @apply p-8 bg-white dark:bg-gray-800 rounded-2xl 
+           hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100
+           dark:hover:from-gray-800 dark:hover:to-gray-700
+           transition-all duration-500 transform hover:-translate-y-1
+           shadow-lg hover:shadow-xl border border-gray-100 dark:border-gray-700;
+  }
+
+  .stat-card {
+    @apply text-center p-6 bg-white/80 dark:bg-gray-800/80 rounded-2xl
+           border border-gray-200/50 dark:border-gray-700/50
+           shadow-lg backdrop-blur-lg
+           transition-all duration-300 hover:transform hover:scale-[1.02];
+  }
+
+  /* New glass-morphism card */
+  .glass-card {
+    @apply relative backdrop-blur-xl bg-white/10 dark:bg-gray-800/10
+           rounded-2xl p-8 border border-white/20 dark:border-gray-700/20
+           shadow-xl transition-all duration-500
+           hover:bg-white/20 dark:hover:bg-gray-800/20;
+  }
+
+  /* Enhanced dark mode toggle */
+  .dark-mode-toggle {
+    @apply p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700
+           transition-colors duration-300 focus:outline-none
+           focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600;
+  }
+}
+/* Custom utilities */
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-red-600 via-orange-500 to-red-500 
+           dark:from-red-500 dark:via-orange-400 dark:to-red-400
+           text-transparent bg-clip-text;
+    background-size: 200% auto;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 0.6s;
+  }
+
+  .shadow-soft {
+    @apply shadow-[0_4px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)];
+  }
+
+  .backdrop-blur-xl {
+    @apply backdrop-blur-[20px];
+  }
+}
+
+/* Enhanced animations */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes gradientBackground {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Enhanced gradients and backgrounds */
+.bg-gradient-hero {
+  @apply bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50
+         dark:from-gray-900 dark:via-gray-800 dark:to-gray-900;
+  background-size: 200% auto;
+}
+
+.bg-gradient-cta {
+  @apply bg-gradient-to-br from-red-600 via-orange-500 to-red-500
+         dark:from-red-700 dark:via-orange-600 dark:to-red-600;
+  background-size: 200% auto;
+}
+
+/* Remove this class as we're using direct background-size */
+/* .bg-300% {
+  background-size: 300% 300%;
+} */
+
+/* Particle effects */
+.particle-background {
+  @apply absolute inset-0 opacity-30 pointer-events-none;
+}
+
+/* New animations */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 15s ease infinite;
+}
+/* Add these new glass effect classes */
+.glass-hero {
+  @apply backdrop-blur-xl bg-black/20 
+         border border-white/10 
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+         transition-all duration-500;
+}
+
+.glass-card {
+  @apply backdrop-blur-2xl bg-white/5
+         border border-white/10
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+         transition-all duration-500;
+}
+
+.glass-feature {
+  @apply backdrop-blur-xl bg-slate-800/50
+         border border-white/5
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+         transition-all duration-500;
+}
+
+.stats-card {
+  backdrop-filter: blur(20px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.01)
+  );
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+}
+
+/* Update the particle background */
+.particle-background {
+  @apply absolute inset-0 opacity-40 pointer-events-none;
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
+}
+
+/* Enhanced animations for glass effects */
+@keyframes glassShine {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.glass-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: glassShine 8s infinite;
+}
+
+/* Section spacing and transitions */
+.section-spacing {
+  @apply py-24 lg:py-32;
+  position: relative;
+}
+
+.section-spacing::before {
+  content: "";
+  @apply absolute left-0 right-0 h-24 -top-24 bg-gradient-to-b;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1));
+  pointer-events: none;
+}
+
+.section-spacing::after {
+  content: "";
+  @apply absolute left-0 right-0 h-24 -bottom-24 bg-gradient-to-t;
+  background: linear-gradient(to top, transparent, rgba(0, 0, 0, 0.1));
+  pointer-events: none;
+}
+
+/* Dark mode adjustments */
+.dark .section-spacing::before,
+.dark .section-spacing::after {
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.2));
+}
+/* Header specific styles */
+.glass-button {
+  @apply backdrop-blur-sm bg-white/10 dark:bg-gray-800/10
+         border border-white/20 dark:border-gray-700/20
+         hover:bg-white/20 dark:hover:bg-gray-700/20
+         text-gray-700 dark:text-gray-300
+         transition-all duration-300;
+}
+
+.glass-button-primary {
+  @apply backdrop-blur-sm bg-red-500/90 
+         border border-red-400/30
+         hover:bg-red-600/90
+         text-white
+         transition-all duration-300
+         shadow-lg shadow-red-500/30;
+}
+
+.glass-button-secondary {
+  @apply backdrop-blur-sm bg-gray-500/10 
+         border border-gray-400/30
+         hover:bg-gray-600/20
+         text-gray-700 dark:text-gray-300
+         transition-all duration-300;
+}
+
+.glass-icon {
+  @apply backdrop-blur-md bg-white/10 dark:bg-gray-800/10
+         border border-white/20 dark:border-gray-700/20
+         shadow-lg;
+}
+
+.glass-dropdown {
+  @apply backdrop-blur-xl bg-white/90 dark:bg-gray-800/90
+         border-b border-white/10 dark:border-gray-700/20
+         shadow-lg;
+}
+
+.mobile-nav-link {
+  @apply hover:bg-gray-100/50 dark:hover:bg-gray-700/50
+         text-gray-700 dark:text-gray-300
+         transition-all duration-300;
+}
+
+/* Enhanced nav link animation */
+.nav-link {
+  @apply relative overflow-hidden;
+}
+
+.nav-link::after {
+  @apply content-[''] absolute bottom-0 left-0 w-0 h-0.5 
+         bg-gradient-to-r from-red-500 to-orange-500
+         transition-all duration-300 ease-out;
+}
+
+.nav-link:hover::after {
+  @apply w-full;
+}
+/* Footer specific styles */
+.glass-social-button {
+  @apply w-10 h-10 flex items-center justify-center
+         backdrop-blur-sm bg-white/10 dark:bg-gray-800/10
+         border border-white/20 dark:border-gray-700/20
+         rounded-xl text-gray-600 dark:text-gray-400
+         hover:bg-red-500/10 hover:text-red-500
+         dark:hover:bg-red-500/10 dark:hover:text-red-500
+         transition-all duration-300 transform hover:scale-110;
+}
+
+.glass-icon-sm {
+  @apply w-8 h-8 flex items-center justify-center
+         backdrop-blur-sm bg-white/10 dark:bg-gray-800/10
+         border border-white/20 dark:border-gray-700/20
+         rounded-lg text-red-500
+         group-hover:bg-red-500/10
+         transition-all duration-300;
+}
+
+.glass-dot {
+  @apply w-2 h-2 mr-2 rounded-full
+         bg-red-500/50 
+         group-hover:bg-red-500
+         transition-all duration-300;
+}
+
+.footer-link {
+  @apply text-gray-600 dark:text-gray-300
+         hover:text-red-500 dark:hover:text-red-500
+         transition-all duration-300;
+}
+
+/* Sidebar specific styles */
+.glass-nav-item {
+  @apply flex items-center px-4 py-2.5 rounded-xl
+         text-gray-700 dark:text-gray-300
+         hover:bg-white/20 dark:hover:bg-gray-700/20
+         backdrop-blur-sm
+         transition-all duration-300;
+}
+
+.active-nav-item {
+  @apply bg-red-500/10 text-red-600 dark:text-red-400
+         border border-red-500/20
+         shadow-sm shadow-red-500/10;
+}
+
+.glass-menu-item {
+  @apply block px-4 py-2 text-sm
+         text-gray-700 dark:text-gray-300
+         hover:bg-white/20 dark:hover:bg-gray-700/20
+         transition-all duration-300;
+}
+
+/* Enhanced sidebar animations */
+#sidebar {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Sidebar scroll customization */
+#sidebar nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+#sidebar nav::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+#sidebar nav::-webkit-scrollbar-thumb {
+  @apply bg-gray-300/50 dark:bg-gray-600/50 rounded-full;
+}
+
+/* Form specific styles */
+.glass-input {
+  @apply appearance-none relative block w-full px-4 py-3
+         backdrop-blur-sm bg-white/5 dark:bg-gray-800/5
+         border border-gray-200/20 dark:border-gray-700/20
+         rounded-xl
+         text-gray-900 dark:text-white
+         placeholder-gray-500 dark:placeholder-gray-400
+         focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50
+         transition-all duration-300;
+}
+
+/* Update existing glass-card for auth pages */
+.auth-card {
+  @apply backdrop-blur-xl 
+         bg-white/10 dark:bg-gray-800/10
+         rounded-2xl p-8
+         border border-white/20 dark:border-gray-700/20
+         shadow-[0_8px_32px_-5px_rgba(0,0,0,0.1)]
+         dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]
+         transition-all duration-500;
+}
+
+/* Enhanced gradient background */
+.bg-gradient-hero {
+  @apply bg-gradient-to-br from-gray-50 via-white to-gray-100
+         dark:from-gray-900 dark:via-gray-800 dark:to-gray-900;
+  background-size: 200% 200%;
+  animation: gradientAnimation 15s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-300/50 dark:bg-gray-600/50 rounded-full 
+         hover:bg-gray-400/50 dark:hover:bg-gray-500/50 
+         transition-colors duration-300;
+}
+
+/* Add these new styles for stats card */
+.stats-grid-card {
+  @apply backdrop-blur-xl bg-black/20 
+         border border-white/10 
+         shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+         transition-all duration-500;
+}
+
+.stat-item {
+  @apply relative overflow-hidden rounded-xl
+         backdrop-blur-md bg-white/5
+         border border-white/10
+         transition-all duration-300
+         hover:bg-white/10;
+}
+
+.stat-icon {
+  @apply relative z-10 w-10 h-10
+         flex items-center justify-center
+         bg-gradient-to-br from-red-500/20 to-orange-500/20
+         rounded-lg transition-all duration-300
+         group-hover:scale-110;
+}
+
+.stat-number {
+  @apply text-2xl lg:text-3xl font-bold
+         bg-gradient-to-r from-white to-gray-300
+         text-transparent bg-clip-text
+         transition-all duration-300
+         group-hover:scale-105;
+}

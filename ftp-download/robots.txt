@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /src/
+Disallow: /vendor/
+Disallow: /cgi-bin/
+Disallow: /*?*
+Disallow: /update_theme.php
+
+# Prevent access to sensitive files
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.txt$
+Disallow: /*.yml$
+Disallow: /*.ini$
+Disallow: /*.log$
+
+# Allow sitemap
+Allow: /sitemap.xml
+
+# Sitemap location
+Sitemap: https://tuneportal.germanywestcentral.cloudapp.azure.com/sitemap.xml
+
+# Crawl-delay for all bots
+Crawl-delay: 10
