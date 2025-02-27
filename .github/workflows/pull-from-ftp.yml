@@ -8,9 +8,15 @@ on:
 jobs:
   pull-ftp:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
@@ -31,20 +37,26 @@ jobs:
             --exclude-glob .htaccess \
             --exclude-glob .git/ \
             --exclude-glob *.bak \
-            --exclude-glob .ftpqouta* \
+            --exclude-glob .ftpquota* \
             --exclude-glob *.zip \
             --exclude-glob *.exe \
-            --exclude-glob vendor/ \
-            --exclude-glob logs/ \
-            --exclude-glob .well-know/ \
+            --exclude-glob *.log \
+            --exclude vendor/ \
+            --exclude logs/ \
+            --exclude uploads/ \
+            --exclude phpmyadmin/ \
+            --exclude .well-known/ \
             $REMOTE_PATH $LOCAL_PATH
           quit
           EOF
 
       - name: Copy downloaded files to repository root
         run: |
-          # Copy while preserving existing sensitive files
-          cp -rn ftp-download/* . || true
+          if [ -d "ftp-download" ]; then
+            cp -rn ftp-download/* . || echo "No files to copy or copy failed."
+          else
+            echo "ftp-download directory not found."
+          fi
 
       - name: Secure Commit changes
         run: |
@@ -53,7 +65,7 @@ jobs:
           
           # Add all changes then explicitly reset sensitive files
           git add .
-          git reset -- .env* .gitignore .htaccess *.bak
+          git reset -- .env* .gitignore .htaccess *.bak *.log
           
           if ! git diff-index --quiet HEAD; then
             git commit -m "Secure update from FTP on $(date)"
