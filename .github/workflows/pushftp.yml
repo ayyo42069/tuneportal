@@ -1,0 +1,50 @@
+name: Pull Files from FTP
+
+# You can trigger this workflow manually or on a schedule:
+on:
+  workflow_dispatch:
+  # Uncomment below to run on a schedule (every day at midnight, for example)
+  # schedule:
+  #   - cron: '0 0 * * *'
+
+jobs:
+  pull-ftp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Mirror FTP directory to workspace
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE_PATH: "/"      # Adjust to the remote directory you wish to pull
+          LOCAL_PATH: "./ftp-download"     # Local directory to mirror files into
+        run: |
+          mkdir -p $LOCAL_PATH
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" ftp://$FTP_SERVER <<EOF
+          mirror --verbose $REMOTE_PATH $LOCAL_PATH
+          quit
+          EOF
+
+      - name: Copy downloaded files to repository root
+        run: |
+          # Adjust this if you want to place files somewhere else
+          cp -r ftp-download/* .
+
+      - name: Commit changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          # Only commit if there are changes; exit code 1 means nothing to commit.
+          git diff-index --quiet HEAD || git commit -m "Update files from FTP"
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.G_TOKEN }}
