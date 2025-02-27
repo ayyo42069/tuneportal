@@ -1,6 +1,5 @@
 name: Pull Files from FTP
 
-# Trigger manually or on a schedule
 on:
   workflow_dispatch:
   # schedule:
@@ -16,32 +15,39 @@ jobs:
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Mirror FTP directory
+      - name: Mirror FTP directory (Exclude sensitive files)
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          REMOTE_PATH: "/"      
+          REMOTE_PATH: "/"
           LOCAL_PATH: "./ftp-download"
         run: |
           mkdir -p $LOCAL_PATH
           lftp -u "$FTP_USERNAME","$FTP_PASSWORD" ftp://$FTP_SERVER <<EOF
-          mirror --verbose $REMOTE_PATH $LOCAL_PATH
+          mirror --verbose \
+            --exclude-glob .env* \
+            --exclude-glob .gitignore \
+            --exclude-glob .htaccess \
+            --exclude-glob .git/ \
+            $REMOTE_PATH $LOCAL_PATH
           quit
           EOF
 
       - name: Copy downloaded files to repository
         run: |
-          # If you want to update the root of the repository with the downloaded files,
-          # you might need to adjust paths to avoid overwriting your workflow files.
+          # Copy while preserving existing sensitive files
           cp -r ftp-download/* .
 
       - name: Commit changes
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          
+          # Explicitly avoid adding sensitive files that might have been modified locally
           git add .
-          # Only commit if there are changes
+          git reset -- .env* .gitignore .htaccess
+          
           if ! git diff-index --quiet HEAD; then
             git commit -m "Update from FTP on $(date)"
           else
