@@ -1,9 +1,9 @@
-name: Pull Files from FTP
+name: Push Files to FTP
 
 on:
   workflow_dispatch:
   # schedule:
-  #   - cron: '0 0 * * *'  # Uncomment to run daily at midnight
+  #   - cron: '0 0 * * *'
 
 jobs:
   pull-ftp:
@@ -15,7 +15,7 @@ jobs:
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
 
-      - name: Mirror FTP directory (Exclude sensitive files)
+      - name: Mirror FTP directory to workspace (Secure)
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -28,34 +28,33 @@ jobs:
           mirror --verbose \
             --exclude-glob .env* \
             --exclude-glob .gitignore \
-            --exclude-glob .ftp \
+            --exclude-glob .htaccess \
             --exclude-glob .git/ \
-            --exclude-glob .htaccess \      
+            --exclude-glob *.bak \
+            --exclude-glob *.ftp \
+            --exclude-glob *.zip \
+            --exclude-glob *.exe \
             --exclude-glob vendor/ \
-            --exclude-glob logs/ \
-            --exclude-glob uploads/ \
-            --exclude-glob phpmyadmin \
-            
             $REMOTE_PATH $LOCAL_PATH
           quit
           EOF
 
-      - name: Copy downloaded files to repository
+      - name: Copy downloaded files to repository root
         run: |
           # Copy while preserving existing sensitive files
-          cp -r ftp-download/* .
+          cp -rn ftp-download/* . || true
 
-      - name: Commit changes
+      - name: Secure Commit changes
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           
-          # Explicitly avoid adding sensitive files that might have been modified locally
+          # Add all changes then explicitly reset sensitive files
           git add .
-          git reset -- .env* .gitignore .htaccess
+          git reset -- .env* .gitignore .htaccess *.bak
           
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Update from FTP on $(date)"
+            git commit -m "Secure update from FTP on $(date)"
           else
             echo "No changes detected."
           fi
@@ -63,4 +62,4 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
-          github_token: ${{ secrets.G_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
