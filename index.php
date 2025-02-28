@@ -179,6 +179,25 @@ $stats = $stats->fetch_assoc();
     .close-modal:hover {
         color: #EF4444;
     }
+    /* Add to existing styles */
+#engine-view svg {
+    transform: scale(1.2) translateY(20px);
+    overflow: visible;
+}
+
+.engine-block {
+    transform-origin: center;
+    filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.3));
+}
+
+.tuning-hotspots {
+    pointer-events: bounding-box;
+}
+
+.tuning-info {
+    transform: translateY(-20px);
+    backdrop-filter: blur(5px);
+}
 </style>
 
 <main class="flex-grow pt-0">
@@ -294,8 +313,9 @@ $stats = $stats->fetch_assoc();
 
                 <!-- Right Column - Interactive 3D Engine Model -->
                 <div class="glass-hero p-6 sm:p-8 lg:p-10 rounded-3xl text-white backdrop-blur-lg 
-                            bg-black/20 border border-white/10 order-1 lg:order-2 card-hover-effect">
-                    <div class="flex justify-between items-center mb-6">
+            bg-black/20 border border-white/10 order-1 lg:order-2 card-hover-effect
+            min-h-[500px]"> <!-- Added minimum height -->
+    <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-semibold bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">Interactive Performance</h3>
                         <div class="flex space-x-2">
                             <button id="view-dyno" class="px-3 py-1 bg-red-600/30 rounded-lg text-sm text-white hover:bg-red-600/50 transition-colors">
@@ -308,9 +328,10 @@ $stats = $stats->fetch_assoc();
                     </div>
                     
                     <!-- Interactive Engine/Dyno Container -->
-                    <div class="relative h-80 w-full">
+                    <div class="relative h-[500px] w-full"> 
                         <!-- Dyno Chart View (Default) -->
-                        <div id="dyno-view" class="absolute inset-0">
+                        <div id="dyno-view" class="absolute inset-0 h-full w-full">
+
                             <!-- Custom SVG Performance Graph -->
                             <svg class="w-full h-full" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
                                 <!-- Graph background -->
@@ -419,9 +440,11 @@ $stats = $stats->fetch_assoc();
                         </div>
                         
                         <!-- 3D Engine View (Hidden by default) -->
-                        <div id="engine-view" class="absolute inset-0 hidden">
+                        <div id="engine-view" class="absolute inset-0 h-full w-full hidden">
                             <!-- 3D Engine SVG -->
-                            <svg class="w-full h-full" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                            <div class="h-full w-full scale-[0.8] transform"> <!-- Scaled down container -->
+                <svg class="w-full h-full" viewBox="0 0 400 300" 
+                     preserveAspectRatio="xMidYMid meet">
                                 <!-- Engine Block -->
                                 <g class="engine-block" opacity="0">
                                     <animate attributeName="opacity" from="0" to="1" dur="1s" fill="freeze" />
@@ -497,6 +520,7 @@ $stats = $stats->fetch_assoc();
                                     <text x="60" y="100" fill="#999" font-size="12" class="info-desc">Custom engine management for optimal performance</text>
                                 </g>
                             </svg>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -699,11 +723,16 @@ $stats = $stats->fetch_assoc();
             });
 
             engineBtn.addEventListener('click', function() {
-                engineView.classList.remove('hidden');
-                dynoView.classList.add('hidden');
-                engineBtn.classList.add('bg-red-600/50');
-                dynoBtn.classList.remove('bg-red-600/50');
-            });
+    engineView.classList.remove('hidden');
+    dynoView.classList.add('hidden');
+    engineBtn.classList.add('bg-red-600/50');
+    dynoBtn.classList.remove('bg-red-600/50');
+    
+    // Force redraw and restart animations
+    void engineView.offsetWidth;
+    const svg = engineView.querySelector('svg');
+    svg.dispatchEvent(new Event('load'));
+});
 
             // Engine Hotspots Interaction
             const hotspots = document.querySelectorAll('.hotspot');
