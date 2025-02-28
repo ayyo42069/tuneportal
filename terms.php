@@ -8,12 +8,12 @@
     <div class="space-y-6 text-gray-700 dark:text-gray-300 overflow-y-auto custom-scrollbar flex-1 pr-4">
                 <section class="space-y-4">
                     <h2 class="text-xl font-semibold text-gradient">1. Acceptance of Terms</h2>
-                    <p>By accessing and using TunePortal, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our services.</p>
+                    <p>By accessing and using Tuning Portal, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our services.</p>
                 </section>
 
                 <section class="space-y-4">
                     <h2 class="text-xl font-semibold text-gradient">2. Service Description</h2>
-                    <p>TunePortal provides automotive tuning file services. We offer:</p>
+                    <p>Tuning Portal provides automotive tuning file services. We offer:</p>
                     <ul class="list-disc pl-6 space-y-2">
                         <li>ECU file modifications</li>
                         <li>Performance tuning services</li>
@@ -51,7 +51,7 @@
 
                 <section class="space-y-4">
                     <h2 class="text-xl font-semibold text-gradient">6. Limitation of Liability</h2>
-                    <p>TunePortal is not liable for:</p>
+                    <p>Tuning Portal is not liable for:</p>
                     <ul class="list-disc pl-6 space-y-2">
                         <li>Vehicle damage resulting from modifications</li>
                         <li>Loss of warranty coverage</li>

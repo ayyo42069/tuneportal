@@ -1,4 +1,4 @@
-# TunePortal 🚗
+# Tuning Portal 🚗
 
 A secure platform for automotive ECU tuning file distribution and management. Designed for tuning professionals and automotive enthusiasts.
 
@@ -42,7 +42,7 @@ A secure platform for automotive ECU tuning file distribution and management. De
 
 ## 📂 Project Structure
 
-    tuneportal/
+    Tuning Portal/
     ├── admin/              # Administrative interfaces
     ├── includes/           # Core functionality
     │   ├── encryption.php

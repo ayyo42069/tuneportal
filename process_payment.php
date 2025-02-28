@@ -24,7 +24,7 @@ try {
                 'unit_amount' => $package['price'] * 100, // Convert to cents
                 'product_data' => [
                     'name' => $package['description'],
-                    'description' => 'Credits for TunePortal services',
+                    'description' => 'Credits for Tuning Portal services',
                 ],
             ],
             'quantity' => 1,

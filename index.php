@@ -327,7 +327,7 @@ $stats = $stats->fetch_assoc();
         <div class="absolute inset-0 bg-[url('/src/images/grid-pattern.svg')] opacity-5"></div>
         <div class="container mx-auto px-4 relative z-10">
             <div class="text-center mb-20">
-                <h2 class="text-5xl font-bold text-white mb-6">Why Choose TunePortal?</h2>
+                <h2 class="text-5xl font-bold text-white mb-6">Why Choose Tuning Portal?</h2>
                 <div class="w-24 h-1 bg-gradient-to-r from-red-500 to-orange-500 mx-auto rounded-full"></div>
             </div>
             

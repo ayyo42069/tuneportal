@@ -21,7 +21,7 @@ $footerClass = $isDashboard ? 'lg:ml-64' : 'w-full';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-bold bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">TunePortal</h3>
+                        <h3 class="text-xl font-bold bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">Tuning Portal</h3>
                     </div>
                     <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
                         Unlock your vehicle's full potential with professional-grade tuning solutions.
@@ -89,7 +89,7 @@ $footerClass = $isDashboard ? 'lg:ml-64' : 'w-full';
         <!-- Copyright section -->
         <div class="border-t border-white/10 dark:border-gray-700/20 py-4">
             <p class="text-center text-gray-600 dark:text-gray-300">
-                &copy; <?= date('Y') ?> TunePortal. All rights reserved.
+                &copy; <?= date('Y') ?> Tuning Portal. All rights reserved.
             </p>
         </div>
     </div>

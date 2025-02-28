@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TunePortal - Automotive Tuning Platform</title>
+    <title>Tuning Portal - Automotive Tuning Platform</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="TunePortal - Your premier platform for automotive tuning solutions, custom maps, and professional tuning services">
+    <meta name="description" content="Tuning Portal - Your premier platform for automotive tuning solutions, custom maps, and professional tuning services">
     <meta name="keywords" content="automotive tuning, car tuning, ECU mapping, performance tuning, engine tuning">
-    <meta name="author" content="TunePortal">
+    <meta name="author" content="Tuning Portal">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph / Social Media Meta Tags -->
-    <meta property="og:title" content="TunePortal - Automotive Tuning Platform">
+    <meta property="og:title" content="Tuning Portal - Automotive Tuning Platform">
     <meta property="og:description" content="Professional automotive tuning solutions and services">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://tuning-portal.eu">
@@ -159,7 +159,7 @@
                         </svg>
                     </div>
                     <span class="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">
-                        TunePortal
+                    Tuning Portal
                     </span>
                 </a>
             </div>
