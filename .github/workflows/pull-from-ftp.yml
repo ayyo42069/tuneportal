@@ -1,4 +1,4 @@
-name: Push Files to FTP
+name: Pull Files to FTP
 
 on:
   workflow_dispatch:
