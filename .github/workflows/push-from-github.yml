@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master  # Adjust if using another branch
+    paths-ignore:
+      - "README.md"
+      - ".github/**"
+      - "*.md"
 jobs:
   push-ftp:
     runs-on: ubuntu-latest
@@ -12,6 +16,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Fetch all history for file change detection
+      
+      - name: Get changed files
+        id: changed-files
+        run: |
+          echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | wc -l)" >> $GITHUB_ENV
       
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
@@ -23,23 +32,56 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           REMOTE_PATH: "/"  # Change this if needed
         run: |
+          # Skip FTP upload if no files changed (except for manual trigger)
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$CHANGED_FILES" -eq "0" ]; then
+            echo "No files changed, skipping FTP upload"
+            exit 0
+          fi
+          
           # Set options to continue on error to prevent workflow failure
           set +e
+          
+          # Log start time for performance tracking
+          echo "Starting FTP upload at $(date)"
           
           # Create a more optimized mirror command with additional options
           lftp -u "$FTP_USERNAME","$FTP_PASSWORD" ftp://$FTP_SERVER <<EOF
           # Set transfer options
           set ftp:ssl-allow true
           set ssl:verify-certificate no
-          set net:max-retries 3
-          set net:timeout 10
+          set net:max-retries 5
+          set net:timeout 15
+          set net:reconnect-interval-base 5
+          set net:reconnect-interval-multiplier 1
+          set mirror:parallel-transfer-count 5
+          
+          # Create log of transferred files
+          set xfer:log true
+          set xfer:log-file /tmp/lftp-transfer.log
           
           # Only upload newer files, preserve timestamps, and show progress
-          mirror --reverse --verbose --only-newer --no-perms --exclude .git/ --exclude vendor/ --exclude .github/ ./ $REMOTE_PATH
+          mirror --reverse --verbose --only-newer --no-perms --parallel=5 \
+            --exclude-glob .git/ --exclude-glob vendor/ --exclude-glob .github/ \
+            --exclude-glob node_modules/ --exclude-glob .DS_Store --exclude-glob *.log \
+            --exclude-glob .env* --exclude-glob *.tmp --exclude-glob *.bak \
+            ./ $REMOTE_PATH
           
           # Exit gracefully
           bye
           EOF
           
+          # Check if transfer log exists and display summary
+          if [ -f "/tmp/lftp-transfer.log" ]; then
+            echo "Transfer summary:"
+            cat /tmp/lftp-transfer.log
+          fi
+          
+          echo "FTP upload completed at $(date)"
+          
           # Always exit with success code
           exit 0
+      
+      - name: Post-upload notification
+        if: always()
+        run: |
+          echo "FTP upload job completed. Status: ${{ job.status }}"
