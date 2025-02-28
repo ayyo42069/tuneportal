@@ -13,39 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Fetch all history
-
-      - name: Set up deployment state tracking
-        id: deployment-state
+          fetch-depth: 0  # Fetch all history for file change detection
+      
+      - name: Get changed files
+        id: changed-files
         run: |
-          # Create a directory to store deployment state
-          mkdir -p .deployment
-          
-          # Create or read the last deployment commit hash
-          if [ -f ".deployment/last_deployed_commit" ]; then
-            LAST_DEPLOYED_COMMIT=$(cat .deployment/last_deployed_commit)
-          else
-            # If this is the first deployment, use the parent of the first commit
-            LAST_DEPLOYED_COMMIT=$(git rev-list --max-parents=0 HEAD)
-          fi
-          echo "LAST_DEPLOYED_COMMIT=$LAST_DEPLOYED_COMMIT" >> $GITHUB_ENV
-          
-          # Get list of changed files since last deployment
-          git diff --name-only $LAST_DEPLOYED_COMMIT HEAD > .deployment/changed_files.txt
-          
-          # Count changed files
-          CHANGED_FILES_COUNT=$(cat .deployment/changed_files.txt | wc -l)
-          echo "CHANGED_FILES_COUNT=$CHANGED_FILES_COUNT" >> $GITHUB_ENV
-          
-          # Store current commit as the new last deployed commit
-          git rev-parse HEAD > .deployment/last_deployed_commit
+          echo "CHANGED_FILES=$(git diff --name-only HEAD^ HEAD | wc -l)" >> $GITHUB_ENV
       
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
       
-      - name: Upload only changed files to FTP
+      - name: Upload files from GitHub to FTP
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
@@ -53,69 +33,55 @@ jobs:
           REMOTE_PATH: "/"  # Change this if needed
         run: |
           # Skip FTP upload if no files changed (except for manual trigger)
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$CHANGED_FILES_COUNT" -eq "0" ]; then
-            echo "No files changed since last deployment, skipping FTP upload"
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ "$CHANGED_FILES" -eq "0" ]; then
+            echo "No files changed, skipping FTP upload"
             exit 0
           fi
           
           # Set options to continue on error to prevent workflow failure
           set +e
           
-          # Log start time and changed files for debugging
+          # Log start time for performance tracking
           echo "Starting FTP upload at $(date)"
-          echo "Uploading $CHANGED_FILES_COUNT changed files since last deployment"
-          cat .deployment/changed_files.txt
           
-          # Create script for uploading only changed files
-          echo "open -u \"$FTP_USERNAME\",\"$FTP_PASSWORD\" ftp://$FTP_SERVER" > ftp_script.txt
-          echo "set ftp:ssl-allow true" >> ftp_script.txt
-          echo "set ssl:verify-certificate no" >> ftp_script.txt
-          echo "set net:max-retries 5" >> ftp_script.txt
-          echo "set net:timeout 15" >> ftp_script.txt
-          echo "set net:reconnect-interval-base 5" >> ftp_script.txt
-          echo "set net:reconnect-interval-multiplier 1" >> ftp_script.txt
+          # Create a more optimized mirror command with additional options
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" ftp://$FTP_SERVER <<EOF
+          # Set transfer options
+          set ftp:ssl-allow true
+          set ssl:verify-certificate no
+          set net:max-retries 5
+          set net:timeout 15
+          set net:reconnect-interval-base 5
+          set net:reconnect-interval-multiplier 1
+          set mirror:parallel-transfer-count 5
           
-          # Process each changed file individually
-          cat .deployment/changed_files.txt | grep -v -E '(^\.git/|^vendor/|^\.github/|^node_modules/|\.DS_Store$|\.log$|^\.env|\.tmp$|\.bak$)' | while read file; do
-            if [ -f "$file" ]; then
-              # Create directory structure if needed
-              dir=$(dirname "$file")
-              if [ "$dir" != "." ]; then
-                echo "mkdir -p \"$REMOTE_PATH/$dir\"" >> ftp_script.txt
-              fi
-              # Upload the file
-              echo "put \"$file\" \"$REMOTE_PATH/$file\"" >> ftp_script.txt
-            fi
-          done
+          # Create log of transferred files
+          set xfer:log true
+          set xfer:log-file /tmp/lftp-transfer.log
           
-          echo "bye" >> ftp_script.txt
+          # Only upload newer files, preserve timestamps, and show progress
+          mirror --reverse --verbose --only-newer --no-perms --parallel=5 \
+            --exclude-glob .git/ --exclude-glob vendor/ --exclude-glob .github/ \
+            --exclude-glob node_modules/ --exclude-glob .DS_Store --exclude-glob *.log \
+            --exclude-glob .env* --exclude-glob *.tmp --exclude-glob *.bak \
+            ./ $REMOTE_PATH
           
-          # Execute the FTP script
-          lftp -f ftp_script.txt
+          # Exit gracefully
+          bye
+          EOF
+          
+          # Check if transfer log exists and display summary
+          if [ -f "/tmp/lftp-transfer.log" ]; then
+            echo "Transfer summary:"
+            cat /tmp/lftp-transfer.log
+          fi
           
           echo "FTP upload completed at $(date)"
-          
-          # Save the deployment state to GitHub artifacts
-          if [ "${{ github.event_name }}" == "push" ]; then
-            # This ensures we track successful deployments only on regular pushes
-            mkdir -p deployment-state
-            cp .deployment/last_deployed_commit deployment-state/
-          fi
           
           # Always exit with success code
           exit 0
       
-      - name: Upload deployment state
-        if: github.event_name == 'push'
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-state
-          path: deployment-state/
-          retention-days: 1
-      
-      - name: Download previous deployment state
-        if: github.event_name == 'push'
-        uses: actions/download-artifact@v4
-        with:
-          name: deployment-state
-          path: .deployment/
+      - name: Post-upload notification
+        if: always()
+        run: |
+          echo "FTP upload job completed. Status: ${{ job.status }}"
