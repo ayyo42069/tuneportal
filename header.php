@@ -159,7 +159,7 @@
                         </svg>
                     </div>
                     <span class="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">
-                    Tuning Portal  
+                    Tuning Portal
                     </span>
                 </a>
             </div>
