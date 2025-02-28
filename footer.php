@@ -66,11 +66,11 @@ $footerClass = $isDashboard ? 'lg:ml-64' : 'w-full';
                         Contact
                     </h4>
                     <div class="space-y-4">
-                        <a href="mailto:support@tuneportal.com" class="footer-link group flex items-center space-x-3">
+                        <a href="mailto:support@tuning-portal.eu" class="footer-link group flex items-center space-x-3">
                             <span class="glass-icon-sm">
                                 <i class="fas fa-envelope"></i>
                             </span>
-                            <span>support@tuneportal.com</span>
+                            <span>support@tuning-portal.eu</span>
                         </a>
                         <a href="tel:+15551234567" class="footer-link group flex items-center space-x-3">
                             <span class="glass-icon-sm">

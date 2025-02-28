@@ -30,8 +30,8 @@ try {
             'quantity' => 1,
         ]],
         'mode' => 'payment',
-        'success_url' => 'https://tuneportal.germanywestcentral.cloudapp.azure.com/payment_success.php?session_id={CHECKOUT_SESSION_ID}',
-        'cancel_url' => 'https://tuneportal.germanywestcentral.cloudapp.azure.com/credits.php',
+        'success_url' => 'https://tuning-portal.eu/payment_success.php?session_id={CHECKOUT_SESSION_ID}',
+        'cancel_url' => 'https://tuning-portal.eu/credits.php',
         'metadata' => [
             'user_id' => $_SESSION['user_id'],
             'credits' => $package['credits']

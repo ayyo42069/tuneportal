@@ -15,8 +15,8 @@
     <meta property="og:title" content="TunePortal - Automotive Tuning Platform">
     <meta property="og:description" content="Professional automotive tuning solutions and services">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tuneportal.germanywestcentral.cloudapp.azure.com">
-    <meta property="og:image" content="https://tuneportal.germanywestcentral.cloudapp.azure.com/logo.png">
+    <meta property="og:url" content="https://tuning-portal.eu">
+    <meta property="og:image" content="https://tuning-portal.eulogo.png">
     
     <!-- Existing CSS -->
     <link href="/src/css/tailwind.css" rel="stylesheet">

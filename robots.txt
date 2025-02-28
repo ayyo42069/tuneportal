@@ -20,7 +20,7 @@ Disallow: /*.log$
 Allow: /sitemap.xml
 
 # Sitemap location
-Sitemap: https://tuneportal.germanywestcentral.cloudapp.azure.com/sitemap.xml
+Sitemap: https://tuning-portal.eu/sitemap.xml
 
 # Crawl-delay for all bots
 Crawl-delay: 10
