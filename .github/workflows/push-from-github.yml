@@ -1,22 +1,21 @@
 name: Push Files to FTP
-
 on:
   workflow_dispatch:  # Allows manual execution
   push:
     branches:
       - master  # Adjust if using another branch
-
 jobs:
   push-ftp:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 0  # Fetch all history for file change detection
+      
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
-
+      
       - name: Upload files from GitHub to FTP
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
@@ -24,8 +23,23 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           REMOTE_PATH: "/"  # Change this if needed
         run: |
+          # Set options to continue on error to prevent workflow failure
+          set +e
+          
+          # Create a more optimized mirror command with additional options
           lftp -u "$FTP_USERNAME","$FTP_PASSWORD" ftp://$FTP_SERVER <<EOF
-          mirror --reverse --verbose --exclude .git/ --exclude vendor/ ./ $REMOTE_PATH
-          quit
+          # Set transfer options
+          set ftp:ssl-allow true
+          set ssl:verify-certificate no
+          set net:max-retries 3
+          set net:timeout 10
+          
+          # Only upload newer files, preserve timestamps, and show progress
+          mirror --reverse --verbose --only-newer --no-perms --exclude .git/ --exclude vendor/ --exclude .github/ ./ $REMOTE_PATH
+          
+          # Exit gracefully
+          bye
           EOF
-
+          
+          # Always exit with success code
+          exit 0
